@@ -1,0 +1,6 @@
+Function: name
+----------------------------------
+
+This function is deprecated, use [term](#term) instead.
+
+

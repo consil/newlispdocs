@@ -1,0 +1,18 @@
+Function: gammai
+------------------------------------
+
+#### syntax: (gammai *num-a* *num-b*)
+
+Calculates the incomplete Gamma function of values *a* and *b* in
+*num-a* and *num-b*, respectively.
+
+    (gammai 4 5)  → 0.7349740847
+
+The incomplete Gamma function is used to derive the probability of Chi²
+to exceed a given value for a degree of freedom, df, as follows:
+
+> ***Q(Chi²|df) = Q(df/2, Chi²/2) = gammai(df/2, Chi²/2)***
+
+See also the [prob-chi2](#prob-chi2) function.
+
+

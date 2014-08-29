@@ -1,0 +1,18 @@
+Function: global?
+-------------------------------------
+
+#### syntax: (global? *sym*)
+
+Checks if symbol in *sym* is global. Built-in functions, context
+symbols, and all symbols made global using the function
+[global](#global) are global:
+
+    global? 'print)   → true
+    (global 'var)     → var
+    (global? 'var)    → true
+
+    (constant (global 'foo))
+
+    (global? 'foo)    → true
+
+

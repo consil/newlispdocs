@@ -1,0 +1,43 @@
+Function: char
+--------------------------------------------------------
+
+#### syntax: (char *str* [*int-index* [true]])\
+ syntax: (char *int*)
+
+Given a string argument, extracts the character at *int-index* from
+*str*, returning either the ASCII value of that character or the Unicode
+value on UTF-8 enabled versions of newLISP.
+
+If *int-index* is omitted, 0 (zero) is assumed. If *int-idx* is followed
+by a boolean `true` value, than the index treats *str* as an 8-bit byte
+array instead of an array of multi-byte UTF-8 characters.
+
+The empty string returns `nil`. Both `(char 0)` and `(char nil)` will
+return `"\000"`.
+
+See [Indexing elements of strings and lists](#indexing).
+
+Given an integer argument, `char` returns a string containing the ASCII
+character with value *int*.
+
+On UTF-8–enabled versions of newLISP, the value in *int* is taken as
+Unicode and a UTF-8 character is returned.
+
+    (char "ABC")          → 65  ; ASCII code for "A"
+    (char "ABC" 1)        → 66  ; ASCII code for "B"
+    (char "ABC" -1)       → 67  ; ASCII code for "C"
+    (char "B")            → 66  ; ASCII code for "B"
+    (char "Ω")            → 937 ; UTF-8 code for "Ω"
+    (char "Ω" 1 true)     → 169 ; byte value at offset 1
+
+    (char 65)  → "A"
+    (char 66)  → "B"
+
+    (char (char 65))  → 65      ; two inverse applications
+
+    (map char (sequence 1 255))  ; returns current character set
+
+    ; The Zen of UTF-8
+    (char (& (char "生") (char "死"))) → 愛 ; by @kosh_bot
+
+

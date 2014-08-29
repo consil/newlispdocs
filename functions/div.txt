@@ -1,0 +1,19 @@
+Function: div
+---------------------------------
+
+#### syntax: (div *num-1* *num-2* [*num-3* ... ])\
+ syntax: (div *num-1*)
+
+Successively divides *num-1* by the number in *num-2—*. `div` can
+perform mixed-type arithmetic, but it always returns floating point
+numbers. Any floating point calculation with `NaN` also returns `NaN`.
+
+    (div 10 3)                 → 3.333333333
+    (div 120 (sub 9.0 6) 100)  → 0.4
+
+    (div 10)                   → 0.1
+
+When *num-1* is the only argument, `div` calculates the inverse of
+*num-1*.
+
+

@@ -1,0 +1,65 @@
+Function: map
+---------------------------------
+
+#### syntax: (map *exp-functor* *list-args-1* [*list-args-2* ... ])
+
+Successively applies the primitive function, defined function, or lambda
+expression *exp-functor* to the arguments specified in *list-args-1
+list-args-2—*, returning all results in a list. Since version 10.5.5
+*list-args* can also be array vectors, but the returned result will
+always be a list.
+
+    (map + '(1 2 3) '(50 60 70))  → (51 62 73)
+
+    (map if '(true nil true nil true) '(1 2 3 4 5) '(6 7 8 9 10))
+    → '(1 7 3 9 5)
+
+    (map (fn (x y) (* x y)) '(3 4) '(20 10))
+    → (60 40)
+
+The second example shows how to dynamically create a function for `map`:
+
+    (define (foo op p) 
+        (append (lambda (x)) (list (list op p 'x))))
+
+We can also use the shorter `fn`:
+
+    (define (foo op p) 
+        (append (fn (x)) (list (list op p 'x))))
+
+`foo` now works like a function-maker:
+
+    (foo 'add 2)  → (lambda (x) (add 2 x))
+
+    (map (foo add 2) '(1 2 3 4 5))  → (3 4 5 6 7)
+
+    (map (foo mul 3) '(1 2 3 4 5))  → (3 6 9 12 15)
+
+Note that the quote before the operand can be omitted because primitives
+evaluate to themselves in newLISP.
+
+By incorporating `map` into the function definition, we can do the
+following:
+
+    (define (list-map op p lst) 
+        (map (lambda (x) (op p x)) lst))
+
+    (list-map + 2 '(1 2 3 4))  → (3 4 5 6)
+
+    (list-map mul 1.5 '(1 2 3 4))  → (1.5 3 4.5 6)
+
+`map` also sets the internal list index `$idx`.
+
+    (map (fn (x) (list $idx x)) '(a b c)) → ((0 a) (1 b) (2 c))
+
+The number of arguments used is determined by the length of the first
+argument list. Arguments missing in other argument lists cause map to
+stop collecting parameters for that level of arguments. This ensures
+that the nth parameter list gets converted to the nth column during the
+transposition occurring. If an argument list contains too many elements,
+the extra ones will be ignored.
+
+Special forms which use parentheses as syntax cannot be mapped (i.e.
+[case](#case)).
+
+

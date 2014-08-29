@@ -1,0 +1,11 @@
+Function: acos
+----------------------------------
+
+#### syntax: (acos *num-radians*)
+
+The arc-cosine function is calculated from the number in *num-radians*.
+
+    (acos 1)  → 0
+    (cos (acos 1)) → 1
+
+

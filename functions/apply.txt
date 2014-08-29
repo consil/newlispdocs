@@ -1,0 +1,51 @@
+Function: apply
+-----------------------------------
+
+#### syntax: (apply *func* *list* [*int-reduce*])
+
+Applies the contents of *func* (primitive, user-defined function, or
+lambda expression) to the arguments in *list*. Only functions and
+operators with standard evaluation of their arguments can be applied.
+
+    (apply + '(1 2 3 4))                   → 10
+    (set 'aList '(3 4 5))                  → (3 4 5)
+    (apply * aList)                        → 60
+    (apply sqrt '(25))                     → 5
+    (apply (lambda (x y) (* x y)) '(3 4))  → 12
+
+The *int-reduce* parameter can optionally contain the number of
+arguments taken by the function in *func*. In this case, *func* will be
+repeatedly applied using the previous result as the first argument and
+taking the other arguments required successively from *list* (in
+left-associative order). For example, if `op` takes two arguments, then:
+
+    (apply op '(1 2 3 4 5) 2)
+
+    ;; is equivalent to
+
+    (op (op (op (op 1 2) 3) 4) 5)
+
+    ;; find the greatest common divisor 
+    ;; of two or more integers 
+    ;; note that newLISP already has a gcd function
+
+    (define (gcd_ a b)
+        (let (r (% b a))
+            (if (= r 0) a (gcd_ r a))))
+
+    (define-macro (my-gcd)
+        (apply gcd_ (map eval (args)) 2))
+
+    (my-gcd 12 18 6)    → 6
+    (my-gcd 12 18 6 4)  → 2
+
+The last example shows how `apply`'s *reduce* functionality can be used
+to convert a two-argument function into one that takes multiple
+arguments. Note, that a built-in [gcd](#gcd) is available.
+
+`apply` should only be used on functions and operators that evaluate all
+of their arguments, not on *special forms* like [dotimes](#dotimes) or
+[case](#case), which evaluate only some of their arguments. Doing so
+will cause the function to fail.
+
+

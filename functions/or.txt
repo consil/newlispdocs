@@ -1,0 +1,17 @@
+Function: or
+--------------------------------
+
+#### syntax: (or *exp-1* [*exp-2* ... ])
+
+Evaluates expressions *exp-x* from left to right until finding a result
+that does not evaluate to `nil` or the empty list `()`. The result is
+the return value of the `or` expression.
+
+    (set 'x 10)
+    (or (> x 100) (= x 10))          → true
+    (or "hello" (> x 100) (= x 10))  → "hello"
+    (or '())                         → ()
+    (or true)                        → true
+    (or)                             → nil
+
+

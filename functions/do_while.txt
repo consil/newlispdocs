@@ -1,0 +1,30 @@
+Function: do-while
+--------------------------------------
+
+#### syntax: (do-while *exp-condition body*)
+
+The expressions in *body* are evaluated before *exp-condition* is
+evaluated. If the evaluation of *exp-condition* is `nil`, then the
+`do-while` expression is finished; otherwise the expressions in *body*
+get evaluated again. Note that `do-while` evaluates the conditional
+expression *after* evaluating the body expressions, whereas
+[while](#while) checks the condition *before* evaluating the body. The
+return value of the `do-while` expression is the last evaluation of the
+*body* expression.
+
+`do-while` also updates the system iterator symbol `$idx`.
+
+    (set 'x 10)
+    (do-while (< x 10) (inc x))
+    x  → 11
+
+    (set 'x 10)
+    (while (< x 10) (inc x)) 
+    x  → 10
+
+While `do-while` goes through the loop at least once, [while](#while)
+never enters the loop.
+
+See also the functions [until](#until) and [do-until](#do-until).
+
+

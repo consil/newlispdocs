@@ -1,0 +1,15 @@
+Function: crit-f
+------------------------------------
+
+#### syntax: (crit-f *num-probability* *int-df1* *int-df2*)
+
+Calculates the critical minimum *F * for a given confidence probability
+*num-probability* under the null hypothesis and the degrees of freedom
+given in *int-df1* and *int-df2* for testing the significance of a
+statistical null hypothesis using the *F-test*.
+
+    (crit-f 0.05 10 12)  → 2.753386727
+
+See also the inverse function [prob-f](#prob-f).
+
+

@@ -1,0 +1,41 @@
+Function: doargs
+------------------------------------
+
+#### syntax: (doargs (*sym* [*exp-break*]) *body*)
+
+Iterates through all members of the argument list inside a user-defined
+function or macro. This function or macro can be defined using
+[define](#define), [define-macro](#define-macro), [lambda](#lambda), or
+[lambda-macro](#lambda-macro). The variable in *sym* is set sequentially
+to all members in the argument list until the list is exhausted or an
+optional break expression (defined in *exp-break*) evaluates to `true`
+or a logical true value. The `doargs` expression always returns the
+result of the last evaluation.
+
+`doargs` also updates the system iterator symbol `$idx`.
+
+    (define (foo)
+        (doargs (i) (println i)))
+
+    > (foo 1 2 3 4)
+    1
+    2
+    3
+    4
+
+The optional break expression causes `doargs` to interrupt processing of
+the arguments:
+
+    (define-macro (foo)
+        (doargs (i (= i 'x)) 
+            (println i)))
+
+    > (foo a b x c d e)
+    a
+    b
+    true
+
+Use the [args](#args) function to access the entire argument list at
+once.
+
+

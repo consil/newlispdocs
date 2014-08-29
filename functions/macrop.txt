@@ -1,0 +1,17 @@
+Function: macro?
+------------------------------------
+
+#### syntax: (macro? *exp*)
+
+Returns `true` if *exp* evaluates to a lambda-macro expression;
+otherwise, `nil` is returned.
+
+    (define-macro (mysetq lv rv) (set lv (eval rv)))
+
+    (macro? mysetq)  → true
+
+    (macro (my-setq Lv Rv) (set 'Lv Rv))
+
+    (macro? my-setq) → true
+
+

@@ -1,0 +1,35 @@
+Function: dup
+---------------------------------
+
+#### syntax: (dup *exp* *int-n* [*bool*])\
+ syntax: (dup *exp*)
+
+If the expression in *exp* evaluates to a string, it will be replicated
+*int-n* times within a string and returned. When specifying an
+expression evaluating to anything other than `nil` in *bool*, the string
+will not be concatenated but replicated in a list like any other data
+type.
+
+If *exp* contains any data type other than string, the returned list
+will contain *int-n* evaluations of *exp*.
+
+Without the repetition parameter, `dup` assumes 2.
+
+    (dup "A" 6)       → "AAAAAA"
+    (dup "A" 6 true)  → ("A" "A" "A" "A" "A" "A")
+    (dup "A" 0)       → ""
+    (dup "AB" 5)      → "ABABABABAB"
+    (dup 9 7)         → (9 9 9 9 9 9 9)
+    (dup 9 0)         → ()
+    (dup 'x 8)        → (x x x x x x x x)
+    (dup '(1 2) 3)    → ((1 2) (1 2) (1 2))
+    (dup "\000" 4)    → "\000\000\000\000"
+
+    (dup "*")         → "**"
+
+The last example shows handling of binary information, creating a string
+filled with four binary zeroes.
+
+See also the functions [sequence](#sequence) and [series](#series).
+
+

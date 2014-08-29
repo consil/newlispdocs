@@ -1,0 +1,26 @@
+Function: join
+----------------------------------
+
+#### syntax: (join *list-of-strings* [*str-joint* [*bool-trail-joint*]])
+
+Concatenates the given list of strings in *list-of-strings*. If
+*str-joint* is present, it is inserted between each string in the join.
+If *bool-trail-joint* is `true` then a joint string is also appended to
+the last string.
+
+    (set 'lst '("this" "is" "a" "sentence"))
+
+    (join lst " ")  → "this is a sentence"
+
+    (join (map string (slice (now) 0 3)) "-")  → "2003-11-26"
+
+    (join (explode "keep it together"))  → "keep it together"
+
+    (join '("A" "B" "C") "-")         → "A-B-C"
+    (join '("A" "B" "C") "-" true)    → "A-B-C-"
+
+See also the [append](#append), [string](#string), and
+[explode](#explode) functions, which are the inverse of the `join`
+operation.
+
+

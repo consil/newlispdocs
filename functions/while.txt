@@ -1,0 +1,23 @@
+Function: while
+-----------------------------------
+
+#### syntax: (while *exp-condition* *body*)
+
+Evaluates the condition in *exp-condition*. If the result is not `nil`
+or the empty list `()`, the expressions in *body* are evaluated.
+Evaluation is repeated until an *exp-condition* results in `nil` or the
+empty list `()`. The result of the body's last evaluated expression is
+the return value of the `while` expression.
+
+`while` also updates the system iterator symbol `$idx`.
+
+    (device (open "somefile.txt" "read"))
+    (set 'line-count 0)
+    (while (read-line) (inc line-count))
+    (close (device))
+    (print "the file has " line-count " lines\n")
+
+Use the [do-while](#do-while) function to evaluate the condition *after*
+evaluating the body of expressions.
+
+

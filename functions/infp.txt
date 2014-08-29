@@ -1,0 +1,17 @@
+Function: inf?
+----------------------------------
+
+#### syntax: (inf? *float*)
+
+If the value in *float* is infinite the function returns `true` else
+`nil`.
+
+    (inf? (div 1 0)) → true
+
+    (div 0 0) → NaN
+
+Note that an integer division by zero e.g. `(/ 1 0)` will throw an
+"division by zero" error and not yield infinity. See also [NaN?](#NaNp)
+to check if a floating point number is valid.
+
+

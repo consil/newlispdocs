@@ -1,0 +1,15 @@
+Function: not
+---------------------------------
+
+#### syntax: (not *exp*)
+
+If *exp* evaluates to `nil` or the empty list `()`, then `true` is
+returned; otherwise, `nil` is returned.
+
+    (not true)            → nil
+    (not nil)             → true
+    (not '())             → true
+    (not (< 1 10))        → nil
+    (not (not (< 1 10)))  → true
+
+

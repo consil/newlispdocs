@@ -1,0 +1,53 @@
+Function: load
+----------------------------------
+
+#### syntax: (load *str-file-name-1* [*str-file-name-2* ... ] [*sym-context*])
+
+Loads and translates newLISP from a source file specified in one or more
+*str-file-name* and evaluates the expressions contained in the file(s).
+When loading is successful, `load` returns the result of the last
+expression in the last file evaluated. If a file cannot be loaded,
+`load` throws an error.
+
+An optional *sym-context* can be specified, which becomes the context of
+evaluation, unless such a context switch is already present in the file
+being loaded. By default, files which do not contain [context](#context)
+switches will be loaded into the `MAIN` context.
+
+The *str-file-name* specs can contain URLs. Both `http://` and
+` file://` URLs are supported.
+
+    (load "myfile.lsp")    
+
+    (load "a-file.lsp" "b-file.lsp") 
+
+    (load "file.lsp" "http://mysite.org/mypro")
+
+    (load "http://192.168.0.21:6000//home/test/program.lsp")
+
+    (load "a-file.lsp" "b-file.lsp" 'MyCTX)
+
+    (load "file:///usr/share/newlisp/mysql.lsp")
+
+In case expressions evaluated during the `load` are changing the
+[context](#context), this will not influence the programming module
+doing the `load`.
+
+The current context after the `load` statement will always be the same
+as before the `load`.
+
+Normal file specs and URLs can be mixed in the same load command.
+
+`load` with `HTTP` URLs can also be used to load code remotely from
+newLISP server nodes running on a Unix-like operating system. In this
+mode, `load` will issue an HTTP GET request to the target URL. Note that
+a double backslash is required when path names are specified relative to
+the root directory. `load` in `HTTP` mode will observe a 60-second
+timeout.
+
+The second to last line causes the files to be loaded into the context
+`MyCTX`. The quote forces the context to be created if it did not exist.
+
+The `file://` URL is followed by a third `/` for the directory spec.
+
+

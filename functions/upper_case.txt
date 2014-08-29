@@ -1,0 +1,14 @@
+Function: upper-case
+--------------------------------------------------------------
+
+#### syntax: (upper-case *str*)
+
+Returns a copy of the string in *str* converted to uppercase.
+International characters are converted correctly.
+
+    (upper-case "hello world")  → "HELLO WORLD"
+
+See also the [lower-case](#lower-case) and [title-case](#title-case)
+functions.
+
+

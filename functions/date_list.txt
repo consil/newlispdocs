@@ -1,0 +1,26 @@
+Function: date-list
+---------------------------------------
+
+#### syntax: (date-list *int-seconds* [*int-index*])
+
+Returns a list of year, month, date, hours, minutes, seconds, day of
+year and day of week from a time value given in seconds after January
+1st, 1970 00:00:00. The date and time values aren given as UTC, which
+may differ from the local timezone.
+
+The week-day value ranges from 1 to 7 for Monday thru Sunday.
+
+    (date-list 1282479244)      → (2010 8 22 12 14 4 234 1)
+    (date-list 1282479244 0)    → 2010 ; year
+    (date-list 1282479244 -2)   → 234  ; day of year
+
+    (apply date-value (date-list 1282479244)) → 1282479244
+
+    (date-list 0)   → (1970 1 1 0 0 0 1 4) ; Thursday 1st, Jan 1970
+
+A second optional *int-index* parameter can be used to return a specific
+member of the list.
+
+`date-list` is the inverse operation of [date-value](#date-value).
+
+

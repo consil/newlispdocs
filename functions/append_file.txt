@@ -1,0 +1,36 @@
+Function: append-file
+-----------------------------------------
+
+#### syntax: (append-file *str-filename* *str-buffer*)
+
+Works similarly to [write-file](#write-file), but the content in
+*str-buffer* is appended if the file in *str-filename* exists. If the
+file does not exist, it is created (in this case, `append-file` works
+identically to [write-file](#write-file)). This function returns the
+number of bytes written.
+
+On failure the function returns `nil`. For error information, use
+[sys-error](#sys-error) when used on files. When used on URLs
+[net-error](#net-error) gives more error information.
+
+    (write-file "myfile.txt" "ABC") 
+    (append-file "myfile.txt" "DEF")
+
+    (read-file "myfile.txt")  → "ABCDEF"
+
+`append-file` can take a `http://` or `file://` URL in *str-file-name*.
+In case of the `http://` prefix , `append-file` works exactly like
+[put-url](#put-url) with `"Pragma: append\r\n"` in the header option and
+can take the same additional parameters. The `"Pragma: append\r\n"`
+option is supplied automatically.
+
+    (append-file "http://asite.com/message.txt" "More message text.")
+
+The file `message.txt` is appended at a remote location
+`http://asite.com` with the contents of *str-buffer*. If the file does
+not yet exist, it will be created. In this mode, `append-file` can also
+be used to transfer files to remote newLISP server nodes.
+
+See also [read-file](#read-file) and [write-file](#write-file).
+
+

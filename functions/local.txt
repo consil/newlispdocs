@@ -1,0 +1,15 @@
+Function: local
+-----------------------------------
+
+#### syntax: (local (*sym-1* [*sym-2* ... ]) *body*)
+
+Initializes one or more symbols in *sym-1—* to `nil`, evaluates the
+expressions in *body*, and returns the result of the last evaluation.
+
+`local` works similarly to [let](#let), but local variables are all
+initialized to `nil`.
+
+`local` provides a simple way to localize variables without explicit
+initialization.
+
+

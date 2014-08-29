@@ -1,0 +1,41 @@
+Function: open
+----------------------------------
+
+#### syntax: (open *str-path-file* *str-access-mode* [*str-option*])
+
+The *str-path-file* is a file name, and *str-access-mode* is a string
+specifying the file access mode. `open` returns an integer, which is a
+file handle to be used on subsequent read or write operations on the
+file. On failure, `open` returns `nil`. The access mode `"write"`
+creates the file if it doesn't exist, or it truncates an existing file
+to `0` (zero) bytes in length.
+
+The following strings are legal access modes:
+
+`"read"` or `"r"` for read only access\
+ `"write"` or `"w"` for write only access\
+ `"update"` or `"u"` for read/write access\
+ `"append"` or `"a"` for append read/write access\
+
+    (device (open "newfile.data" "write"))  → 5
+    (print "hello world\n")  → "hello world"
+    (close (device))         → 5
+
+    (set 'aFile (open "newfile.data" "read"))
+    (seek aFile 6)
+    (set 'inChar (read-char aFile))
+    (print inChar "\n")
+    (close aFile)
+
+The first example uses `open` to set the device for [print](#print) and
+writes the word `"hello world"` into the file `newfile.data`. The second
+example reads a byte value at offset 6 in the same file (the ASCII value
+of `'w'` is 119). Note that using `close` on [(device)](#device)
+automatically resets [device](#device) to `0` (zero).
+
+As an additional *str-option*, `"non-block"` or `"n"` can be specified
+after the `"read"` or `"write"` option. Only available on Unix systems,
+non-blocking mode can be useful when opening *named pipes* but is not
+required to perform I/O on named pipes.
+
+

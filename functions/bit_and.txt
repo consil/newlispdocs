@@ -1,0 +1,11 @@
+Function: &
+-------------------------------
+
+#### syntax: (& *int-1* *int-2* [*int-3* ... ])
+
+A bitwise `and` operation is performed on the number in *int-1* with the
+number in *int-2*, then successively with *int-3*, etc.
+
+    (& 0xAABB 0x000F)  → 11  ; which is 0xB
+
+

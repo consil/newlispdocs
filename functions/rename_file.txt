@@ -1,0 +1,12 @@
+Function: rename-file
+-----------------------------------------
+
+#### syntax: (rename-file *str-path-old* *str-path-new*)
+
+Renames a file or directory entry given in the path name *str-path-old*
+to the name given in *str-path-new*. Returns `nil` or `true` depending
+on the operation's success.
+
+    (rename-file "data.lisp" "data.backup")
+
+

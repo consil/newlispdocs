@@ -1,0 +1,29 @@
+Function: dotree
+------------------------------------
+
+#### syntax: (dotree (*sym* *sym-context* [*bool*]) *body*)
+
+The expressions in *body* are evaluated for all symbols in
+*sym-context*. The symbols are accessed in a sorted order. Before each
+evaluation of the body expression(s), the variable in *sym* is set to
+the next symbol from *sym-context*. The variable used as the loop index
+is local to the `dotree` expression and behaves according the rules of
+dynamic scoping.
+
+When the optional *bool* expression evaluates to not `nil`, only symbols
+starting with an underscore character `_` are accessed. Symbol names
+starting with an `_` underscore are used for [hash keys](#hash) and
+symbols created by [bayes-train](#bayes-train).
+
+`dotree` also updates the system iterator symbol `$idx`.
+
+    ;; faster and less memory overhead
+    (dotree (s SomeCTX) (print s " "))
+
+    ;; slower and higher memory usage
+    (dolist (s (symbols SomeCTX)) (print s " "))
+
+This example prints the names of all symbols inside SomeCTX to the
+console window.
+
+

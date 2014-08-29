@@ -1,0 +1,116 @@
+Function: json-parse
+----------------------------------------
+
+#### syntax: (json-parse *str-json-data*)
+
+This function parses JSON formatted text and translated it to newLISP
+S-expressions. All data types conforming to the ECMA-262 standard are
+translated. The resulting lists from JSON object data can be processed
+using [assoc](#assoc), [lookup](#lookup) and [ref](#ref).
+
+The following example shows a nested JSON object from a file
+`person.json`:
+
+    {
+    "name": "John Smith",
+    "age": 32,
+    "employed": true,
+    "address": {
+    "street": "701 First Ave.",
+    "city": "Sunnyvale, CA 95125",
+    "country": "United States"
+    },
+    "children": [
+    {
+        "name": "Richard",
+        "age": 7
+    },
+    {
+        "name": "Susan",
+        "age": 4
+    },
+    {
+        "name": "James",
+        "age": 3
+    }
+    ]
+    }
+
+The file is read, parsed and the resulting S-expression stored in `jsp`:
+
+    (set 'jsp (json-parse (read-file "person.json")))
+    →
+    ( ("name" "John Smith") 
+    ("age" 32) 
+    ("employed" true) 
+    ("address" ( ("street" "701 First Ave.") 
+           ("city" "Sunnyvale, CA 95125") 
+           ("country" "United States")) ) 
+    ("children" (
+    (("name" "Richard") ("age" 7)) 
+    (("name" "Susan") ("age" 4)) 
+    (("name" "James") ("age" 3))) )
+    )
+
+Data can be extracted using [assoc](#assoc), [lookup](#lookup) or
+[ref](#ref):
+
+    ; the address
+    (lookup "address" jsp)
+    → (("street" "701 First Ave.") ("city" "Sunnyvale, CA 95125") ("country" "United States"))
+
+    ; the city of the address
+    (lookup "city" (lookup "address" jsp)) 
+    → "Sunnyvale, CA 95125"
+
+    ; a child named Susan
+    (ref '(( * "Susan") *) jsp match true) 
+    → (("name" "Susan") ("age" 4))
+
+    ; all names
+    (map last (ref-all '("name" *) jsp match true)) 
+    → ("John Smith" "Richard" "Susan" "James")
+
+    ; only names of children
+    (map last (ref-all '("name" *) (lookup "children" jsp) match true))
+    →
+    ("Richard" "Susan" "James")
+
+    ; names of children other method
+    (map last (map first (lookup "children" jsp)))
+    →
+    ("Richard" "Susan" "James")
+
+Although most of the time JSON object types are parsed, all JSON data
+types can be parsed directly, without occurring as part of a JSON
+object. The following examples show parsing of a JSON array:
+
+    ; parse a JSON array data type
+
+    (json-parse "[1, 2, 3, 4, 5]") → (1 2 3 4 5)
+
+When the UTF-8 capable version of newLISP is used, JSON formatted
+Unicode gets translated into UTF-8:
+
+    ; parse a JSON object data type ands Unicode
+    ; the outer {,} are newLISP string delimiters [text],[/text] tags could also be used
+    ; the inner {,} are JSON object delimiters
+
+    (json-parse { {"greek letters" : "\u03b1\u03b2\u03b3\u03b4"} }) → (("greek letters" "αβγδ"))
+
+    ; strings longer than 2047 bytes should be delimted with [text], [/text] tags
+
+    (json-parse [text]{"greek letters" : "\u03b1\u03b2\u03b3\u03b4"}[/text]) → (("greek letters" "αβγδ"))
+
+The hex-code representation of Unicoder characters in JSON is the same
+as can be used in UTF-8 enabled newLISP.
+
+Because JSON objects contain `{,},"` characters, quotes should not be
+used to limit JSON data, or all quotes inside the JSON data would need a
+preceding backslash `\`. `{,}` braces can be used as long as braces
+inside the JSON data are balanced. The safest delimiter are
+`[text], [/text]` tags — they suppress all special processing of the
+string when read by newLISP and are suitable to delimit large data sizes
+greater 2047 bytes.
+
+

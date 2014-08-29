@@ -1,0 +1,16 @@
+Function: even?
+-------------------------------------------------------
+
+#### syntax: (even? *int-number*)
+
+Checks if an integer number is *even divisible* by `2`, without
+remainder. When a floating point number is passed for *int-number*, it
+will be converted to an integer by cutting off its fractional part.
+
+    (even? 123)  → nil
+    (even? 8)    → true
+    (even? 8.7)  → true
+
+Use [odd?](#oddp) to check if an integer is not divisible by `2`.
+
+

@@ -1,0 +1,53 @@
+Function: slice
+-----------------------------------
+
+#### syntax: (slice *list* *int-index* [*int-length*])\
+ syntax: (slice *array* *int-index* [*int-length*])\
+ syntax: (slice *str* *int-index* [*int-length*])
+
+In the first form, `slice` copies a sublist from a *list*. The original
+list is left unchanged. The sublist extracted starts at index
+*int-index* and has a length of *int-length*. If *int-length* is
+negative, `slice` will take the parameter as offset counting from the
+end and copy up to that offset. If the parameter is omitted, `slice`
+copies all of the elements to the end of the list.
+
+See also [Indexing elements of strings and lists](#indexing).
+
+    (slice '(a b c d e f) 3 2)   → (d e)
+    (slice '(a b c d e f) 2 -2)  → (c d)
+    (slice '(a b c d e f) 2)     → (c d e f)
+    (slice '(a b c d e f) -4 3)  → (c d e)
+
+    (set 'A (array 3 2 (sequence 1 6))) → ((1 2) (3 4) (5 6))
+    (slice A 1 2) → ((3 4) (5 6))
+
+In the second form, a part of the string in *str* is extracted.
+*int-index* contains the start index and *int-length* contains the
+length of the substring. If *int-length* is not specified, everything to
+the end of the string is extracted. `slice` also works on string buffers
+containing binary data like `0`'s (zeroes). It operates on byte
+boundaries rather than character boundaries. See also [Indexing elements
+of strings and lists](#indexing).
+
+Note that `slice` always works on single 8-bit byte boundaries for
+offset and length numbers, even when running the UTF-8 enabled version
+of newLISP.
+
+    (slice "Hello World" 6 2)  → "Wo"
+    (slice "Hello World" 0 5)  → "Hello"
+    (slice "Hello World" 6)    → "World"
+    (slice "newLISP" -4 2)     → "LI"
+
+    ; UTF-8 strings are converted to a list, then joined again
+
+    (join (slice (explode "ΩΨΧΦΥΤΣΣΡΠΟΞΝΜΛΚΙΘΗΖΕΔΓΒΑ") 3 5))  → "ΦΥΤΣΣ" 
+
+Note that an *implicit slice* is available for lists. See the chapter
+[Implicit rest and slice](#implicit_rest_slice).
+
+Be aware that [slice](#slice) always works on byte boundaries rather
+than character boundaries in the UTF-8–enabled version of newLISP. As a
+result, [slice](#slice) can be used to manipulate binary content.
+
+

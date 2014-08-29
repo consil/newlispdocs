@@ -1,0 +1,25 @@
+Function: fn
+--------------------------------
+
+#### syntax: (fn (*list-parameters*) *exp-body*)
+
+`fn` is used to define anonymous functions, which are frequently used in
+[map](#map), [sort](#sort), and many other functions where functions can
+be used as arguments.
+
+Using an anonymous function eliminates the need to define a new function
+with [define](#define). Instead, a function is defined on the fly:
+
+    (map (fn (x) (+ x x)) '(1 2 3 4 5)) → (2 4 6 8 10)
+
+    (sort '(".." "..." "." ".....") (fn (x y) (> (length x) (length y))))
+    → ("....." "..." ".." ".")
+
+The example defines the function *fn(x)*, which takes an integer (*x*)
+and doubles it. The function is *mapped* onto a list of arguments using
+[map](#map). The second example shows strings being sorted by length.
+
+The [lambda](#lambda) function (the longer, traditional form) can be
+used in place of `fn`.
+
+

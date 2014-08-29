@@ -1,0 +1,17 @@
+Function: title-case
+--------------------------------------------------------------
+
+#### syntax: (title-case *str* *[bool]*)
+
+Returns a copy of the string in *str* with the first character converted
+to uppercase. When the optional *bool* parameter evaluates to any value
+other than `nil`, the rest of the string is converted to lowercase.
+
+    (title-case "hello")       → "Hello"
+    (title-case "hELLO" true)  → "Hello"
+    (title-case "hELLO")       → "HELLO"
+
+See also the [lower-case](#lower-case) and [upper-case](#upper-case)
+functions.
+
+

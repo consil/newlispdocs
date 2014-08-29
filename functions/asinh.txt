@@ -1,0 +1,12 @@
+Function: asinh
+-----------------------------------
+
+#### syntax: (asinh *num-radians*)
+
+Calculates the inverse hyperbolic sine of *num-radians*, the value whose
+hyperbolic sine is *num-radians*.
+
+    (asinh 2)         → 1.443635475
+    (sinh (asinh 2))  → 2
+
+

@@ -1,0 +1,28 @@
+Function: bigint
+------------------------------------
+
+#### syntax: (bigint *number*)\
+ syntax: (bigint *string*)
+
+A floating point or integer number gets converted to big integer format.
+When converting from floating point, rounding errors occur going back
+and forth between decimal and binary arithmetic.
+
+A string argument gets parsed to a number and converted to a big
+integer.
+
+    (bigint 12345)          → 12345L
+
+    (bigint 1.234567890e30) → 1234567889999999957361000000000L 
+
+    (set 'num 567890)
+    (bigint num)            → 567890L
+
+    (bigint "-54321")       → -54321L
+    (bigint "123.45")       → 123L
+    (bigint "123hello")     → 123L
+
+See also the manual chapter [Big integer, unlimited precision
+arithmetic](#big_int)
+
+

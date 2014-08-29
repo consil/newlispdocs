@@ -1,0 +1,16 @@
+Function: quote
+-----------------------------------
+
+#### syntax: (quote *exp*)
+
+Returns *exp* without evaluating it. The same effect can be obtained by
+prepending a `'` (single quote) to *exp*. The function `quote` is
+resolved during runtime, the prepended `'` quote is translated into a
+protective envelope (quote cell) during code translation.
+
+    (quote x)         → x
+    (quote 123)       → 123
+    (quote (a b c))   → (a b c)
+    (= (quote x) 'x)  → true
+
+

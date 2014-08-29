@@ -1,0 +1,107 @@
+Function: command-event
+-------------------------------------------
+
+#### syntax: (command-event *sym-event-handler* | *func-event-handler*)
+
+Specifies a user defined function for pre-processing the newLISP
+command-line before it gets evaluated. This can be used to write
+customized interactive newLISP shells and to transform HTTP requests
+when running in server mode.
+
+`command-event` takes either a symbol of a user-defined function or a
+lambda function. The event-handler function must return a string or the
+command-line will be passed untranslated to newLISP.
+
+To only force a prompt, the function should return the empty string
+`""`.
+
+The following example makes the newLISP shell work like a normal Unix
+shell when the command starts with a letter. But starting the line with
+an open parenthesis or a space initiates a newLISP evaluation.
+
+    (command-event (fn (s) 
+        (if (starts-with s "[a-zA-Z]" 0) (append "!" s) s)))
+
+See also the related [prompt-event](#prompt-event) which can be used for
+further customizing interactive mode by modifying the newLISP prompt.
+
+The following program can be used either stand-alone or included in
+newLISP's `init.lsp` startup file:
+
+    #!/usr/bin/newlisp
+
+    ; set the prompt to the current directory name
+    (prompt-event (fn (ctx) (append (real-path) "> ")))
+
+    ; pre-process the command-line
+    (command-event (fn (s) 
+        (if 
+            (starts-with s "cd") 
+            (string " " (true? (change-dir (last (parse s " ")))))
+
+            (starts-with s "[a-zA-Z]" 0)
+            (append "!" s)
+
+            true s)))
+
+In the definition of the command-line translation function the Unix
+command `cd` gets a special treatment, to make sure that the directory
+is changed for newLISP process too. This way when shelling out with `!`
+and coming back, newLISP will maintain the changed directory.
+
+Command lines for newLISP must start either with a space or an opening
+parenthesis. Unix commands must start at the beginning of the line.
+
+When newLISP is running in server mode either using the `-c` or `-http`
+option, it receives HTTP requests similar to the following:
+
+    GET /index.html
+
+Or if a query is involved:
+
+    GET /index.cgi?userid=joe&password=secret
+
+A function specified by `command-event` could filter and transform these
+request lines, e.g.: discovering all queries trying to perform CGI using
+a file ending in `.exe`.  Such a request would be translated into a
+request for an error page:
+
+    ;; httpd-conf.lsp
+    ;;
+    ;; filter and translate HTTP requests for newLISP
+    ;; -c or -http server modes
+    ;; reject query commands using CGI with .exe files
+
+    (command-event (fn (s)
+        (let (request s)
+            (when (find "?" s) ; is this a query
+                (set 'request (first (parse s "?")))
+                ; discover illegal extension in queries
+                (when (ends-with request ".exe")
+                    (set 'request "GET /errorpage.html")) )
+            request)
+    ))
+
+When starting the server mode with
+`newlisp httpd-conf.lsp -c -d80 -w ./httpdoc` newLISP will load the
+definition for `command-event` for filtering incoming requests, and the
+query:
+
+    GET /cmd.exe?dir
+
+Would be translated into:
+
+    GET /errorpage.html
+
+The example shows a technique frequently used in the past by spammers on
+Win32 based, bad configured web servers to gain control over servers.
+
+`httpd-conf.lsp` files can easily be debugged loading the file into an
+interactive newLISP session and entering the HTTP requests manually.
+newLISP will translate the command line and dispatch it to the built-in
+web server. The server output will appear in the shell window.
+
+Note, that the command line length as well as the line length in HTTP
+headers is limited to 512 characters for newLISP.
+
+

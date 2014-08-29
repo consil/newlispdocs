@@ -1,0 +1,12 @@
+Function: sqrt
+----------------------------------
+
+#### syntax: (sqrt *num*)
+
+Calculates the square root from the expression in *num* and returns the
+result.
+
+    (sqrt 10)  → 3.16227766
+    (sqrt 25)  → 5
+
+

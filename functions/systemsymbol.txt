@@ -1,0 +1,27 @@
+Function: $
+--------------------------------
+
+#### syntax: (\$ *int-idx*)
+
+The functions that use regular expressions ([directory](#directory),
+[ends-with](#ends-with), [find](#find), [parse](#parse),
+[regex](#regex), [search](#search), [starts-with](#starts-with) and
+[replace](#replace)) all bind their results to the predefined system
+variables `$0`, `$1`, `$2`–`$15` after or during the function's
+execution. System variables can be treated the same as any other symbol.
+As an alternative, the contents of these variables may also be accessed
+by using `($ 0)`, `($ 1)`, `($ 2)`, etc. This method allows indexed
+access (i.e., `($ i)`, where `i` is an integer).
+
+    (set 'str  "http://newlisp.org:80")
+    (find "http://(.*):(.*)" str 0)  → 0
+                                     
+    $0  → "http://newlisp.org:80"
+    $1  → "newlisp.org"
+    $2  → "80"
+                                     
+    ($ 0)  → "http://newlisp.org:80"
+    ($ 1)  → "newlisp.org"
+    ($ 2)  → "80"
+
+

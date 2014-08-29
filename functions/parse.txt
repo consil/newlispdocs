@@ -1,0 +1,57 @@
+Function: parse
+-----------------------------------
+
+#### syntax: (parse *str-data* [*str-break* [*int-option*]])
+
+Breaks the string that results from evaluating *str-data* into string
+tokens, which are then returned in a list. When no *str-break* is given,
+`parse` tokenizes according to newLISP's internal parsing rules. A
+string may be specified in *str-break* for tokenizing only at the
+occurrence of a string. If an *int-option* number is specified, a
+regular expression pattern may be used in *str-break*.
+
+When *str-break* is not specified, the maximum token size is 2048 for
+quoted strings and 256 for identifiers. In this case, newLISP uses the
+same faster tokenizer it uses for parsing newLISP source. If *str-break*
+is specified, there is no limitation on the length of tokens. A
+different algorithm is used that splits the source string *str-data* at
+the string in *str-break*.
+
+    (parse "hello how are you")     → ("hello" "how" "are" "you")
+
+    (parse "one:two:three" ":")     → ("one" "two" "three")
+
+    (parse "one--two--three" "--")  → ("one" "two" "three")
+
+    (parse "one-two--three---four" "-+" 0) 
+    → ("one" "two" "three" "four")
+
+    (parse "hello regular   expression 1, 2, 3" {,\s*|\s+} 0)
+    → ("hello" "regular" "expression" "1" "2" "3")
+
+The last two examples show a regular expression as the break string with
+the default option `0` (zero). Instead of `{` and `}` (left and right
+curly brackets), double quotes can be used to limit the pattern. In this
+case, double backslashes must be used inside the pattern. The last
+pattern could be used for parsing CSV (Comma Separated Values) files.
+For the regular expression option numbers, see [regex](#regex).
+
+`parse` will return empty fields around separators as empty strings:
+
+    (parse "1,2,3," ",") → ("1" "2" "3" "")
+    (parse "1,,,4" ",")  → ("1" "" "" "4")
+    (parse "," ",")      → ("" "")
+
+    (parse "")      → ()
+    (parse "" " ")  → ()
+
+This behavior is needed when parsing records with empty fields.
+
+Parsing an empty string will always result in an empty list.
+
+Use the [regex](#regex) function to break strings up and the
+[directory](#directory), [find](#find), [find-all](#find-all),
+[regex](#regex), [replace](#replace), and [search](#search) functions
+for using regular expressions.
+
+

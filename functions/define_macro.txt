@@ -1,0 +1,109 @@
+Function: define-macro
+------------------------------------------
+
+#### syntax: (define-macro (*sym-name* [*sym-param-1* ... ]) *body*)\
+ syntax: (define-macro (*sym-name* [(*sym-param-1* *exp-default*) ... ]) *body*)
+
+Functions defined using `define-macro` are called *fexpr* in other LISPs
+as they don't do variable expansion. In newLISP they are still called
+macros, because they are written with the same purpose of creating
+special syntax forms with non-standard evaluation patterns of arguments.
+Functions created using `define-macro` can be combined with template
+expansion using [expand](#expand) or [letex](#letex).
+
+Since v.10.5.8, newLISP also as expansion macros using [macro](#macro).
+
+Defines the new fexpr *sym-name*, with optional arguments *sym-param-1*.
+`define-macro` is equivalent to assigning a lambda-macro expression to a
+symbol. When a `define-macro` function is called, unevaluated arguments
+are assigned to the variables in *sym-param-1 ...*. Then the *body*
+expressions are evaluated. When evaluating the `define-macro` function,
+the lambda-macro expression is returned.
+
+    (define-macro (my-setq p1 p2) (set p1 (eval p2))) 
+    → (lambda-macro (p1 p2) (set p1 (eval p2)))
+
+    (my-setq x 123)  → 123
+    x                → 123
+
+New functions can be created to behave like built-in functions that
+delay the evaluation of certain arguments. Because fexprs can access the
+arguments inside a parameter list, they can be used to create
+flow-control functions like those already built-in to newLISP.
+
+All parameters defined are optional. When a macro is called without
+arguments, those parameters assume the value `nil`. If those parameters
+have a default value specified in *exp-default*, they assume that
+default value.
+
+    (define-macro (foo (a 1) (b 2))
+      (list a b))
+        
+    (foo)      → (1 2)
+    (foo 3)    → (3 2)
+    (foo 3 4)  → (3 4)
+
+Expressions in *exp-default* are evaluated in the function's current
+environment.
+
+    (define-macro (foo (a 10) (b (div a 2))) 
+      (list a b))
+
+    (foo)      → (10 5)
+    (foo 30)   → (30 15)
+    (foo 3 4)  → (3 4)
+
+Note that in *fexprs*, the danger exists of passing a parameter with the
+same variable name as used in the `define-macro` definition. In this
+case, the *fexpr's* internal variable would end up receiving `nil`
+instead of the intended value:
+
+    ;; not a good definition!
+
+    (define-macro (my-setq x y) (set x (eval y)))  
+
+    ;; symbol name clash for x
+
+    (my-setq x 123)  → 123
+    x                → nil
+
+There are several methods that can be used to avoid this problem, known
+as *variable capture*, by writing *hygienic* `define-macro`s:
+
+-   Put the definition into its own lexically closed namespace context.
+    If the function has the same name as the context, it can be called
+    by using the context name alone. A function with this characteristic
+    is called a [*default function*](#default_function). This is the
+    preferred method in newLISP to write `define-macro`s.
+-   Use [args](#args) to access arguments passed by the function.
+
+<!-- -->
+
+    ;; a define-macro as a lexically isolated function
+    ;; avoiding variable capture in passed parameters
+
+    (context 'my-setq)
+
+    (define-macro (my-setq:my-setq x y) (set x (eval y)))  
+
+    (context MAIN)
+
+    (my-setq x 123)  → 123  ; no symbol clash
+    x                → 123
+
+The definition in the example is lexically isolated, and no variable
+capture can occur. Instead of the function being called using
+`(my-setq:my-setq …)`, it can be called with just `(my-setq …)` because
+it is a [*default function*](#default_function).
+
+The second possibility is to refer to passed parameters using
+[args](#args):
+
+    ;; avoid variable capture in macros using the args function
+
+    (define-macro (my-setq) (set (args 0) (eval (args 1))))
+
+See also the [macro](#macro) expansion function not susceptible to
+variable capture.
+
+

@@ -1,0 +1,17 @@
+Function: odd?
+------------------------------------------------------
+
+#### syntax: (odd? *int-number*)
+
+Checks the parity of an integer number. If the number is not *even
+divisible* by `2`, it has *odd* parity. When a floating point number is
+passed for *int-number*, it will be converted first to an integer by
+cutting off its fractional part.
+
+    (odd? 123)  → true
+    (odd? 8)    → nil
+    (odd? 8.7)  → nil
+
+Use [even?](#evenp) to check if an integer is even, divisible by `2`.
+
+

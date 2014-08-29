@@ -1,0 +1,31 @@
+Function: trace-highlight
+---------------------------------------------
+
+#### syntax: (trace-highlight *str-pre* *str-post* [*str-header* *str-footer*])
+
+Sets the characters or string of characters used to enclose expressions
+during [trace](#trace). By default, the \# (number sign) is used to
+enclose the expression highlighted in [trace](#trace) mode. This can be
+changed to different characters or strings of up to seven characters. If
+the console window accepts terminal control characters, this can be used
+to display the expression in a different color, bold, reverse, and so
+forth.
+
+Two more strings can optionally be specified for *str-header and
+str-footer*, which control the separator and prompt. A maximum of 15
+characters is allowed for the header and 31 for the footer.
+
+    ;; active expressions are enclosed in >> and <<
+
+    (trace-highlight ">>" "<<") 
+                 
+    ;; 'bright' color on a VT100 or similar terminal window
+
+    (trace-highlight "\027[1m" "\027[0m")   
+
+The first example replaces the default `#` (number sign) with a `>>` and
+`<<`. The second example works on most Linux shells. It may not,
+however, work in console windows under Win32 or CYGWIN, depending on the
+configuration of the terminal.
+
+

@@ -1,0 +1,24 @@
+Function: rand
+----------------------------------
+
+#### syntax: (rand *int-range* [*int-N*])
+
+Evaluates the expression in *int-range* and generates a random number in
+the range of `0` (zero) to (*int-range* - 1). When `0` (zero) is passed,
+the internal random generator is initialized using the current value
+returned by the C `time()` function. Optionally, a second parameter can
+be specified to return a list of length *int-N* of random numbers.
+
+    (dotimes (x 100) (print (rand 2))) =>
+    11100000110100111100111101 ... 10111101011101111101001100001000
+
+    (rand 3 100)  → (2 0 1 1 2 0 …)
+
+The first line in the example prints equally distributed `0`'s and
+`1`'s, while the second line produces a list of 100 integers with `0`,
+`1`, and `2` equally distributed. Use the [random](#random) and
+[normal](#normal) functions to generate floating point random numbers,
+and use [seed](#seed) to vary the initial seed for random number
+generation.
+
+

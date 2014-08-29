@@ -1,0 +1,16 @@
+Function: sleep
+-----------------------------------
+
+#### syntax: (sleep *num-milliseconds*)
+
+Gives up CPU time to other processes for the amount of milliseconds
+specified in *num-milli-seconds*.
+
+    (sleep 1000)  ; sleeps 1 second
+    (sleep 0.5)   ; sleeps 500 micro seconds
+
+On some platforms, `sleep` is only available with a resolution of one
+second. In this case, the parameter *int-milli-seconds* will be rounded
+to the nearest full second.
+
+

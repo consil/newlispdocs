@@ -1,0 +1,22 @@
+Function: read-utf8
+---------------------------------------
+
+#### syntax: (read-utf8 *int-file*)
+
+Reads an UTF-8 character from a file specified by the file handle in
+*int-file*. The file handle is obtained from a previous [open](#open)
+operation. Each `read-utf8` advances the file pointer by the number of
+bytes contained in the UTF-8 character. Once the end of the file is
+reached, `nil` is returned.
+
+The function returns an integer value which can be converted to a
+displayable UTF-8 character string using the [char](#char) function.
+
+    (set 'fle (open "utf8text.txt" "read"))
+    (while (setq chr (read-utf8 fle))
+        (print (char chr)))
+
+The example reads a file containing UTF-8 encoded text and displays it
+to the terminal screen.
+
+

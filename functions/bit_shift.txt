@@ -1,0 +1,28 @@
+Function: bit-shift
+----------------------------------------
+
+#### syntax: (\<\< *int-1* *int-2* [*int-3* ... ])\
+ syntax: (\>\> *int-1* *int-2* [*int-3* ... ])\
+ syntax: (\<\< *int-1*)\
+ syntax: (\>\> *int-1*)
+
+The number *int-1* is arithmetically shifted to the left or right by the
+number of bits given as *int-2*, then shifted by *int-3* and so on. For
+example, 64-bit integers may be shifted up to 63 positions. When
+shifting right, the most significant bit is duplicated (*arithmetic
+shift*):
+
+    (>> 0x8000000000000000 1)  → 0xC000000000000000  ; not 0x0400000000000000!
+
+
+    (<< 1 3)      →  8
+    (<< 1 2 1)    →  8
+    (>> 1024 10)  →  1
+    (>> 160 2 2)  → 10
+
+    (<< 3)        →  6
+    (>> 8)        →  4
+
+When *int-1* is the only argument `<<` and `>>` shift by one bit.
+
+

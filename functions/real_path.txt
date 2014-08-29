@@ -1,0 +1,25 @@
+Function: real-path
+---------------------------------------
+
+#### syntax: (real-path [*str-path*])\
+ syntax: (real-path *str-exec-name* true)
+
+In the first syntax `real-path` returns the full path from the relative
+file path given in *str-path*. If a path is not given, `"."` (the
+current directory) is assumed.
+
+    (real-path)  → "/usr/home/fred"  ; current directory
+    (real-path "./somefile.txt")
+    → "/usr/home/fred/somefile.txt"
+
+In the second syntax `real-path` returns the full path for an executable
+found given in *str-exe-name*. This syntax relies on an environment
+variable PATH defined on UNIX and Windows systems.
+
+    (real-path "make" true) → "/usr/bin/make"
+
+The output length is limited by the OS's maximum allowed path length. If
+`real-path` fails (e.g., because of a nonexistent path), `nil` is
+returned.
+
+

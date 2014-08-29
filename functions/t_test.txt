@@ -1,0 +1,107 @@
+Function: t-test
+------------------------------------
+
+#### syntax: (t-test *list-vector* *number-value*)\
+ syntax: (t-test *list-vector-A* *list-vector-B* [`true`])\
+ syntax: (t-test *list-vector-A* *list-vector-B* *float-probability*)
+
+In the **first syntax** the function uses a one sample *Student's t*
+test to compare the mean value of *list-vector* to the value in
+*number-value*:
+
+    ; one sample t-test
+    (t-test '(3 5 4 2 5 7 4 3) 2.5)
+    → '(4.125 2.5 1.552 0.549 2.960 7 0.021)
+
+The following data are returned in a list:
+
+  name         description
+  ------------ -------------------------------------------------------
+  mean         mean of data in vector
+  value        value to compare
+  sdev         standard deviation in data vector
+  mean-error   standard error of mean
+  t            t between mean and value
+  df           degrees of freedom
+  p            two tailed probability of t under the null hypothesis
+
+In above example the difference of the mean value `4.125` from `2.5` is
+moderately significant. With a probability `p = 0.021 (2.1%)` the null
+hypothesis that the mean is not significantly different, can be
+rejected.
+
+In the **second syntax**, the function performs a t-test using the
+*Student's t* statistic for comparing the means values in
+*list-vector-A* and *list-vector-B*. If the `true` flag is not used,
+both vectors in A and B can be of different length and groups
+represented by A and B are not related.
+
+When the optional flag is set to `true`, measurements were taken from
+the same group twice, e.g. before and after a procedure.
+
+The following results are returned in a list:
+
+  name     description
+  -------- -------------------------------------------------------
+  mean-a   mean of group A
+  mean-b   mean of group B
+  sdev-a   standard deviation in group A
+  sdev-b   standard deviation in group B
+  t        t between mean values
+  df       degrees of freedom
+  p        two tailed probability of t under the null hypothesis
+
+The first example studies the effect of different sleep length before a
+test on the SCAT (Sam's Cognitive Ability Test):
+
+    ; SCAT (Sam's Cognitive Ability Test) 
+    ; two independent sample t-test
+    (set 'hours-sleep-8 '(5 7 5 3 5 3 3 9))
+    (set 'hours-sleep-4 '(8 1 4 6 6 4 1 2))
+
+    (t-test hours-sleep-8 hours-sleep-4)
+     → (5 4 2.138 2.563 0.847 14 0.411)
+
+The duration of sleeps before the SCAT does not have a significant
+effect with a probability value of `0.411`.
+
+In the second example, the same group of people get tested twice, before
+and after a treatment with Prozac depression medication:
+
+    ; Effect of an antidepressant on a group of depressed people
+    ; two related samples t-test
+    (set 'mood-pre '(3 0 6 7 4 3 2 1 4))
+    (set 'mood-post '(5 1 5 7 10 9 7 11 8))
+
+    (t-test mood-pre mood-post true)
+    → (3.333 7 2.236 3.041 -3.143 8 0.0137)
+
+The effect of the antidepressant treatment is moderately significant
+with a `p` of `0.0137`.
+
+In the **third syntax**, a form of the *Student's t* called *Welch's
+t-test* is performed. This method is used when the variances observed in
+both samples are significantly different. The threshold can be set using
+the *float-probability* parameter. When this parameter is used the
+`t-test` function will perform a F-test to compare the variances in the
+two data samples. If the probability of the found *F-ratio* is below the
+*float-probability* parameter, the *Welch's t-test* method will be used.
+Specifying this value as `1.0` effectively forces a *Welch's t-test*:
+
+    ; two independent sample t-test using the Welch method
+    (t-test '(10 4 7 1 1 6 1 8 2 4) '(4 6 9 4 6 8 9 3) 1.0)
+    → (4.4 6.125 3.239 2.357 -1.307 15 0.211) 
+
+    ; two independent sample t-test using the normal method
+    (t-test '(10 4 7 1 1 6 1 8 2 4) '(4 6 9 4 6 8 9 3))
+    → (4.4 6.125 3.239 2.357 -1.260 16 0.226)
+
+There is no significant difference between the means of the two samples.
+The *Welch* method of the t-test is slightly more sensitive in this case
+than using the normal t-test method.
+
+Smaller values than `1.0` would trigger the *Welch's t-test* method only
+when the significance of variance difference in the samples reaches
+certain value.
+
+

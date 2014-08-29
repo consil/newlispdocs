@@ -1,0 +1,23 @@
+Function: random
+------------------------------------
+
+#### syntax: (random *float-offset* *float-scale* *int-n*)\
+ syntax: (random *float-offset* *float-scale*)
+
+In the first form, `random` returns a list of *int-n* evenly distributed
+floating point numbers scaled (multiplied) by *float-scale*, with an
+added offset of *float-offset*. The starting point of the internal
+random generator can be seeded using [seed](#seed).
+
+    (random 0 1 10)
+    → (0.10898973 0.69823783 0.56434872 0.041507289 0.16516733
+        0.81540917 0.68553784 0.76471068 0.82314585 0.95924564)
+
+When used in the second form, `random` returns a single evenly
+distributed number:
+
+    (random 10 5)  → 11.0971
+
+See also the [normal](#normal) and [rand](#rand) functions.
+
+

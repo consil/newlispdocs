@@ -1,0 +1,29 @@
+Function: flat
+----------------------------------
+
+#### syntax: (flat *list* [*int-level*])
+
+Returns a flattened list from a list:
+
+    (set 'lst '(a (b (c d))))
+    (flat lst)  → (a b c d)
+
+    ; extract a list of index vectors of all elements
+
+    (map (fn (x) (ref x lst)) (flat lst)) 
+    → ((0) (1 0) (1 1 0) (1 1 1))
+
+The optional *int-level* parameter can be used to limit the recursion
+level when flattening the list:
+
+    (flat '(a b (c d (e f)) (g h (i j))) )   → (a b c d e f g h i j)
+
+    (flat '(a b (c d (e f)) (g h (i j))) 1)  → (a b c d (e f) g h (i j))
+
+    (flat '(a b (c d (e f)) (g h (i j))) 2)  → (a b c d e f g h i j)
+
+If *int-level* is `0`, no flattening will occur.
+
+`flat` can be used to iterate through nested lists.
+
+

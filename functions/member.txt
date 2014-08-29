@@ -1,0 +1,29 @@
+Function: member
+------------------------------------
+
+#### syntax: (member *exp* *list*)\
+ syntax: (member *str-key* *str* [*num-option*])
+
+In the first syntax, `member` searches for the element *exp* in the list
+*list*. If the element is a member of the list, a new list starting with
+the element found and the rest of the original list is constructed and
+returned. If nothing is found, `nil` is returned. When specifying
+*num-option*, `member` performs a regular expression search.
+
+    (set 'aList '(a b c d e f g h))  → (a b c d e f g h)
+    (member 'd aList)                → (d e f g h)
+    (member 55 aList)                → nil
+
+In the second syntax, `member` searches for *str-key* in *str*. If
+*str-key* is found, all of *str* (starting with *str-key*) is returned.
+`nil` is returned if nothing is found.
+
+    (member "LISP" "newLISP")  → "LISP"
+    (member "LI" "newLISP")    → "LISP"
+    (member "" "newLISP")      → "newLISP"
+    (member "xyz" "newLISP")   → nil
+    (member "li" "newLISP" 1)  → "LISP"
+
+See also the related functions [slice](#slice) and [find](#find).
+
+

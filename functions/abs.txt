@@ -1,0 +1,10 @@
+Function: abs
+-----------------------------------------------------
+
+#### syntax: (abs *num*)
+
+Returns the absolute value of the number in *num*.
+
+    (abs -3.5)  → 3.5
+
+

@@ -1,0 +1,24 @@
+Function: xml-type-tags
+-------------------------------------------
+
+#### syntax: (xml-type-tags [*exp-text-tag* *exp-cdata-tag* *exp-comment-tag* *exp-element-tags*])
+
+Can suppress completely or replace the XML type tags "TEXT", "CDATA",
+"COMMENT", and "ELEMENT" with something else specified in the
+parameters.
+
+Note that `xml-type-tags` only suppresses or translates the tags
+themselves but does not suppress or modify the tagged information. The
+latter would be done using option numbers in [xml-parse](#xml-parse).
+
+Using `xml-type-tags` without arguments returns the current type tags:
+
+    (xml-type-tags)  → ("TEXT" "CDATA" "COMMENT" "ELEMENT")
+
+    (xml-type-tags nil 'cdata '!-- nil)
+
+The first example just shows the currently used type tags. The second
+example specifies suppression of the "TEXT" and "ELEMENT" tags and shows
+`cdata` and `!--` instead of "CDATA" and "COMMENT".
+
+

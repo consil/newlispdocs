@@ -1,0 +1,25 @@
+Function: debug
+-----------------------------------
+
+#### syntax: (debug *func*)
+
+Calls [trace](#trace) and begins evaluating the user-defined function in
+*func*. `debug` is a shortcut for executing `(trace true)`, then
+entering the function to be debugged.
+
+    ;; instead of doing
+    (trace true)
+    (my-func a b c)
+    (trace nil)
+
+    ;; use debug as a shortcut
+    (debug (my-func a b c))
+
+When in `debug` or [trace](#trace) mode, error messages will be printed.
+The function causing the exception will return either `0` or `nil` and
+processing will continue. This way, variables and the current state of
+the program can still be inspected while debugging.
+
+See also the [trace](#trace) function.
+
+

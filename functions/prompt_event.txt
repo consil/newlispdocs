@@ -1,0 +1,28 @@
+Function: prompt-event
+------------------------------------------
+
+#### syntax: (prompt-event *sym-event-handler* | *func-event-handler*)
+
+Refines the prompt as shown in the interactive newLISP shell. The
+*sym-event-handler* or *func-event-handler* is either a symbol of a
+user-defined function or a lambda expression:
+
+    > (prompt-event (fn (ctx) (string ctx ":" (real-path) "$ ")))
+    $prompt-event
+    MAIN:/Users/newlisp$ (+ 3 4)
+    7
+    MAIN:/Users/newlisp$
+
+The current context before calling the `prompt-event` code is passed as
+a parameter to the function. Computer output is shown in bold.
+
+The example redefines the `>` prompt to be the current context followed
+by a colon `:`, followed by the directory name, followed by the dollar
+symbol. Together with the [command-event](#command-event) function this
+can be used to create fully customized shells or custom command
+interpreters.
+
+The function in `prompt-event` must return a string of 63 characters
+maximum. Not returning a string will leave the prompt unchanged.
+
+

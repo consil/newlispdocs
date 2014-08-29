@@ -1,0 +1,35 @@
+Function: corr
+----------------------------------
+
+#### syntax: (corr *list-vector-X* *list-vector-Y*)
+
+Calculates the *Pearson* product-moment correlation coefficient as a
+measure of the linear relationship between the two variables in
+*list-vector-X* and *list-vector-Y*. Both lists must be of same length.
+
+`corr` returns a list containing the following values:
+
+  name   description
+  ------ -------------------------------------------------------
+  r      Correlation coefficient
+  b0     Regression coefficient offset
+  b1     Regression coefficient slope
+  t      t - statistic for significance testing
+  df     Degrees of freedom for t
+  p      Two tailed probability of t under the null hypothesis
+
+
+    (set 'study-time '(90 100 130 150 180 200 220 300 350 400))
+    (set 'test-errors '(25 28 20 20 15 12 13 10 8 6))
+
+    (corr study-time test-errors) → (-0.926 29.241 -0.064 -6.944 8 0.0001190)
+
+The negative correlation of `-0.926` between study time and test errors
+is highly significant with a two-tailed `p` of about `0.0001` under the
+null hypothesis.
+
+The regression coefficients `b0 = 29.241` and `b1 = -0.064` can be used
+to estimate values of the Y variable (test errors) from values in X
+(study time) using the equation `Y = b0 + b1 * X`.
+
+

@@ -1,0 +1,55 @@
+Function: net-receive-udp
+---------------------------------------------
+
+#### syntax: (net-receive-udp *int-port* *int-maxsize* [*int-microsec* [*str-addr-if*]])
+
+Receives a User Datagram Protocol (UDP) packet on port *int-port*,
+reading *int-maxsize* bytes. If more than *int-maxsize* bytes are
+received, bytes over *int-maxsize* are discarded on Linux/BSD; on Win32,
+`net-receive-udp` returns `nil`. `net-receive-udp` blocks until a
+datagram arrives or the optional timeout value in *int-microsec*
+expires. When setting up communications between datagram sender and
+receiver, the `net-receive-udp` statement must be set up first.
+
+No previous setup using `net-listen` or `net-connect` is necessary.
+
+`net-receive-udp` returns a list containing a string of the UDP packet
+followed by a string containing the sender's IP number and the port
+used.
+
+    ;; wait for datagram with maximum 20 bytes 
+    (net-receive-udp 10001 20) 
+
+    ;; or
+    (net-receive-udp 10001 20 5000000)  ; wait for max 5 seconds
+              
+    ;; executed on remote computer
+    (net-send-udp "nuevatec.com" 1001 "Hello")  → 4 
+
+    ;; returned from the net-receive-udp statement
+    → ("Hello" "128.121.96.1" 3312)  
+
+    ;; sending binary information
+    (net-send-udp "ahost.com" 2222 (pack "c c c c" 0 1 2 3))  
+    → 4 
+
+    ;; extracting the received info
+    (set 'buff (first (net-receive-udp 2222 10)))   
+
+    (print (unpack "c c c c" buff))  → (0 1 2 3)
+
+See also the [net-send-udp](#net-send-udp) function for sending
+datagrams and the [pack](#pack) and [unpack](#unpack) functions for
+packing and unpacking binary information.
+
+To listen on a specified address on computers with more than one
+interface card, an interface IP address or name can be optionally
+specified in *str-addr-if*. When specifying *str-addr-if*, a timeout
+must also be specified in *int-wait*.
+
+As an alternative, UDP communication can be set up using
+[net-listen](#net-listen), or [net-connect](#net-connect) together with
+the `"udp"` option to make non-blocking data exchange possible with
+[net-receive-from](#net-receive-from) and [net-send-to](#net-send-to).
+
+

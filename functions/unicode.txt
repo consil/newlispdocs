@@ -1,0 +1,21 @@
+Function: unicode
+-------------------------------------
+
+#### syntax: (unicode *str-utf8*)
+
+Converts ASCII/UTF-8 character strings in *str* to UCS-4–encoded Unicode
+of 4-byte integers per character. The string is terminated with a 4-byte
+integer `0`. This function is only available on UTF-8–enabled versions
+of newLISP.
+
+    (unicode "new") 
+    → "n\000\000\000e\000\000\000w\000\000\000\000\000\000\000"
+
+    (utf8 (unicode "new"))  → "new"
+
+On *big endian* CPU architectures, the byte order will be reversed from
+high to low. The `unicode` and [utf8](#utf8) functions are the inverse
+of each other. These functions are only necessary if UCS-4 Unicode is in
+use. Most systems use UTF-8 encoding only.
+
+

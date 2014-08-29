@@ -1,0 +1,57 @@
+Function: net-receive-from
+----------------------------------------------
+
+#### syntax: (net-receive-from *int-socket* *int-max-size*)
+
+`net-receive-from` can be used to set up non-blocking UDP
+communications. The socket in *int-socket* must previously have been
+opened by either [net-listen](#net-listen) or
+[net-connect](#net-connect) (both using the `"udp"` option).
+*int-max-size* specifies the maximum number of bytes that will be
+received. On Linux/BSD, if more bytes are received, those will be
+discarded; on Win32, `net-receive-from` returns `nil` and closes the
+socket.
+
+On success `net-receive` returns a list of the data string, remote IP
+number and remote port used. On failure it returns `nil`.
+
+    ;; bind port 1001 and the default address
+    (net-listen 1001 "" "udp")  → 1980 
+
+    ;; optionally poll for arriving data with 100ms timeout
+    (while (not (net-select 1980 "r" 100000)) (do-something ... ))
+
+    (net-receive-from 1980 20)  → ("hello" "192.168.0.5" 3240)
+
+    ;; send answer back to sender
+    (net-send-to "192.168.0.5" 3240 "hello to you" 1980)
+
+    (net-close 1980) ; close socket
+
+The second line in this example is optional. Without it, the
+`net-receive-from` call would block until data arrives. A UDP server
+could be set up by listening and polling several ports, serving them as
+they receive data.
+
+Both, the sender and the receiver have to issue
+[net-listen](#net-listen) commands for UDP mode. Not for listening as in
+TCP/IP protocol communications, but to create the socket bound to the
+port and address. For a complete example see the files `udp-server.lsp`
+and `udp-client.lsp` in the `newlisp-x.x.x/examples/` directory of the
+source distribution.
+
+Note that `net-receive` could not be used in this case because it does
+not return the sender's address and port information, which are required
+to talk back. In UDP communications, the data packet itself contains the
+address of the sender, *not* the socket over which communication takes
+place. `net-receive` can also be used for TCP/IP communications.
+
+See also the [net-connect](#net-connect) function with the `"udp"`
+option and the [net-send-to](#net-send-to) function for sending UDP data
+packets over open connections.
+
+For blocking short UDP transactions, see the
+[net-send-udp](#net-send-udp) and [net-receive-udp](#net-receive-udp)
+functions.
+
+

@@ -1,0 +1,12 @@
+Function: directory?
+----------------------------------------
+
+#### syntax: (directory? *str-path*)
+
+Checks if *str-path* is a directory. Returns `true` or `nil` depending
+on the outcome.
+
+    (directory? "/etc")             → true
+    (directory? "/usr/bin/emacs/")  → nil
+
+

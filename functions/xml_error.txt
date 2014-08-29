@@ -1,0 +1,16 @@
+Function: xml-error
+---------------------------------------
+
+#### syntax: (xml-error)
+
+Returns a list of error information from the last
+[xml-parse](#xml-parse) operation; otherwise, returns `nil` if no error
+occurred. The first element contains text describing the error, and the
+second element is a number indicating the last scan position in the
+source XML text, starting at `0` (zero).
+
+    (xml-parse "<atag>hello</atag><fin")  → nil
+
+    (xml-error)  → ("expected closing tag: >" 18)
+
+

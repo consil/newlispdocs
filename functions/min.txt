@@ -1,0 +1,12 @@
+Function: min
+---------------------------------
+
+#### syntax: (min *num-1* [*num-2* ... ])
+
+Evaluates the expressions *num-1*— and returns the smallest number.
+
+    (min 4 6 2 3.54 7.1)  → 2
+
+See also the [max](#max) function.
+
+

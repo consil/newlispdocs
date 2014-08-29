@@ -1,0 +1,23 @@
+Function: binomial
+--------------------------------------
+
+#### syntax: (binomial *int-n* *int-k* *float-p*)
+
+The binomial distribution function is defined as the probability for an
+event to occur *int-k* times in *int-n* trials if that event has a
+probability of *float-p* and all trials are independent of one another:
+
+***binomial = pow(p, k) \* pow(1.0 - p, n - k) \* n! / (k! \* (n -
+k)!)***
+
+where *x!* is the factorial of *x* and *pow(x, y)* is *x* raised to the
+power of *y*.
+
+
+    (binomial 10 3 0.5)  → 0.1171875
+
+The example calculates the probability for an event with a probability
+of 0.5 to occur 3 times in 10 trials. For a cumulated distribution, see
+the [betai](#betai) function.
+
+

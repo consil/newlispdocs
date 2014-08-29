@@ -1,0 +1,34 @@
+Function: write-file
+----------------------------------------
+
+#### syntax: (write-file *str-file-name* *str-buffer*)
+
+Writes a file in *str-file-name* with contents in *str-buffer* in one
+swoop and returns the number of bytes written.
+
+On failure the function returns `nil`. For error information, use
+[sys-error](#sys-error) when used on files. When used on URLs
+[net-error](#net-error) gives more error information.
+
+    (write-file "myfile.enc"
+        (encrypt (read-file "/home/lisp/myFile") "secret"))
+
+The file `myfile` is read, [encrypted](#encrypt) using the password
+`secret`, and written back into the new file `myfile.enc` in the current
+directory.
+
+`write-file` can take an `http://` or `file://` URL in *str-file-name*.
+When the prefix `http://` is used, `write-file` works exactly like
+[put-url](#put-url) and can take the same additional parameters:
+
+    (write-file "http://asite.com/message.txt" "This is a message" )
+
+The file `message.txt` is created and written at a remote location,
+`http://asite.com`, with the contents of *str-buffer*. In this mode,
+`write-file` can also be used to transfer files to remote newLISP server
+nodes.
+
+See also the [append-file](#append-file) and [read-file](#read-file)
+functions.
+
+

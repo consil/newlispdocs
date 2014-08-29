@@ -1,0 +1,16 @@
+Function: erf
+---------------------------------
+
+#### syntax: (erf *num*)
+
+`erf` calculates the error function of a number in *num*. The error
+function is defined as:
+
+***erf (x) = 2/sqrt(pi) \* integral from 0 to x of exp(-t\^2) dt***
+
+    (map erf (sequence 0.0 6.0 0.5))
+    → 
+    (0 0.5204998778 0.8427007929 0.9661051465 0.995322265 0.999593048 
+     0.9999779095 0.9999992569 0.9999999846 0.9999999998 1 1 1) 
+
+

@@ -1,0 +1,14 @@
+Function: net-local
+---------------------------------------
+
+#### syntax: (net-local *int-socket*)
+
+Returns the IP number and port of the local computer for a connection on
+a specific *int-socket*.
+
+    (net-local 16)  → ("204.179.131.73" 1689)
+
+Use the [net-peer](#net-peer) function to access the remote computer's
+IP number and port.
+
+

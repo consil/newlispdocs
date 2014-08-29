@@ -1,0 +1,92 @@
+Function: find-all
+--------------------------------------
+
+#### syntax: (find-all *str-regex-pattern* *str-text* [*exp* [*int-regex-option*]])\
+ syntax: (find-all *list-match-pattern* *list* [*exp*])\
+ syntax: (find-all *exp-key* *list* [*exp* [*func-compare*]])
+
+In the first syntax, `find-all` finds all occurrences of
+*str-regex-pattern* in the text *str-text*, returning a list containing
+all matching strings. The empty list `()` is returned if no matches are
+found. In the first syntax string searches are always done using regular
+expression patterns, even if no *int-regex-option* is specified. The
+system variable `$count` is updated with the number of matches found.
+
+Optionally, an expression can be specified to process the found string
+or regular subexpressions before placing them into the returned list. An
+additional option, *int-option*, specifies special regular expression
+options (see [regex](#regex) for further details).
+
+    (find-all {\d+} "lkjhkljh34ghfdhgfd678gfdhfgd9")
+    → ("34" "678" "9")
+
+    $count → 3
+
+    (find-all {(new)(lisp)} "newLISPisNEWLISP" (append $2 $1) 1)
+    → ("LISPnew" "LISPNEW")
+
+    (unique (sort 
+        (find-all {[a-zA-Z]+} 
+            (replace "<[^>]+>" (get-url "http://newlisp.org") "" 0) )
+    ))
+    → ("A" "ACC" "AI" "API" "About" "All" "Amazing" "Apps"
+    ...
+    "where" "whole" "width" "wiki" "will" "with" "work" "written")
+
+    ; use $count in evaluated expr
+    (find-all "a" "ababab" (string $count $it)) → ("1a" "2a" "3a")
+
+The first example discovers all numbers in a text. The second example
+shows how an optional expression in *exp* can work on subexpressions
+found by the regular expression pattern in *str-pattern*. The last
+example retrieves a web page, cleans out all HTML tags, and then
+collects all words into a unique and sorted list.
+
+Note that `find-all` with strings always performs a regular expression
+search, even if the option in *int-option* is omitted.
+
+In the second syntax, `find-all` searches for all list [match](#match)
+patterns *list-match-pattern* in *list*. As in `find-all` for strings,
+an expression can be specified in *exp* to process further the matched
+sublist found in *list*. The system variable `$count` is updated with
+the number of matches found.
+
+    (find-all '(? 2) '((a 1) (b 2) (a 2) (c 4))) → ((b 2) (a 2))
+
+    (find-all '(? 2) '((a 1) (b 2) (a 2) (c 4)) (first $it)) → (b a)
+
+    $count → 2
+
+`find-all` for list matches always uses [match](#match) to compare when
+searching for sublists and always needs a list for the pattern
+expression.
+
+In the third syntax, `find-all` can specify a built-in or user-defined
+function used for comparing list elements with the key expression in
+*exp-key*:
+
+    (find-all 5 '(2 7 4 5 9 2 4 9 7 4 8) $it <) → (7 9 9 7 8)
+
+    ; process the found element available in $it
+
+    (find-all 5 '(2 7 4 5 9 2 4 9 7 4 8) (* 3 $it) <) → (21 27 27 21 24)
+    ; same as
+    (find-all 5 '(2 7 4 5 9 2 4 9 7 4 8) (* 3 $it) (fn (x y) (< x y))) → (21 27 27 21 24)
+
+
+    (find-all 5 '(2 7 4 5 9 2 4 9 7 4 8) ("abcdefghijk" $it) <) → ("h" "j" "j" "h" "i")
+
+    $count → 5
+
+    ; use $count
+    (find-all 'a '(a b a b a b) (list $count $it)) → ((1 a) (2 a) (3 a))
+
+Any type of expression can be searched for or can be contained in the
+list. `find-all` in this syntax works similar to [filter](#filter) but
+with the added benefit of being able to define a processing expression
+for the found element.
+
+If no *func-compare* is defined and *exp-key* is a list, then
+[match](#match) will be used for comparison, as in the second syntax.
+
+

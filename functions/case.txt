@@ -1,0 +1,26 @@
+Function: case
+----------------------------------
+
+#### syntax: (case *exp-switch* (*exp-1* *body-1*) [(*exp-2* *body-2*) ... ])
+
+The result of evaluating *exp-switch* is compared to each of the
+*unevaluated* expressions *exp-1, exp-2,* —. If a match is found, the
+corresponding expressions in *body* are evaluated. The result of the
+last body expression is returned as the result for the entire `case`
+expression.
+
+    (define (translate n)
+      (case n
+        (1 "one")
+        (2 "two")          
+        (3 "three")
+        (4 "four")
+        (true "Can't translate this")))
+
+    (translate 3)   → "three"
+    (translate 10)  → "Can't translate this"
+
+The example shows how, if no match is found, the last expression in the
+body of a `case` function can be evaluated.
+
+

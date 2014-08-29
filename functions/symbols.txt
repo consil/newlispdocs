@@ -1,0 +1,18 @@
+Function: symbols
+-------------------------------------
+
+#### syntax: (symbols [*context*])
+
+Returns a sorted list of all symbols in the current context when called
+without an argument. If a context symbol is specified, symbols defined
+in that context are returned.
+
+    (symbols)       ; list of all symbols in current context
+    (symbols 'CTX)  ; list of symbols in context CTX
+    (symbols CTX)   ; omitting the quote
+    (set 'ct CTX)   ; assigning context to a variable
+    (symbols ct)    ; list of symbols in context CTX
+
+The quote can be omitted because contexts evaluate to themselves.
+
+

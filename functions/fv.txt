@@ -1,0 +1,21 @@
+Function: fv
+--------------------------------
+
+#### syntax: (fv *num-rate* *num-nper* *num-pmt* *num-pv* [*int-type*])
+
+Calculates the future value of a loan with constant payment *num-pmt*
+and constant interest rate *num-rate* after *num-nper* period of time
+and a beginning principal value of *num-pv*. If payment is at the end of
+the period, *int-type* is `0` (zero) or *int-type* is omitted; for
+payment at the beginning of each period, *int-type* is 1.
+
+    (fv (div 0.07 12) 240 775.30 -100000)  → -0.5544645052
+
+The example illustrates how a loan of \$100,000 is paid down to a
+residual of \$0.55 after 240 monthly payments at a yearly interest rate
+of 7 percent.
+
+See also the functions [irr](#irr), [nper](#nper), [npv](#npv),
+[pmt](#pmt), and [pv](#pv).
+
+

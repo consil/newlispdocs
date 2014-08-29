@@ -1,0 +1,15 @@
+Function: prob-chi2
+---------------------------------------
+
+#### syntax: (prob-chi2 *num-chi2* *int-df*)
+
+Returns the probability of an observed *Chi²* statistic in *num-chi2*
+with *num-df* degrees of freedom to be equal or greater under the null
+hypothesis. `prob-chi2` is derived from the incomplete Gamma function
+[gammai](#gammai).
+
+    (prob-chi2 10 6)  → 0.1246520195
+
+See also the inverse function [crit-chi2](#crit-chi2).
+
+

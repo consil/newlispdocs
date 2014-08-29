@@ -1,0 +1,25 @@
+Function: flt
+---------------------------------
+
+#### syntax: (flt *number*)
+
+Converts *number* to a 32-bit float represented by an integer. This
+function is used when passing 32-bit floats to library routines. newLISP
+floating point numbers are 64-bit and are passed as 64-bit floats when
+calling imported C library routines.
+
+    (flt 1.23)  → 1067282596
+
+    ;; pass 32-bit float to C-function: foo(float value) 
+    (import "mylib.so" "foo")
+    (foo (flt 1.23))
+
+    (get-int (pack "f" 1.23))  → 1067282596
+
+    (unpack "f" (pack "ld" (flt 1.2345)))  → (1.234500051)
+
+The last two statements illustrate the inner workings of `flt`.
+
+Use the [import](#import) function to import libraries.
+
+

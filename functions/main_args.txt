@@ -1,0 +1,54 @@
+Function: main-args
+---------------------------------------
+
+#### syntax: (main-args)\
+ syntax: (main-args *int-index*)
+
+`main-args` returns a list with several string members, one for program
+invocation and one for each of the command-line arguments.
+
+    newlisp 1 2 3
+
+    > (main-args)
+    ("/usr/bin/newlisp" "1" "2" "3")
+
+After `newlisp 1 2 3` is executed at the command prompt, `main-args`
+returns a list containing the name of the invoking program and three
+command-line arguments.
+
+Optionally, `main-args` can take an *int-index* for indexing into the
+list. Note that an index out of range will cause `nil` to be returned,
+not the last element of the list like in list-indexing.
+
+    newlisp a b c
+
+    > (main-args 0)   
+    "/usr/bin/newlisp"
+    > (main-args -1)  
+    "c"
+    > (main-args 2)   
+    "b"
+    > (main-args 10)
+    nil
+
+Note that when newLISP is executed from a script, `main-args` also
+returns the *name* of the script as the second argument:
+
+    #!/usr/bin/newlisp
+    # 
+    # script to show the effect of 'main-args' in script file
+
+    (print (main-args) "\n")
+    (exit)
+
+    # end of script file
+
+    ;; execute script in the OS shell:
+
+    script 1 2 3
+
+    ("/usr/bin/newlisp" "./script" "1" "2" "3")
+
+Try executing this script with different command-line parameters.
+
+

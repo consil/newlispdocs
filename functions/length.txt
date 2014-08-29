@@ -1,0 +1,43 @@
+Function: length
+--------------------------------------------------------
+
+#### syntax: (length *exp*)
+
+Returns the number of elements in a list, the number of rows in an array
+and the number of bytes in a string or in a symbol name.
+
+Applied to a number, `length` returns the number of digits for normal
+and big integers and the number of digits before the decimal separator
+for floats.
+
+Before version 10.5.6 `length` returned the storage size in bytes for
+integers (4 or 8) and floats (8).
+
+    ; number of top level elements in a list
+    (length '(a b (c d) e))         → 4
+    (length '())                    → 0
+    (set 'someList '(q w e r t y))  → (q w e r t y)
+    (length someList)               → 6
+
+    ; number of top level elements in an array
+    (set 'ary (array 2 4 '(0)))  → ((1 2 3 4) (5 6 7 8))
+    (length ary)                 → 2
+
+    ; number of bytes in a string or byte buffer
+    (length "Hello World")  → 11
+    (length "")             → 0
+    (length "\000\001\003") → 3
+
+    ; number of bytes in a symbol name string
+    (length 'someVar)  → 7
+
+    ; number of int digits in a number
+    (length 0)         → 0
+    (length 123)       → 3
+    (length 1.23)      → 1
+    (length 1234567890123456789012345L) → 25 
+
+Use [utf8len](#utf8len) to calculate the number of UTF-8 characters in a
+string.
+
+

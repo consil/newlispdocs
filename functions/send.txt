@@ -1,0 +1,194 @@
+Function: send
+----------------------------------
+
+#### syntax: (send *int-pid* *exp*)\
+ syntax: (send)
+
+The `send` function enables communication between parent and child
+processes started with [spawn](#spawn). Parent processes can send and
+receive messages to and from their child processes and child processes
+can send and receive messages to and from their parent process. A proxy
+technique – shown further down – is employed to communicate between
+child process peers. `send` and [receive](#receive) do not require locks
+or semaphores. They work on dual send and receive message queues.
+
+Processes started using [fork](#fork) or [process](#process) can not use
+`send` and `receive` message functions. Instead they should use either
+[share](#share) with [semaphore](#semaphore) or [pipe](#pipe) to
+communicate.
+
+The `send` function is not available on Win32.
+
+In the first syntax `send` is used to send a message from a parent to a
+child process or a child to a parent process.
+
+The second syntax is only used by parent processes to get a list of all
+child processes ready to accept message from the parent in their receive
+queues. If a child's receive queue is full, it will not be part of the
+list returned by the `(send)` statement.
+
+The content of a message may be any newLISP expression either atomic or
+list expressions: boolean constants `nil` and `true`, integers, floating
+point numbers or strings, or any list expression in valid newLISP
+syntax. The size of a message is unlimited.
+
+The *exp* parameter specifies the data to be sent to the recipient in
+*int-pid*. The recipient can be either a spawned child process of the
+current process or the parent process. If a message queue is full, it
+can be read from the receiving end, but a `send` issued on the other
+side of the queue will fail and return `nil`.
+
+    ; child process dispatching message to parent
+
+    (set 'ppid (sys-info -4)) ; get parent pid
+
+    (send ppid "hello") ; send message
+
+The targeted recipient of the message is the parent process:
+
+    ; parent process receiving message from child
+
+    (receive child-pid msg) → true
+    msg                     → "hello"
+
+When the `send` queue is full, `send` will return `nil` until enough
+message content is read on the receiving side of the queue and the queue
+is ready to accept new messages from `send` statements.
+
+Using the [until](#until) looping function, the message statements can
+be repeated until they return a value not `nil`. This way, non-blocking
+`send` and `receive` can be made blocking until they succeed:
+
+    ; blocking sender
+    (until (send pid msg)) ; true after message is queued up
+
+    ; blocking receiver
+    (until (receive pid msg)) ; true after message could be read
+
+The sender statement blocks until the message could be deposited in the
+recipients queue.
+
+The `receive` statement blocks until a new message can be fetched from
+the queue.
+
+As the `until` statements in this example lack body expressions, the
+last value of the evaluated conditional expression is the return value
+of the `until` loop.
+
+### Blocking message exchange
+
+The following code shows how a recipient can listen for incoming
+messages, and in turn how a sender can retry to deposit a message into a
+queue. The example shows 5 child processes constantly delivering status
+data to a parent process which will display the data. After three data
+sets have been read, the parent will abort all child processes and exit:
+
+    #!/usr/bin/newlisp
+
+    ; child process transmits random numbers
+    (define (child-process)
+        (set 'ppid (sys-info -4)) ; get parent pid
+        (while true
+            (until (send ppid (rand 100))))
+    )
+
+    ; parent starts 5  child processes, listens and displays
+    ; the true flag is specified to enable send/receive
+
+    (dotimes (i 5) (spawn 'result (child-process) true))
+
+    (for (i 1 3)
+        (dolist (cpid (sync)) ; iterate thru pending child PIDs
+            (until (receive cpid msg))
+            (print "pid:" cpid "->" (format "%-2d  " msg)))
+        (println)
+    )
+
+    (abort) ; cancel child-processes
+    (exit)
+
+Running above example produces the following output:
+
+    pid:53181->47  pid:53180->61  pid:53179->75  pid:53178->39  pid:53177->3   
+    pid:53181->59  pid:53180->12  pid:53179->20  pid:53178->77  pid:53177->47  
+    pid:53181->6   pid:53180->56  pid:53179->96  pid:53178->78  pid:53177->18
+
+The `(sync)` expression returns a list of all child PIDs, and
+`(until (receive cpid msg))` is used to force a wait until status
+messages are received for each of the child processes.
+
+A timeout mechanism could be part of an `until` or `while` loop to stop
+waiting after certain time has expired.
+
+The examples show messages flowing from a child processes to a parent
+process, in the same fashion messages could flow into the other
+direction from parent to child processes. In that case the parent
+process would use `(send)` to obtain a list of child processes with
+place in their message queues.
+
+### Messages containing code for evaluation
+
+The most powerful feature of the message functions is the ability to
+send any newLISP expression, which then can be evaluated by the
+recipient. The recipient uses [eval](#eval) to evaluate the received
+expression. Symbols contained in the expression are evaluated in the
+receivers environment.
+
+The following example shows how a parent process acts like a message
+proxy. The parent receives messages from a child process A and routes
+them to a second child process with ID B. In effect this implements
+messages between child process peers. The implementation relies on the
+fact that the recipient can evaluate expressions contained in messages
+received. These expressions can be any valid newLISP statements:
+
+    #!/usr/bin/newlisp
+
+    ; sender child process of the message
+    (set 'A (spawn 'result 
+        (begin
+            (dotimes (i 3)
+                (set 'ppid (sys-info -4))
+                /* the statement in msg will be evaluated in the proxy */
+                (set 'msg '(until (send B (string "greetings from " A))))
+                (until (send ppid msg)))
+            (until (send ppid '(begin 
+                (sleep 100) ; make sure all else is printed
+                (println "parent exiting ...\n")
+                (set 'finished true))))) true)) 
+
+    ; receiver child process of the message
+    (set 'B (spawn 'result 
+        (begin
+            (set 'ppid (sys-info -4))
+            (while true
+                (until (receive ppid msg))
+                (println msg)
+                (unless (= msg (string "greetings from " A))
+                    (println "ERROR in proxy message: " msg)))) true))
+
+    (until finished (if (receive A msg) (eval msg))) ; proxy loop
+
+    (abort)
+    (exit)
+
+Child process `A` sends three messages to `B`. As this cannot be done
+directly `A` sends `send` statements to the parent for evaluation. The
+statement:
+
+    (until (send pidB (string "greetings from " A)))
+
+will be evaluated in the environment of the parent process. Even so the
+variables `A` and `B` are bound to `nil` in the sender process `A`, in
+the parent process they will be bound to the correct process ID numbers.
+
+After sending the three messages, the statement:
+
+    (set 'finished true)
+
+is sent to the parent process. Once evaluated, it will cause the `until`
+loop to finish.
+
+For more details on `send` and `receive` and more examples see the [Code
+Patterns](http://www.newlisp.org/CodePatterns.html) document.
+
+

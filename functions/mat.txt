@@ -1,0 +1,45 @@
+Function: mat
+---------------------------------
+
+#### syntax: (mat *+* | *-* | *\** | */* *matrix-A matrix-B*)\
+ syntax: (mat *+* | *-* | *\** | */* *matrix-A number*)
+
+Using the first syntax, this function performs fast floating point
+scalar operations on two-dimensional matrices in *matrix-A* or
+*matrix-B*. The type of operation is specified by one of the four
+arithmetic operators `+`, `-`, `*`, or `/`. This type of arithmetic
+operator is typically used for integer operations in newLISP. In the
+case of `mat`, however, all operations will be performed as floating
+point operations (`add`, `sub`, `mul`, `div`).
+
+Matrices in newLISP are two-dimensional lists or arrays. Internally,
+newLISP translates lists and arrays into fast, accessible C-language
+data objects. This makes matrix operations in newLISP as fast as those
+coded directly in C. The same is true for the matrix operations
+[multiply](#multiply) and [invert](#invert).
+
+    (set 'A '((1 2 3) (4 5 6)))
+    (set 'B A)
+
+    (mat + A B)    → ((2 4 6) (8 10 12))
+    (mat - A B)    → ((0 0 0) (0 0 0))
+    (mat * A B)    → ((1 4 9) (16 25 36))
+    (mat / A B)    → ((1 1 1) (1 1 1))
+
+    ; specify the operator in a variable
+
+    (set 'op +)
+    (mat op A B)    → ((2 4 6) (8 10 12)) 
+
+Using the second syntax, all cells in *matrix-A* are operated on with a
+scalar in *number*:
+
+    (mat + A 5)    → ((6 7 8) (9 10 11))
+    (mat - A 2)    → ((-1 0 1) (2 3 4))
+    (mat * A 3)    → ((3 6 9) (12 15 18))
+    (mat / A 10)   → ((.1 .2 .3) (.4 .5 .6))
+
+See also the other matrix operations [det](#det), [invert](#invert),
+[multiply](#multiply), and [transpose](#transpose).
+
+

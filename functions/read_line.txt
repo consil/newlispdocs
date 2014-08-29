@@ -1,0 +1,48 @@
+Function: read-line
+---------------------------------------
+
+#### syntax: (read-line [*int-file*])
+
+Reads from the current I/O device a string delimited by a line-feed
+character (ASCII 10). There is no limit to the length of the string that
+can be read. The line-feed character is not part of the returned string.
+The line always breaks on a line-feed, which is then swallowed. A line
+breaks on a carriage return (ASCII 13) only if followed by a line-feed,
+in which case both characters are discarded. A carriage return alone
+only breaks and is swallowed if it is the last character in the stream.
+
+By default, the current [device](#device) is the keyboard
+([device](#device) `0`). Use the built-in function [device](#device) to
+specify a different I/O device (e.g., a file). Optionally, a file handle
+can be specified in the *int-file* obtained from a previous
+[open](#open) statement.
+
+The last buffer contents from a read-line operation can be retrieved
+using [current-line](#current-line).
+
+When `read-line` is reading from a file or from *stdin* in a CGI program
+or pipe, it will return `nil` when input is exhausted.
+
+When using `read-line` on *stdin*, line length is limited to 2048
+characters and performance is much faster.
+
+    (print "Enter a num:")
+    (set 'num (int (read-line)))
+
+    (set 'in-file (open "afile.dat" "read"))
+    (while (read-line in-file)
+            (write-line))   
+    (close in-file)
+
+The first example reads input from the keyboard and converts it to a
+number. In the second example, a file is read line-by-line and displayed
+on the screen. The `write-line` statement takes advantage of the fact
+that the result from the last `read-line` operation is stored in a
+system internal buffer. When [write-line](#write-line) is used without
+argument, it writes the contents of the last `read-line` buffer to the
+screen.
+
+See also the [current-line](#current-line) function for retrieving this
+buffer.
+
+

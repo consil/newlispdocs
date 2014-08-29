@@ -1,0 +1,46 @@
+Function: swap
+----------------------------------------------------
+
+#### syntax: (swap *place-1* *place-2*)
+
+The contents of the two places *place-1 and place-2* are swapped. A
+*place* can be the contents of an unquoted symbol or any list or array
+references expressed with [nth](#nth), [first](#first), [last](#lst) or
+implicit [indexing](#indexing) or places referenced by [assoc](#assoc)
+or [lookup](#lookup).
+
+`swap` is a destructive operation that changes the contents of the
+lists, arrays, or symbols involved.
+
+    (set 'lst '(a b c d e f))
+
+    (swap (first lst) (last lst)) → a
+    lst                           → (f b c d e a)
+
+    (set 'lst-b '(x y z))
+
+    (swap (lst 0) (lst-b -1)) → f
+    lst                       → (z b c d e a)
+    lst-b                     → (x y f)
+
+    (set 'A (array 2 3 (sequence 1 6)) → ((1 2 3) (4 5 6))
+
+    (swap (A 0) (A 1)) → (1 2 3)
+    A                  → ((4 5 6) (1 2 3))
+
+    (set 'x 1 'y 2)
+
+    (swap x y)  → 1
+    x  → 2
+    y  → 1
+
+    (set 'lst '((a 1 2 3) (b 10 20 30)))
+    (swap (lookup 'a lst -1) (lookup 'b lst 1))
+    lst → ((a 1 2 10) (b 3 20 30))
+
+    (swap (assoc 'a lst) (assoc 'b lst))
+    lst →  ((b 3 20 30) (a 1 2 10))
+
+Any two places can be swept in the same or different objects.
+
+

@@ -1,0 +1,54 @@
+Function: sync
+----------------------------------
+
+#### syntax: (sync *int-timeout* [*func-inlet*])\
+ syntax: (sync)
+
+When *int-timeout* in milliseconds is specified, `sync` waits for child
+processes launched with [spawn](#spawn) to finish. Whenever a child
+process finishes, `sync` assigns the evaluation result of the spawned
+subtask to the symbol specified in the spawn statement. The `sync`
+returns `true` if all child processes have been processed or `nil` if
+the timeout value has been reached and more child processes are pending.
+
+If `sync` additionally is given with an optional user-defined *inlet*
+function in *func-inlet*, this function will be called with the child
+process-id as argument whenever a spawned child process returns.
+*func-inlet* can contain either a lambda expression or a symbol which
+defines a function.
+
+Without any parameter, `sync` returns a list of pending child process
+PIDs (process identifiers), for which results have not been processed
+yet.
+
+The function `sync` is not available on Win32.
+
+    ; wait for 10 seconds and process finished child processes
+    (sync 10000) 
+
+    ; wait for the maximum time (~ 1193 hours)
+    (sync -1) 
+
+    (define (report pid)
+        (println "process: " pid " has returned"))
+
+    ; call the report function, when a child returns
+    (sync 10000 report) ; wait for 10 seconds max
+
+    ; return a list of pending child processes
+    (sync)         → (245 246 247 248)
+
+    ; wait and do something else
+    (until (true? (sync 10 report) )
+        (println (time-of-day)))
+
+When `sync` is given with a timeout parameter, it will block until
+timeout or until all child processes have returned, whichever comes
+earlier. When no parameter is specified or a function is specified,
+`sync` returns immediately.
+
+The function `sync` is part of the Cilk API for synchronizing child
+processes and process parallelization. See the reference for the
+function [spawn](#spawn) for a full discussion of the Cilk API.
+
+

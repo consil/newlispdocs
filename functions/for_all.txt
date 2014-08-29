@@ -1,0 +1,19 @@
+Function: for-all
+-------------------------------------
+
+#### syntax: (for-all *func-condition* *list*)
+
+Applies the function in *func-condition* to all elements in *list*. If
+all elements meet the condition in *func-condition*, the result is
+`true`; otherwise, `nil` is returned.
+
+    (for-all number? '(2 3 4 6 7))                 → true
+
+    (for-all number? '(2 3 4 6 "hello" 7))         → nil
+
+    (for-all (fn (x) (= x 10)) '(10 10 10 10 10))  → true
+
+Use the [exists](#exists) function to check if at least one element in a
+list meets a condition.
+
+

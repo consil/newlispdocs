@@ -1,0 +1,26 @@
+Function: delete-file
+-----------------------------------------
+
+#### syntax: (delete-file *str-file-name*)
+
+Deletes a file given in *str-file-name*. Returns `true` if the file was
+deleted successfully.
+
+On failure the function returns `nil`. For error information, use
+[sys-error](#sys-error) when used on files. When used on URLs
+[net-error](#net-error) gives more error information.
+
+The file name can be given as a URL.
+
+    (delete-file "junk")
+
+    (delete-file "http://asite.com/example.html")
+
+    (delete-file "file://aFile.txt")
+
+The first example deletes the file `junk` in the current directory. The
+second example shows how to use a URL to specify the file. In this form,
+additional parameters can be given. See [delete-url](#delete-url) for
+details.
+
+

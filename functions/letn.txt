@@ -1,0 +1,39 @@
+Function: letn
+----------------------------------
+
+#### syntax: (letn ((*sym1* [*exp-init1*]) [(*sym2* [*exp-init2*]) ... ]) *body*)\
+ syntax: (letn (*sym1* *exp-init1* [*sym2* *exp-init2* ... ]) *body*)
+
+`letn` is like a *nested let* and works similarly to [let](#let), but
+will incrementally use the new symbol bindings when evaluating the
+initializer expressions as if several [let](#let) were nested. In the
+fully parenthesized first syntax, initializers are optional and assumed
+`nil` if missing.
+
+The following comparison of [let](#let) and `letn` show the difference:
+
+    (set 'x 10)
+    (let ((x 1) (y (+ x 1))) 
+    (list x y))           → (1 11)
+
+    (letn ((x 1) (y (+ x 1))) 
+    (list x y))          → (1 2)
+
+While in the first example using [let](#let) the variable `y` is
+calculated using the binding of `x` before the [let](#let) expression,
+in the second example using `letn` the variable `y` is calculated using
+the new local binding of `x`.
+
+    (letn  (x 1 y x) 
+        (+ x y))     →  2
+
+    ;; same as nested let's
+
+    (let (x 1)
+        (let (y x)
+          (+ x y)))  →  2
+
+`letn` works like several *nested* [let](#let). The parentheses around
+the initializer expressions can be omitted.
+
+

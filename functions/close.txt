@@ -1,0 +1,17 @@
+Function: close
+-----------------------------------
+
+#### syntax: (close *int-file*)
+
+Closes the file specified by the file handle in *int-file*. The handle
+would have been obtained from a previous [open](#open) operation. If
+successful, `close` returns `true`; otherwise `nil` is returned.
+
+    (close (device))  → true
+    (close 7)         → true
+    (close aHandle)   → true
+
+Note that using `close` on [device](#device) automatically resets it to
+0 (zero, the screen device).
+
+

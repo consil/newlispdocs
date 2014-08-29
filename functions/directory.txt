@@ -1,0 +1,41 @@
+Function: directory
+---------------------------------------
+
+#### syntax: (directory [*str-path*])\
+ syntax: (directory *str-path* *str-pattern* [*int-regex-option*])
+
+A list of directory entry names is returned for the directory path given
+in *str-path*. On failure, `nil` is returned. When *str-path* is
+omitted, the list of entries in the current directory is returned.
+
+    (directory "/bin")
+
+    (directory "c:/")
+
+The first example returns the directory of `/bin`, the second line
+returns a list of directory entries in the root directory of drive C:.
+Note that on Win32 systems, a forward slash (`/`) can be included in
+path names. When used, a backslash (`\`) must be preceded by a second
+backslash.
+
+In the second syntax, `directory` can take a regular expression pattern
+in *str-pattern*. Only filenames matching the pattern will be returned
+in the list of directory entries. In *int-regex-options*, special
+regular expression options can be specified; see [regex](#regex) for
+details.
+
+    (directory "." "\\.c")  → ("foo.c" "bar.c")
+    ;; or using braces as string pattern delimiters
+    (directory "." {\.c})  → ("foo.c" "bar.c")
+
+    ; show only hidden files (starting with dot)
+    (directory "." "^[.]")   → ("." ".." ".profile" ".rnd" ".ssh")
+
+The regular expression forces `directory` to return only file names
+containing the string `".c"`.
+
+Other functions that use regular expressions are [find](#find),
+[find-all](#find-all), [parse](#parse), [regex](#regex),
+[replace](#replace), and [search](#search).
+
+

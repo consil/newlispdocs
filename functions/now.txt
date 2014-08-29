@@ -1,0 +1,68 @@
+Function: now
+---------------------------------
+
+#### syntax: (now [*int-minutes-offset* [*int-index*]])
+
+Returns information about the current date and time as a list of
+integers. An optional time-zone offset can be specified in minutes in
+*int-minutes-offset*. This causes the time to be shifted forward or
+backward in time, before being split into separate date values.
+
+An optional list-index in *int-index* makes `now` return a specific
+member in the result list.
+
+    (now)       → (2002 2 27 18 21 30 140000 57 3 -300 0)
+    (now 0 -2)  → -300 ; minutes west of GMT
+
+
+    (apply date-value (now))  → 1014834090
+
+The numbers represent the following date-time fields:
+
+  format                        description
+  ----------------------------- -------------------------------------------------
+  year                          Gregorian calendar
+  month                         (1–12)
+  day                           (1–31)
+  hour                          (0–23) UTC
+  minute                        (0–59)
+  second                        (0–59)
+  microsecond                   (0–999999) OS-specific, millisecond resolution
+  day of current year           Jan 1st is 1
+  day of current week           (1–7) starting Monday
+  time zone offset in minutes   west of GMT
+  daylight savings time type    (0–6) on Linux/Unix or bias in minutes on Win32
+
+
+The second example returns the Coordinated Universal Time (UTC) time
+value of seconds after January 1, 1970.
+
+Ranging from 0 to 23, hours are given in UTC and are not adjusted for
+the local time zone. The resolution of the `microseconds` field depends
+on the operating system and platform. On some platforms, the last three
+digits of the `microseconds` field are always `0` (zero).
+
+The "day of the week" field starts with 1 on Monday conforming to the
+ISO 8601 international standard for date and time representation.
+
+On some platforms, the daylight savings time flag is not active and
+returns `0` (zero) even during daylight savings time (dst).
+
+Depending on the geographical area, the daylight savings time type (dst)
+has a different value from 1 to 6:
+
+  type   area
+  ------ ----------------------
+  0      not on dst
+  1      USA style dst
+  2      Australian style dst
+  3      Western European dst
+  4      Middle European dst
+  5      Eastern European dst
+  6      Canada dst
+
+See also the [date](#date), [date-list](#date-list),
+[date-parse](#date-parse), [date-value](#date-value), [time](#time), and
+[time-of-day](#time-of-day) functions.
+
+

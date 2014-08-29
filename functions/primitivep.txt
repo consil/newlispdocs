@@ -1,0 +1,12 @@
+Function: primitive?
+----------------------------------------
+
+#### syntax: (primitive? *exp*)
+
+Evaluates and tests if *exp* is a primitive symbol and returns `true` or
+`nil` depending on the result.
+
+    (set 'var define)
+    (primitive? var)  → true
+
+

@@ -1,0 +1,128 @@
+Function: semaphore
+---------------------------------------
+
+#### syntax: (semaphore)\
+ syntax: (semaphore *int-id*)\
+ syntax: (semaphore *int-id* *int-wait*)\
+ syntax: (semaphore *int-id* *int-signal*)\
+ syntax: (semaphore *int-id* *0*)
+
+A semaphore is an interprocess synchronization object that maintains a
+count between `0` (zero) and some maximum value. Useful in controlling
+access to a shared resource, a semaphore is set to signaled when its
+count is greater than zero and to non-signaled when its count is zero.
+
+A semaphore is created using the first syntax. This returns the
+semaphore ID, an integer used subsequently as *int-id* when the
+*semaphore* function is called. Initially, the semaphore has a value of
+zero, which represents the non-signaled state.
+
+If calling `semaphore` with a negative value in *int-wait* causes it to
+be decremented below zero, the function call will block until another
+process signals the semaphore with a positive value in *int-signal*.
+Calls to the semaphore with *int-wait* or *int-signal* effectively try
+to increment or decrement the semaphore value by a positive or negative
+value specified in *int-signal* or *int-wait*. Because the value of a
+semaphore must never fall below zero, the function call will block when
+this is attempted (i.e., a semaphore with a value of zero will block
+until another process increases the value with a positive *int-signal*).
+
+The second syntax is used to inquire about the value of a semaphore by
+calling `semaphore` with the *int-id* only. This form is not available
+on Win32.
+
+Supplying `0` (zero) as the last argument will release system resources
+for the semaphore, which then becomes unavailable. Any pending waits on
+this semaphore in other child processes will be released.
+
+On Win32, only parent and child processes can share a semaphore. On
+Linux/Unix, independent processes can share a semaphore.
+
+On failure the `semaphore` function returns `nil`.
+[sys-error](#sys-error) can be used to retrieve the error number and
+text from the underlying operating system.
+
+The following code examples summarize the different syntax forms:
+
+    ;; init semaphores 
+    (semaphore) 
+
+    ;; assign a semaphore to sid 
+    (set 'sid (semaphore))
+
+    ;; inquire the state of a semaphore (not on Win32)
+    (semaphore sid)
+
+    ;; put sid semaphore in wait state (-1) 
+    (semaphore sid -1) 
+
+    ;; run sid semaphore previously put in wait (always 1) 
+    (semaphore sid 1) 
+
+    ;; run sid semaphore with X times a skip (backward or forward) on the function 
+    (semaphore sid X) 
+
+    ;; release sid semaphore system-wide (always 0) 
+    (semaphore sid 0) 
+
+The following example shows semaphores controlling a child process:
+
+    ;; counter process output in bold
+
+    (define (counter n)
+        (println "counter started")
+        (dotimes (x n)
+            (semaphore sid -1)
+            (println x)))
+
+    ;; hit extra <enter> to make the prompt come back
+    ;; after output to the console from the counter process
+
+    > (set 'sid (semaphore))
+
+    > (semaphore sid)
+    0
+
+    > (fork (counter 100))
+
+    counter started
+    > (semaphore sid 1)
+    0
+    > (semaphore sid 3)
+    1
+    2
+    3
+    > (semaphore sid 2)
+    4
+
+    5
+    > _
+
+After the semaphore is acquired in `sid`, it has a value of `0` (the
+non-signaled state). When starting the process `counter`, the semaphore
+will block after the initial start message and will wait in the
+semaphore call. The `-1` is trying to decrement the semaphore, which is
+not possible because its value is already zero. In the interactive, main
+parent process, the semaphore is signaled by raising its value by `1`.
+This unblocks the semaphore call in the `counter` process, which can now
+decrement the semaphore from `1` to `0` and execute the `print`
+statement. When the semaphore call is reached again, it will block
+because the semaphore is already in the wait (`0`) state.
+
+Subsequent calls to `semaphore` with numbers greater than `1` give the
+`counter` process an opportunity to decrement the semaphore several
+times before blocking.
+
+More than one process can participate in controlling the semaphore, just
+as more than one semaphore can be created. The maximum number of
+semaphores is controlled by a system-wide kernel setting on Unix-like
+operating systems.
+
+Use the [fork](#fork) function to start a new process and the
+[share](#share) function to share information between processes. For a
+more comprehensive example of using `semaphore` to synchronize
+processes, see the file `prodcons.lsp` example in the `examples`
+directory in the source distribution, as well as the examples and
+modules distributed with newLISP.
+
+

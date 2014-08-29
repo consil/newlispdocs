@@ -1,0 +1,29 @@
+Function: delete-url
+----------------------------------------
+
+#### syntax: (delete-file *str-url*)
+
+This function deletes the file on a remote HTTP server specified in
+*str-url*. The HTTP `DELETE` protocol must be enabled on the target web
+server, or an error message string may be returned. The target file must
+also have access permissions set accordingly. Additional parameters such
+as timeout and custom headers are available exactly as in the
+[get-url](#get-url) function.
+
+If *str-url* starts with `file://` a file on the local file system is
+deleted.
+
+This feature is also available when the [delete-file](#delete-file)
+function is used and a URL is specified for the filename.
+
+    (delete-url "http://www.aserver.com/somefile.txt")
+    (delete-url "http://site.org:8080/page.html" 5000)
+
+    ; delete on the local file system
+    (delete-url "file:///home/joe/somefile.txt")
+
+The second example configures a timeout option of five seconds. Other
+options such as special HTTP protocol headers can be specified, as well.
+See the [get-url](#get-url) function for details.
+
+

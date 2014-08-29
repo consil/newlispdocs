@@ -1,0 +1,40 @@
+Function: rest
+--------------------------------------------------------
+
+#### syntax: (rest *list*)\
+ syntax: (rest *array*)\
+ syntax: (rest *str*)
+
+Returns all of the items in a list or a string, except for the first.
+`rest` is equivalent to *cdr* or *tail* in other Lisp dialects.
+
+    (rest '(1 2 3 4))            → (2 3 4)
+    (rest '((a b) c d))          → (c d)
+    (set 'aList '(a b c d e))    → (a b c d e)
+    (rest aList)                 → (b c d e)
+    (first (rest aList))         → b
+    (rest (rest aList))          → (d e)
+    (rest (first '((a b) c d)))  → (b)
+
+    (set 'A (array 2 3 (sequence 1 6)))
+    → ((1 2) (3 4) (5 6))
+
+    (rest A)  → ((3 4) (5 6))
+
+    (rest '()) → ()
+
+In the second version, `rest` returns all but the first character of the
+string *str* in a string.
+
+    (rest "newLISP")          → "ewLISP"
+    (first (rest "newLISP"))  → "e"
+
+See also the [first](#first) and [last](#last) functions.
+
+Note that an *implicit rest* is available for lists. See the chapter
+[Implicit rest and slice](#implicit_rest_slice).
+
+Note that [rest](#rest) works on character boundaries rather than byte
+boundaries when the UTF-8–enabled version of newLISP is used.
+
+

@@ -1,0 +1,35 @@
+Function: display-html_[JS](#JS)
+----------------------------------------------------
+
+#### syntax: (display-html *str-html*)\
+ syntax: (display-html *str-html* *bool-flag*)
+
+Using the first syntax, the function replaces the current page in the
+browser with the HTML page found in *str-html*.
+
+If *bool-flag* evaluates to `true`, the page gets opened in a new
+browser tab and the current page is not affected.
+
+This function is only available on newLISP compiled to JavaScript.
+
+    (set 'page [text]
+    <html>
+    <head>
+    <title>Hello App</title>
+    </head>
+    <body>
+    <h2>Hello World</h2>
+    </body>
+    </html>
+    [/text])
+
+    ; open the page in a new browser tab
+    (display-html page true) → "92"
+
+The function returns the length of the HTML document displayed as a
+string.
+
+See also the function [eval-string-js](#eval-string-js) for evaluation
+of JavaScript in the current page.
+
+

@@ -1,0 +1,102 @@
+Function: ref
+---------------------------------
+
+#### syntax: (ref *exp-key* *list* [*func-compare* [true]])
+
+`ref` searches for the key expression *exp-key* in *list* and returns a
+list of integer indices or an empty list if *exp-key* cannot be found.
+`ref` can work together with [push](#push) and [pop](pop), both of which
+can also take lists of indices.
+
+By default, `ref` checks if expressions are equal. With *func-compare*,
+more complex comparison functions can be used. The comparison function
+can be a previously defined function. Note that this function always
+takes two arguments, even if only the second argument is used inside the
+function.
+
+When the optional `true` parameter is present, the element found is
+returned instead of the index vector.
+
+    ; get index vectors for list elements
+
+    (set 'pList '(a b (c d (x) e)))
+
+    (ref 'x pList)    → (2 2 0)
+
+    (ref '(x) pList)   → (2 2)
+
+    ; the key expression is in a variable
+
+    (set 'p '(c d (x) e))
+
+    (ref p pList p)     → (2)
+
+    ; indexing using the vector returned from ref
+
+    (set 'v (ref '(x) pList)) → (2 2)
+
+    (pList v) → (x)
+
+    ; if nothing is found, nil is returned
+
+    (ref 'foo plist)  → nil
+
+    ; not specifying a comparison functor assumes =
+
+    (set 'L '(a b (c d (e) f)))
+
+    (ref 'e L)      → (2 2 0)
+    (ref 'e L =)    → (2 2 0)
+
+    ; a is the first symbol where e is greater
+
+    (ref 'e L >)  → (0)
+
+    ; return the element instead of the index
+
+    (ref 'e L > true)  → a
+
+    ; use an anonymous comparison function
+
+    (ref 'e L (fn (x y) (or (= x y) (= y 'd))))      → (2 1)
+
+    (ref 'e L (fn (x y) (or (= x y) (= y 'd))) true) → d
+
+The following example shows the use of [match](#match) and
+[unify](#unify) to formulate searches that are as powerful as regular
+expressions are for strings:
+
+    (set 'L '((l 3) (a 12) (k 5) (a 10) (z 22)))
+
+    ; use match as a comparison function
+
+    (ref '(a ?) L match) → (1)
+
+    ; use unify as a comparison function
+
+    (set 'L '( ((a b) (c d)) ((e e) (f g)) ))
+
+    (ref '(X X) L unify)      → (1 0)
+
+    (ref '(X g) L unify)      → (1 1)
+
+    (ref '(X g) L unify true) → (f g)
+
+The `'(X X)` pattern with [unify](#unify) searches for a list pair where
+the two elements are equal. The `unify` pattern `'(X g)` searches for a
+list pair with the symbol `g` as the second member. The patterns are
+quoted to protect them from evaluation.
+
+Pass the list as a default functor:
+
+    (set 'C:C '(a b (c d) e f))
+
+    (ref 'd C)  → (2 1)
+
+This is suitable when passing lists by reference using a context. See
+also the chapter [Passing data by reference](#pass_big).
+
+See also the [ref-all](#ref-all) function, which searches for all
+occurrences of a key expression in a nested list.
+
+

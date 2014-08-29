@@ -1,0 +1,26 @@
+Function: curry
+-----------------------------------
+
+#### syntax: (curry *func* *exp*)
+
+Transforms *func* from a function *f(x, y)* that takes two arguments
+into a function *fx(y)* that takes a single argument. `curry` works like
+a macro in that it does not evaluate its arguments. Instead, they are
+evaluated during the application of *func*.
+
+    (set 'f (curry + 10))  → (lambda ($x) (+ 10 $x))
+
+    (f 7)  → 17
+
+    (filter (curry match '(a *)) '((a 10) (b 5) (a 3) (c 8) (a 9)))
+    →  ((a 10) (a 3) (a 9))
+
+    (clean (curry match '(a *)) '((a 10) (b 5) (a 3) (c 8) (a 9)))
+    →  ((b 5) (c 8))
+
+    (map (curry list 'x) (sequence 1 5))
+    →  ((x 1) (x 2) (x 3) (x 4) (x 5))
+
+`curry` can be used on all functions taking two arguments.
+
+

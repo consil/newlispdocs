@@ -1,0 +1,81 @@
+Function: set-locale
+----------------------------------------
+
+#### syntax: (set-locale [*str-locale* [*int-category*]])
+
+Reports or switches to a different locale on your operating system or
+platform. When used without arguments, *set-locale* reports the current
+locale being used. When *str-locale* is specified, *set-locale* switches
+to the locale with all category options turned on (`LC_ALL`). Placing an
+empty string in *str-locale* switches to the default locale used on the
+current platform.
+
+`set-locale` returns either the current locale string and decimal point
+string in a list or `nil` if the requested change could not be
+performed.
+
+    ; report current locale
+
+    (set-locale)     
+
+    ; set default locale of your platform and country
+    ; return value shown when executing on German MS-Windows
+
+    (set-locale "")    → ("German_Germany.1252" ",")
+    (add 1,234 1,234)  → 2,468
+
+By default, newLISP – if not enabled for UTF-8 – starts up with the
+POSIX C default locale. This guarantees that newLISP's behavior will be
+identical on any platform locale. On UTF-8 enabled versions of newLISP
+the locale of the current platform is chosen.
+
+    ; after non-UTF-8 newLISP start up
+
+    (set-locale)  → ("C" ".")
+
+In *int-category* integer numbers may be specified as *category options*
+for fine-tuning certain aspects of the locale, such as number display,
+date display, and so forth. The options valid on your platform can be
+found in the C include file `locale.h` and may be different on each
+platform. When no *int-category* is specified, `LC_ALL` is used to turn
+on all options for that locale.
+
+  --------------------------------
+  Category       Mac OS X, BSDs\
+                 & MS Windows
+  -------------- -----------------
+  LC\_ALL        0
+
+  LC\_COLLATE    1
+
+  LC\_CTYPE      2
+
+  LC\_MONETARY   3
+
+  LC\_NUMERIC    4
+
+  LC\_TIME       5
+  --------------------------------
+
+
+The default C locale uses the decimal dot, but most others use a decimal
+comma.
+
+    ; with the current locale "en_US.UTF-8", only change the decimal separator 
+    ; to German locale comma on  Mac OS X. LC_NUMERIC is 4 on most platforms 
+
+    (set-locale) → ("en_US.UTF-8" ".") 
+    (set-locale "de_DE.UTF-8" 4) → ("de_DE.UTF-8" ",") 
+
+    ; mixed locale shows country setting for each category, 4 has changed
+    (set-locale) → ("en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/de_DE.UTF-8/en_US.UTF-8/en_US.UTF-8" ",")
+
+Note that using `set-locale` does not change the behavior of regular
+expressions in newLISP. To localize the behavior of PCRE (Perl
+Compatible Regular Expressions), newLISP must be compiled with different
+character tables. See the file, LOCALIZATION, in the newLISP source
+distribution for details.
+
+See also the chapter [Switching the locale](#switching).
+
+

@@ -1,0 +1,59 @@
+Function: new
+---------------------------------
+
+#### syntax: (new *context-source* *sym-context-target* [*bool*])\
+ syntax: (new *context-source*)
+
+The context *context-source* is copied to *sym-context-target*. If the
+target context does not exist, a new context with the same variable
+names and user-defined functions as in *context-source* is created. If
+the target context already exists, then new symbols and definitions are
+added. Existing symbols are only overwritten when the expression in
+*bool* evaluates to anything other than `nil`; otherwise, the content of
+existing symbols will remain. This makes *mixins* of context objects
+possible. `new` returns the target context, which cannot be MAIN.
+
+In the second syntax, the existing context in *context-source* gets
+copied into the current context as the target context.
+
+All references to symbols in the originating context will be translated
+to references in the target context. This way, all functions and data
+structures referring to symbols in the original context will now refer
+to symbols in the target context.
+
+    (new CTX 'CTX-2)  → CTX-2   
+
+    ;; force overwrite of existing symbols
+    (new CTX MyCTX true)  → MyCTX   
+
+The first line in the example creates a new context called `CTX-2` that
+has the exact same structure as the original one. Note that `CTX` is not
+quoted because contexts evaluate to themselves, but CTX-2 must be quoted
+because it does not exist yet.
+
+The second line merges the context `CTX` into `MyCTX`. Any existing
+symbols of the same name in `MyCTX` will be overwritten. Because `MyCTX`
+already exists, the quote before the context symbol can be omitted.
+
+Context symbols need not be mentioned explicitly, but they can be
+contained in variables:
+
+    (set 'foo:x 123)
+    (set 'bar:y 999)
+
+    (set 'ctxa foo)
+    (set 'ctxb bar)
+
+    (new ctxa ctxb)  ; from foo to bar
+
+    bar:x  → 123  ; x has been added to bar
+    bar:y  → 999)
+
+The example refers to contexts in variables and merges context `foo`
+into `bar`.
+
+See also the function [def-new](#def-new) for moving and merging single
+functions instead of entire contexts. See the [context](#context)
+function for a more comprehensive example of `new`.
+
+

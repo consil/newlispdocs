@@ -1,0 +1,13 @@
+Function: change-dir
+----------------------------------------
+
+#### syntax: (change-dir *str-path*)
+
+Changes the current directory to be the one given in *str-path*. If
+successful, `true` is returned; otherwise `nil` is returned.
+
+    (change-dir "/etc")
+
+Makes `/etc` the current directory.
+
+

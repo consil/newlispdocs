@@ -1,0 +1,25 @@
+Function: abort
+-----------------------------------
+
+#### syntax: (abort *int-pid*)\
+ syntax: (abort)
+
+In the first form, `abort` aborts a specific child process of the
+current parent process giving the process id in *int-pid*. The process
+must have been started using [spawn](#spawn). For processes started
+using [fork](#fork), use [destroy](#destroy) instead.
+
+The function `abort` is not available on Win32.
+
+    (abort 2245)  → true
+
+To abort all child processes spawned from the current process use
+`abort` without any parameters:
+
+    (abort)  → true ; abort all
+
+The function `abort` is part of the Cilk API for synchronizing child
+processes and process parallelization. See the reference for the
+function [spawn](#spawn) for a full discussion of the Cilk API.
+
+

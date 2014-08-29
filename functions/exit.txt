@@ -1,0 +1,14 @@
+Function: exit
+----------------------------------
+
+#### syntax: (exit [*int*])
+
+Exits newLISP. An optional exit code, *int*, may be supplied. This code
+can be tested by the host operating system. When newLISP is run in
+[daemon server mode](#daemon) using `-d` as a command-line option, only
+the network connection is closed, while newLISP stays resident,
+listening for a new connection.
+
+    (exit 5)
+
+

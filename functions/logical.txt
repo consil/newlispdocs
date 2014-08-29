@@ -1,0 +1,58 @@
+Function: logical
+-------------------------------------------------------------------------
+
+#### syntax: (\< *exp-1* [*exp-2* ... ])\
+ syntax: (\> *exp-1* [*exp-2* ... ])\
+ syntax: (= *exp-1* [*exp-2* ... ])\
+ syntax: (\<= *exp-1* [*exp-2* ... ])\
+ syntax: (\>= *exp-1* [*exp-2* ... ])\
+ syntax: (!= *exp-1* [*exp-2* ... ])
+
+Expressions are evaluated and the results are compared successively. As
+long as the comparisons conform to the comparison operators, evaluation
+and comparison will continue until all arguments are tested and the
+result is `true`. As soon as one comparison fails, `nil` is returned.
+
+If only one argument is supplied, all comparison operators assume `0`
+(zero) as a second argument. This can be used to check if a number is
+negative, positive, zero or not zero.
+
+All types of expressions can be compared: atoms, numbers, symbols, and
+strings. List expressions can also be compared (list elements are
+compared recursively).
+
+When comparing lists, elements at the beginning of the list are
+considered more significant than the elements following (similar to
+characters in a string). When comparing lists of different lengths but
+equal elements, the longer list is considered greater (see examples).
+
+In mixed-type expressions, the types are compared from lowest to
+highest. Floats and integers are compared by first converting them to
+the needed type, then comparing them as numbers.
+
+> **Atoms:** nil, true, integer or float, string, symbol, primitive\
+>  **Lists:** quoted list/expression, list/expression, lambda,
+> lambda-macro
+
+    (< 3 5 8 9)                     → true
+    (> 4 2 3 6)                     → nil
+    (< "a" "c" "d")                 → true
+    (>= duba aba)                   → true
+    (< '(3 4) '(1 5))               → nil
+    (> '(1 2 3) '(1 2))             → true
+    (= '(5 7 8) '(5 7 8))           → true
+    (!= 1 4 3 7 3)                  → true
+    (< 1.2 6 "Hello" 'any '(1 2 3))           → true
+    (< nil true)                              → true
+    (< '(((a b))) '(((b c))))                 → true
+    (< '((a (b c)) '(a (b d)) '(a (b (d)))))  → true
+
+    ; with single argument compares against 0
+
+    (> 1)    → true ; checks for positive
+    (> -1)   → nil ; checks for negative
+    (= 123)  → nil ; checks for zero
+
+    (map > '(1 3 -4 -3 1 2))   → (true true nil nil true true)
+
+

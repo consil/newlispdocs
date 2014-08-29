@@ -1,0 +1,24 @@
+Function: throw-error
+-----------------------------------------
+
+#### syntax: (throw-error *exp*)
+
+Causes a user-defined error exception with text provided by evaluating
+*exp*.
+
+    (define (foo x y)
+        (if (= x 0) (throw-error "first argument cannot be 0"))
+        (+ x y))
+
+    (foo 1 2)  → 3
+
+    (foo 0 2)  ; causes a user error exception
+    ERR: user error : first argument cannot be 0
+    called from user-defined function foo
+
+The user error can be handled like any other error exception using
+user-defined error handlers and the [error-event](#error-event)
+function, or the form of [catch](#catch) that can capture error
+exceptions.
+
+

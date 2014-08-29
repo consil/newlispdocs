@@ -1,0 +1,60 @@
+Function: delete
+------------------------------------
+
+#### syntax: (delete *symbol* [*bool*])\
+ syntax: (delete *sym-context* [*bool*])
+
+Deletes a symbol *symbol*, or a context in *sym-context* with all
+contained symbols from newLISP's symbol table. References to the symbol
+will be changed to `nil`.
+
+When the expression in *bool* evaluates to `true`, symbols are only
+deleted when they are not referenced.
+
+When the expression in *bool* evaluates to `nil`, symbols will be
+deleted without any reference checking. Note that this mode should only
+be used, if no references to the symbol exist outside it's namespace. If
+external references exist, this mode can lead to system crashes, as the
+external reference is not set to `nil` when using this mode. This mode
+can be used to delete namespace hashes and to delete namespaces in
+object systems, where variables are strictly treated as private.
+
+Protected symbols of built-in functions and special symbols like `nil`
+and `true` cannot be deleted.
+
+`delete` returns `true` if the symbol was deleted successfully or `nil`
+if the symbol was not deleted.
+
+When deleting a context symbol, the first `delete` removes the context
+namespace contents and demotes the context symbol to a normal
+mono-variable symbol. A second `delete` will remove the symbol from the
+symbol table.
+
+    (set 'lst '(a b aVar c d))
+
+    (delete 'aVar)  ; aVar deleted, references marked nil
+
+    lst  → (a b nil c d)
+
+    (set 'lst '(a b aVar c d))
+
+    (delete 'aVar true)  
+    → nil ; protect aVar if referenced
+
+    lst  → (a b aVar c d)
+
+    ;; delete all symbols in a context
+    (set 'foo:x 123)
+    (set 'foo:y "hello")
+
+    (delete 'foo)  → foo:x, foo:y deleted
+
+In the last example only the symbols inside context `foo` will be
+deleted but not the context symbol `foo` itself. It will be converted to
+a normal unprotected symbol and contain `nil`.
+
+Note that deleting a symbol that is part of an expression which is
+currently executing can crash the system or have other unforeseen
+effects.
+
+

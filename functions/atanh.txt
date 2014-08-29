@@ -1,0 +1,16 @@
+Function: atanh
+-----------------------------------
+
+#### syntax: (atanh *num-radians*)
+
+Calculates the inverse hyperbolic tangent of *num-radians*, the value
+whose hyperbolic tangent is *num-radians*. If the absolute value of
+*num-radians* is greater than 1, `atanh` returns `NaN`; if it is equal
+to 1, `atanh` returns infinity.
+
+    (atanh 0.5) → 0.5493061443
+    (tanh (atanh 0.5)) → 0.5
+    (atanh 1.1) → NaN
+    (atanh 1) → inf
+
+

@@ -1,0 +1,45 @@
+Function: letex
+-----------------------------------
+
+#### syntax: (letex ((*sym1* [*exp-init1*]) [(*sym2* [*exp-init2*]) ... ]) *body*)\
+ syntax: (letex (*sym1* *exp-init1* [*sym2* *exp-init2* ... ]) *body*)
+
+This function combines [let](#let) and [expand](#expand) to expand local
+variables into an expression before evaluating it. In the fully
+parenthesized first syntax initializers are optional and assumed `nil`
+if missing.
+
+Both forms provide the same functionality, but in the second form the
+parentheses around the initializers can be omitted:
+
+    (letex (x 1 y 2 z 3) '(x y z))    → (1 2 3)
+
+    (letex ( (x 1) (y '(a b c)) (z "hello") ) '(x y z)) 
+
+    → (1 (a b c) "hello")
+
+Before the expression `'(x y z)` gets evaluated, `x, y` and `z` are
+literally replaced with the initializers from the `letex` initializer
+list. The final expression which gets evaluated is `'(1 2 3)`.
+
+In the second example a function `make-adder` is defined for making
+adder functions:
+
+    (define (make-adder n)
+        (letex (c n) (lambda (x) (+ x c))))
+
+    (define add3 (make-adder 3)) → (lambda (x) (+ x 3))
+
+    (add3 10) → 13
+
+    ; letex can expand symbols into themselves
+    ; the following form also works
+
+    (define (make-adder n)
+         (letex (n n) (lambda (x) (+ x n))))
+
+`letex` evaluates `n` to the constant `3` and replaces `c` with it in
+the lambda expression. The second examples shows, how a `letex` variable
+can be expanded into itself.
+
+

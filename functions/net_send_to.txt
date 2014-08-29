@@ -1,0 +1,48 @@
+Function: net-send-to
+-----------------------------------------
+
+#### syntax: (net-send-to *str-remotehost* *int-remoteport* *str-buffer* *int-socket*)
+
+Can be used for either UDP or TCP/IP communications. The socket in
+*int-socket* must have previously been opened with a
+[net-connect](#net-connect) or [net-listen](#net-listen) function. If
+the opening functions was used with the `"udp"` option, `net-listen` or
+`net-connect` are not used to listen or to connect but only to create
+the UDP socket. The host in *str-remotehost* can be specified either as
+a hostname or as an IP-number string.
+
+When using `net-connect` together with `net-send-to`, then only one of
+the functions should specify the remote host. The other should leave the
+address as an empty string.
+
+    ;;;;;;;;;;;;;;;;;; UDP server
+    (set 'socket (net-listen 10001 "" "udp"))
+    (if socket (println "server listening on port " 10001)
+           (println (net-error)))
+    (while (not (net-error))
+       (set 'msg (net-receive-from socket 255))
+       (println "-> " msg)
+       (net-send-to (nth 1 msg) (nth 2 msg) 
+                    (upper-case (first msg)) socket))
+
+    ;;;;;;;;;;;;;;;;;; UDP client
+    (set 'socket (net-listen 10002 "" "udp"))
+    (if (not socket) (println (net-error)))
+    (while (not (net-error))
+       (print "> ")
+       (net-send-to "127.0.0.1" 10001 (read-line) socket)
+       (net-receive socket buff 255)
+       (println "-> " buff))
+
+In the examples both, the client and the server use `net-listen` to
+create the UDP socket for sending and receiving. The server extracts the
+client address and port from the message received and uses it in the
+`net-send-to` statement.
+
+See also the [net-receive-from](#net-receive-from) function and the
+[net-listen](#net-listen) function with the `"udp"` option.
+
+For blocking short UDP transactions use [net-send-udp](#net-send-udp)
+and [net-receive-udp](#net-receive-udp).
+
+

@@ -1,0 +1,13 @@
+Function: ceil
+----------------------------------
+
+#### syntax: (ceil *number*)
+
+Returns the next highest integer above *number* as a floating point.
+
+    (ceil -1.5)  → -1
+    (ceil 3.4)   → 4
+
+See also the [floor](#floor) function.
+
+

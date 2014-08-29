@@ -1,0 +1,62 @@
+Function: explode
+-----------------------------------------------------------
+
+#### syntax: (explode *str* [*int-chunk* [*bool*]])\
+ syntax: (explode *list* [*int-chunk* [*bool*]])
+
+In the first syntax, `explode` transforms the string (*str*) into a list
+of single-character strings. Optionally, a chunk size can be specified
+in *int-chunk* to break the string into multi-character chunks. When
+specifying a value for *bool* other than `nil`, the last chunk will be
+omitted if it does not have the full length specified in *int-chunk*.
+
+    (explode "newLISP")  → ("n" "e" "w" "L" "I" "S" "P")
+
+    (join (explode "keep it together"))  → "keep it together"
+
+    (explode "newLISP" 2)    → ("ne" "wL" "IS" "P")
+
+    (explode "newLISP" 3)    → ("new" "LIS" "P")
+
+    ; omit last chunk if too short
+    (explode "newLISP" 3 true)    → ("new" "LIS")
+
+Only on non UTF8– enabled versions, `explode` also works on binary
+content:
+
+    (explode "\000\001\002\003") 
+    → ("\000" "\001" "\002" "\003")
+
+When called in UTF-8–enabled versions of newLISP, `explode` will work on
+character boundaries rather than byte boundaries. In UTF-8–encoded
+strings, characters may contain more than one byte. Processing will stop
+when a zero byte character is found.
+
+To explode binary contents on UTF-8–enabled versions of newLISP use
+[unpack](#unpack) as shown in the following example:
+
+    (set 'str "\001\002\003\004") → "\001\002\003\004"
+
+    (unpack (dup "c" (length str)) str) → (1 2 3 4)
+    (unpack (dup "s" (length str)) str) → ("\001" "\002" "\003" "\004")
+
+In the second syntax, `explode` explodes a list (*list*) into sublists
+of chunk size *int-chunk*, which is 1 (one) by default.
+
+The following shows an example of the last chunk being omitted when the
+value for *bool* is other than `nil`, and the chunk does not have the
+full length specified in *int-chunk*.
+
+    (explode '(a b c d e f g h))    → ((a) (b) (c) (d) (e) (f) (g) (h))
+    (explode '(a b c d e f g) 2)  → ((a b) (c d) (e f) (g))
+
+    ; omit last chunk if too short
+    (explode '(a b c d e f g) 2 true)  → ((a b) (c d) (e f))
+
+    (transpose (explode '(a b c d e f g h) 2)) 
+    → ((a c e g) (b d f h))
+
+The [join](#join) and [append](#append) functions are inverse operations
+of `explode`.
+
+

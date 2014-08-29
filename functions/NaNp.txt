@@ -1,0 +1,36 @@
+Function: NaN?
+----------------------------------
+
+#### syntax: (NaN? *float*)
+
+Tests if the result of a floating point math operation is a `NaN`.
+Certain floating point operations return a special IEEE 754 number
+format called a `NaN` for 'Not a Number'.
+
+    ; floating point operation on NaN yield NaN
+    (set 'x (sqrt -1))  → NaN
+    (NaN? x)            → true
+    (add x 123)         → NaN
+    (mul x 123)         → NaN
+
+    ; integer operations treat NaN as zero
+    (+ x 123)  → 123
+    (* x 123)  → 0
+
+    ; comparisons with NaN values yield nil
+    (> x 0)   → nil
+    (<= x 0)  → nil
+    (= x x)   → nil
+
+    (set 'infinity (mul 1.0e200 1.0e200)) → inf
+    (NaN? (sub infinity infinity)) → true
+
+Note that all floating point arithmetic operations with a `NaN` yield a
+`NaN`. All comparisons with `NaN` return `nil`, but `true` when
+comparing to itself. Comparison with itself, however, would result in
+*not* `true` when using ANSI C. Integer operations treat `NaN` as `0`
+(zero) values.
+
+See also [inf?](#infp) for testing a floating point value for infinity.
+
+

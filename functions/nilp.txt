@@ -1,0 +1,24 @@
+Function: nil?
+----------------------------------
+
+#### syntax: (nil? *exp*)
+
+If the expression in *exp* evaluates to `nil`, then `nil?` returns
+`true`; otherwise, it returns `nil`.
+
+    (map nil? '(x nil  1 nil "hi" ()))
+    → (nil true nil true nil nil)
+
+    (nil? nil)  → true
+    (nil? '())  → nil
+
+    ; nil? means strictly nil
+    (nil? (not '()))  → nil
+
+The `nil?` predicate is useful for distinguishing between `nil` and the
+empty list `()`.
+
+Note that `nil?` means *strictly* `nil` while `true?` means everything
+not `nil` or the empty list `()`.
+
+

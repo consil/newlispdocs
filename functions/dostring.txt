@@ -1,0 +1,50 @@
+Function: dostring
+------------------------------------------------------------
+
+#### syntax: (dostring (*sym* *string* [*exp-break*]) *body*)
+
+The expressions in *body* are evaluated for each character in *string*.
+The variable in *sym* is set to each ASCII or UTF-8 integer value of the
+characters before evaluation of the body expressions. The variable used
+as loop index is local and behaves according to the rules of dynamic
+scoping.
+
+Optionally, a condition for early loop exit may be defined in
+*exp-break*. If the break expression evaluates to any non-`nil` value,
+the `dolist` loop returns with the value of *exp-break*. The break
+condition is tested before evaluating *body.*
+
+    ; ASCII example
+    (set 'str "abcdefg")
+    (dostring (c str) (println c " - " (char c)))
+
+    97 - a
+    98 - b
+    99 - c
+    100 - d
+    101 - e
+    102 - f
+    103 - g
+
+    ; UTF8 example
+    (set 'utf8str "我能吞下玻璃而不伤身体。")
+    (dostring (c utf8str) (println c " - " (char c)))
+
+    25105 - 我
+    33021 - 能
+    21534 - 吞
+     ...
+    20307 - 体
+    12290 - 。 
+
+This example prints the value of each character in the console window.
+In UTF-8 enabled versions of newLISP, individual characters may be
+longer than one byte and the number in the loop variable may exceed 255.
+The return value of `dostring` is the result of the last evaluated
+expression.
+
+The internal system variable `$idx` keeps track of the current offset
+into the string passed to `dostring`, and it can be accessed during its
+execution.
+
+

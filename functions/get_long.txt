@@ -1,0 +1,41 @@
+Function: get-long
+--------------------------------------
+
+#### syntax: (get-long *int-address*)
+
+Gets a 64-bit integer from the address specified in *int-address*. This
+function is handy when using `import` to import shared library
+functions, a function returning an address pointer to a long integer, or
+a pointer to a structure containing long integers.
+
+    long long int * foo(void)
+    {
+    int * result;
+    …
+    *result = 123;
+    return(result);
+    }
+
+    long long int foo-b(void)
+    {
+    int result;
+    …
+    result = 456;
+    return(result);
+    }
+
+Consider the C function `foo` (from a shared library), which returns an
+integer pointer (address of an integer).
+
+    (import "mylib.so" "foo")
+    (get-int (foo))  → 123
+    (foo-b)          → 456
+
+Note that using `get-long` with an incorrect address in *int-address* is
+unsafe and could result in the system crashing or becoming unstable.
+
+See also the [address](#address), [get-char](#get-char),
+[get-float](#get-float), [get-int](#get-int), [get-string](#get-string),
+[pack](#pack), and [unpack](#unpack) functions.
+
+

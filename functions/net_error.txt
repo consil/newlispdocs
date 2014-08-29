@@ -1,0 +1,68 @@
+Function: net-error
+---------------------------------------
+
+#### syntax: (net-error)\
+ syntax: (net-error *int-error*)
+
+Retrieves the last error that occurred when calling a any of the
+following functions: [net-accept](#net-accept),
+[net-connect](#net-connect), [net-eval](#net-eval),
+[net-listen](#net-listen), [net-lookup](#net-lookup),
+[net-receive](#net-receive), [net-receive-udp](#net-receive-udp),
+[net-select](#net-select), [net-send](#net-send),
+[net-send-udp](#net-send-udp), and [net-service](#net-service). Whenever
+one of these functions fails, it returns `nil` and `net-error` can be
+used to retrieve more information.
+
+Functions that communicate using sockets close the socket automatically
+and remove it from the [net-sessions](#net-sessions) list.
+
+Each successful termination of a [net-\*](#socket_tcpip) function clears
+the error number.
+
+The following messages are returned:
+
+  no   description
+  ---- -----------------------------------
+  1    Cannot open socket
+  2    DNS resolution failed
+  3    Not a valid service
+  4    Connection failed
+  5    Accept failed
+  6    Connection closed
+  7    Connection broken
+  8    Socket send() failed
+  9    Socket recv() failed
+  10   Cannot bind socket
+  11   Too many sockets in net-select
+  12   Listen failed
+  13   Badly formed IP
+  14   Select failed
+  15   Peek failed
+  16   Not a valid socket
+  17   Cannot unblock socket
+  18   Operation timed out
+  19   HTTP bad formed URL
+  20   HTTP file operation failed
+  21   HTTP transfer failed
+  22   HTTP invalid response from server
+  23   HTTP no response from server
+  24   HTTP document empty
+  25   HTTP error in header
+  26   HTTP error in chunked format
+
+
+    (net-error) → nil
+
+    (net-connect "jhghjgkjhg" 80)  →  nil
+
+    (net-error)  →  (2 "ERR: "DNS resolution failed") 
+
+When *int-error* is specified the number and error text for that error
+number is returned.
+
+    (net-error 10) → (10 "Cannot bind socket")
+
+See also [last-error](#last-error) and [sys-error](#sys-error).
+
+

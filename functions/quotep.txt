@@ -1,0 +1,15 @@
+Function: quote?
+------------------------------------
+
+#### syntax: (quote? *exp*)
+
+Evaluates and tests whether *exp* is quoted. Returns `true` or `nil`
+depending on the result.
+
+    (set 'var ''x)  → 'x
+    (quote? var)    → true
+
+Note that in the `set` statement, ` ''x` is quoted twice because the
+first quote is lost during the evaluation of the `set` assignment.
+
+

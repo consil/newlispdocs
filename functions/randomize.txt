@@ -1,0 +1,23 @@
+Function: randomize
+---------------------------------------
+
+#### syntax: (randomize *list* [*bool*])
+
+Rearranges the order of elements in *list* into a random order.
+
+    (randomize '(a b c d e f g))  → (b a c g d e f)
+    (randomize (sequence 1 5))    → (3 5 4 1 2)
+
+`randomize` will always return a sequence different from the previous
+one without the optional *bool* flag. This may require the function to
+calculate several sets of reordered elements, which in turn may lead to
+different processing times with different invocations of the function on
+the same input list length. To allow for the output to be equal to the
+input, `true` or any expression evaluating to not `nil` must be
+specified in *bool*.
+
+`randomize` uses an internal *pseudo random sequence* generator that
+returns the same series of results each time newLISP is started. Use the
+[seed](#seed) function to change this sequence.
+
+

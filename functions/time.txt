@@ -1,0 +1,19 @@
+Function: time
+----------------------------------
+
+#### syntax: (time *exp* [*int-count*)
+
+Evaluates the expression in *exp* and returns the time spent on
+evaluation in floating point milliseconds. Depending on the platform
+decimals of milliseconds are shown or not shown.
+
+    (time (myprog x y z))  → 450.340
+
+    (time (myprog x y z) 10)  → 4420.021
+
+In first the example, 450 milliseconds elapsed while evaluating
+`(myprog x y z)`. The second example returns the time for ten
+evaluations of `(myprog x y z)`. See also [date](#date),
+[date-value](#date-value), [time-of-day](#time-of-day), and [now](#now).
+
+

@@ -1,0 +1,58 @@
+Function: cpymem
+------------------------------------
+
+#### syntax: (cpymem *int-from-address* *int-to-address* *int-bytes*)
+
+Copies *int-bytes* of memory from *int-from-address* to
+*int-to-address*. This function can be used for direct memory
+writing/reading or for hacking newLISP internals (e.g., type bits in
+newLISP cells, or building functions with binary executable code on the
+fly).
+
+Note that this function should only be used when familiar with newLISP
+internals. `cpymem` can crash the system or make it unstable if used
+incorrectly.
+
+    (set 's "0123456789")
+
+    (cpymem "xxx" (+ (address s) 5) 3)
+
+    s  → "01234xxx89")
+
+The example copies a string directly into a string variable.
+
+The following example creates a new function from scratch, runs a piece
+of binary code, and adds up two numbers. This assembly language snippet
+shows the x86 (Intel CPU) code to add up two numbers and return the
+result:
+
+     55       push ebp
+     8B EC    mov  ebp, esp
+     8B 45 08 mov  eax, [ebp+08]
+     03 45 0C add  eax, [ebp+0c]
+     5D       pop  ebp
+     C3       ret
+
+     ; for Win32/stdcall change last line
+     C2 08 00 ret 
+
+The binary representation is attached to a new function created in
+newLISP:
+
+    (set 'foo-code (append
+         (pack "bbbbbbbbbb" 0x55 0x8B 0xEC 0x8B 0x45 0x08 0x03 0x45 0x0C 0x5D)
+         (if (= ostype "Win32") (pack "bbb" 0xC2 0x08 0x00) (pack "b" 0xC3))))
+    (set 'foo print)
+    (cpymem (pack "ld" (if (= ostype "Win32") 8456 4360)) (first (dump foo)) 4)
+    (cpymem (pack "ld" (address foo-code)) (+ (first (dump foo)) 12) 4)
+    (set 'foo-name "foo")
+    (cpymem (pack "ld" foo-name) (+ (first (dump foo)) 8) 4)
+
+    (foo 3 4)  →  7
+
+The last example will not work on all hardware platforms and OSs.
+
+Use the [dump](#dump) function to retrieve binary addresses and the
+contents from newLISP cells.
+
+

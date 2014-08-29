@@ -1,0 +1,28 @@
+Function: seed
+----------------------------------
+
+#### syntax: (seed *int-seed*)
+
+Seeds the internal random generator that generates numbers for
+[amb](#amb), [normal](#normal), [rand](#rand), and [random](#random)
+with the number specified in *int-seed*. Note that the random generator
+used in newLISP is the C-library function *rand()*. All randomizing
+functions in newLISP are based on this function.
+
+Note that the maximum value for *int-seed* is limited to 16 or 32 bits,
+depending on the operating system used. Internally, only the 32 least
+significant bits are passed to the random seed function of the OS.
+
+    (seed 12345)
+
+    (seed (time-of-day))
+
+After using `seed` with the same number, the random generator starts the
+same sequence of numbers. This facilitates debugging when randomized
+data are involved. Using `seed`, the same random sequences can be
+generated over and over again.
+
+The second example is useful for guaranteeing a different seed any time
+the program starts.
+
+

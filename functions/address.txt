@@ -1,0 +1,44 @@
+Function: address
+-------------------------------------
+
+#### syntax: (address *int*)\
+ syntax: (address *float*)\
+ syntax: (address *str*)
+
+Returns the memory address of the integer in *int*, the double floating
+point number in *float*, or the string in *str*. This function is used
+for passing parameters to library functions that have been imported
+using the [import](#import) function.
+
+    (set 's "\001\002\003\004")
+
+    (get-char (+ (address s) 3))   → 4
+
+    (set 'x 12345) ; x is a 64-bit long int
+
+    ; on a big-endian CPU, i.e. PPC or SPARC 
+    (get-long (address x))         → 12345
+    ; the 32-bit int is in high 32-bit part of the long int
+    (get-int (+ (address x) 4))    → 12345
+
+    ; on a little-endian CPU, i.e. Intel i386
+    ; the 32-bit int is in the low 32-bit part of the long int
+    (get-int (address x))          → 12345
+
+    ; on both architectures (integers are 64 bit in newLISP)
+    (set 'x 1234567890)
+    (get-long (address x))         →  1234567890
+
+When a string is passed to C library function the address of the string
+is used automatically, and it is not necessary to use the `address`
+function in that case. As the example shows, `address` can be used to do
+pointer arithmetic on the string's address.
+
+`address` should only be used on persistent addresses from data objects
+referred to by a variable symbol, not from volatile intermediate
+expression objects.
+
+See also the [get-char](#get-char), [get-int](#get-int),
+[get-long](#get-long) and [get-float](#get-float) functions.
+
+

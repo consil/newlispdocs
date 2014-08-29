@@ -1,0 +1,12 @@
+Function: integer?
+--------------------------------------
+
+#### syntax: (integer? *exp*)
+
+Returns `true` only if the value of *exp* is an integer; otherwise, it
+returns `nil`.
+
+    (set 'num 123)  → 123
+    (integer? num)  → true
+
+

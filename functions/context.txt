@@ -1,0 +1,118 @@
+Function: context
+-------------------------------------
+
+#### syntax: (context [*sym-context*])\
+ syntax: (context *sym-context* *str | sym* [*exp-value*])
+
+In the first syntax, `context` is used to switch to a different context
+namespace. Subsequent [load](#load)s of newLISP source or functions like
+[eval-string](#eval-string) and [sym](#sym) will put newly created
+symbols and function definitions in the new context.
+
+If the context still needs to be created, the symbol for the new context
+should be specified. When no argument is passed to `context`, then the
+symbol for the current context is returned.
+
+Because contexts evaluate to themselves, a quote is not necessary to
+switch to a different context if that context already exists.
+
+    (context 'GRAPH)          ; create / switch context GRAPH
+
+    (define (foo-draw x y z)  ; function resides in GRAPH
+      (…))
+                                    
+    (set 'var 12345)
+    (symbols)  → (foo-draw var)  ; GRAPH has now two symbols
+
+    (context MAIN)               ; switch back to MAIN (quote not required)
+
+    (print GRAPH:var) → 12345    ; contents of symbol in GRAPH
+
+    (GRAPH:foo-draw 10 20 30)    ; execute function in GRAPH
+    (set 'GRAPH:var 6789)        ; assign to a symbol in GRAPH
+
+If a context symbol is referred to before the context exists, the
+context will be created implicitly.
+
+    (set 'person:age 0)       ; no need to create context first
+    (set 'person:address "")  ; useful for quickly defining data structures
+
+Contexts can be copied:
+
+    (new person 'JohnDoe)  →  JohnDoe
+
+    (set 'JohnDoe:age 99)
+
+Contexts can be referred to by a variable:
+
+    (set 'human JohnDoe)
+
+    human:age  → 99
+
+    (set 'human:address "1 Main Street")
+
+    JohnDoe:address  → "1 Main Street"
+
+An evaluated context (no quote) can be given as an argument:
+
+    > (context 'FOO)
+    FOO
+    FOO> (context MAIN)
+    MAIN
+    > (set 'old FOO)
+    FOO
+    > (context 'BAR)
+    BAR
+    BAR> (context MAIN:old)
+    FOO
+    FOO> 
+
+If an identifier with the same symbol already exists, it is redefined to
+be a context.
+
+Symbols within the current context are referred to simply by their
+names, as are built-in functions and special symbols like `nil` and
+`true`. Symbols outside the current context are referenced by prefixing
+the symbol name with the context name and a `:` (colon). To quote a
+symbol in a different context, prefix the context name with a `'`
+(single quote).
+
+Within a given context, symbols may be created with the same name as
+built-in functions or context symbols in MAIN. This overwrites the
+symbols in MAIN when they are prefixed with a context:
+
+    (context 'CTX)
+    (define (CTX:new var)
+        (…))
+        
+    (context 'MAIN)
+
+`CTX:new` will overwrite new in MAIN.
+
+In the second syntax, `context` can be used to create symbols in a
+namespace. Note that this should not be used for creating hashes or
+dictionaries. For a shorter, more convenient method to use namespaces as
+hash-like dictionaries, see the chapter [Hash functions and
+dictionaries](#hash).
+
+    ;; create a symbol and store data in it
+    (context 'Ctx "abc" 123)   → 123
+    (context 'Ctx 'xyz 999)    → 999
+
+    ;; retrieve contents from  symbol
+    (context 'Ctx "abc")       → 123
+    (context 'Ctx 'xyz)        → 999
+    Ctx:abc                    → 123
+    Ctx:xyz                    → 999
+
+The first three statements create a symbol and store a value of any data
+type inside. The first statement also creates the context named `Ctx`.
+When a symbol is specified for the name, the name is taken from the
+symbol and creates a symbol with the same name in the context `Ctx`.
+
+Symbols can contain spaces or any other special characters not typically
+allowed in newLISP symbols being used as variable names. This second
+syntax of `context` only creates the new symbol and returns the value
+contained in it. It does not switch to the new namespace.
+
+

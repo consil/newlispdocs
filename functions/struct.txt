@@ -1,0 +1,97 @@
+Function: struct
+------------------------------------
+
+#### syntax: (struct *symbol* [*str-data-type* ... ])
+
+The `struct` function can be used to define aggregate data types for
+usage with the extended syntax of [import](#import), [pack](#pack) and
+[unpack](#unpack). This allows importing functions which take C-language
+*struct* data types or pointers to these aggregate data types.
+
+The following example illustrates the usage of `struct` together with
+the C data functions `localtime` and `asctime`. The `localtime`
+functions works similar to the built-in [now](#now) function. The
+`asctime` function takes the numerical data output by `localtime` and
+formats these to readable text.
+
+    /* The C function prototypes for the functions to import */
+
+    struct tm * localtime(const time_t *clock);
+
+    char * asctime(const struct tm *timeptr);
+
+    /* the tm struct aggregating different time related values */
+
+    struct tm {
+        int tm_sec;      /* seconds after the minute [0-60] */
+        int tm_min;      /* minutes after the hour [0-59] */
+        int tm_hour;     /* hours since midnight [0-23] */
+        int tm_mday;     /* day of the month [1-31] */
+        int tm_mon;      /* months since January [0-11] */
+        int tm_year;     /* years since 1900 */
+        int tm_wday;     /* days since Sunday [0-6] */
+        int tm_yday;     /* days since January 1 [0-365] */
+        int tm_isdst;    /* Daylight Savings Time flag */
+        long tm_gmtoff;  /* offset from CUT in seconds */   /*** not on Windows ***/
+        char *tm_zone;   /* timezone abbreviation */        /*** not on Windows ***/
+    };
+
+Function import and definition of the structure data type in newLISP:
+
+    ;; for pointers to structs always use void*
+    ;; as a library use msvcrt.dll on Windows or libc.so on Unix.
+    ;; The tm struct type is configured for Mac OSX and Linux.
+    ;; On other OS the tm structure may be different
+     
+    (import "libc.dylib" "asctime" "char*" "void*")
+    (import "libc.dylib" "localtime" "void*" "void*")
+
+    ; definition of the struct
+    (struct 'tm "int" "int" "int" "int" "int" "int" "int" "int" "int" "long" "char*")
+
+
+    ;; use import and struct
+
+    ; todays date number (seconds after 1970 also called Unix epoch time)
+    (set 'today (date-value))  → 1324134913
+
+    ;; the time value is passed by it's address
+    ;; localtime retirns a pointer to a tm struct
+
+    (set 'ptr (localtime (address today))) → 2896219696
+
+    ; unpack the tm struct  (7:15:13 on the 17th etc.)
+    (unpack tm ptr) → (13 15 7 17 11 111 6 350 0 -28800 "PST")
+
+    ; transform to readable form
+    (asctime ptr) → "Sat Dec 17 07:15:13 2011\n"
+
+    ; all in one statement does actually not use struct, pointers are passed directly
+    (asctime (localtime (address today))) → "Sat Dec 17 07:15:13 2011"
+
+    ; same as the built-in date function
+    (date today) → "Sat Dec 17 07:15:13 2011"
+
+Care must be taken to pass valid addresses to pointer parameters in
+imported functions or when passing address pointers to
+[unpack](#unpack). Invalid address pointers can crash newLISP or make it
+unstable.
+
+`struct` definitions can be nested:
+
+    ; the pair aggregate type
+    (struct 'pair "char" "char") → pair
+
+    ; nested struct type
+    (struct 'comp "pair" "int")  → comp
+
+    ; pack data using the extended pack syntax
+    ; note the insertion of structure alignment bytes after the pair
+    (pack comp (pack pair 1 2) 3) → "\001\002\000\000\003\000\000\000"
+
+    ; unpack reverses the process
+    (unpack comp "\001\002\000\000\003\000\000\000") → ((1 2) 3)
+
+Nested structures are unpacked recursively.
+
+

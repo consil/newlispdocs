@@ -1,0 +1,47 @@
+Function: pretty-print
+------------------------------------------
+
+#### syntax: (pretty-print [*int-length* [*str-tab* [*str-fp-format*]])
+
+Reformats expressions for [print](#print), [save](#save), or
+[source](#source) and when printing in an interactive console. The first
+parameter, *int-length*, specifies the maximum line length, and
+*str-tab* specifies the string used to indent lines. The third parameter
+*str-fp-format* describes the default format for printing floating point
+numbers. All parameters are optional. `pretty-print` returns the current
+settings or the new settings when parameters are specified.
+
+    (pretty-print)  → (80 " " "%1.15g")  ; default setting
+
+    (pretty-print 90 "\t")  → (90 "\t")
+
+    (pretty-print 100)  → (100 "\t") 
+
+    (sin 1)    → 0.841470984807897 
+    (pretty-print 80 " " "%1.3f")
+    (sin 1)    → 0.841
+
+    (set 'x 0.0)
+    x   → 0.000
+
+The first example reports the default settings of 80 for the maximum
+line length and a `space` character for indenting. The second example
+changes the line length to 90 and the indent to a TAB character. The
+third example changes the line length only. The last example changes the
+default format for floating point numbers. This is useful when printing
+unformatted floating point numbers without fractional parts, and these
+numbers should still be recognizable as floating point numbers. Without
+the custom format, `x` would be printed as `0` indistinguishable from
+floating point number. All situations where unformatted floating point
+numbers are printed, are affected.
+
+Note that `pretty-print` cannot be used to prevent line breaks from
+being printed. To completely suppress pretty printing, use the function
+[string](#string) to convert the expression to a raw unformatted string
+as follows:
+
+    ;; print without formatting
+
+    (print (string my-expression))  
+
+

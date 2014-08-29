@@ -1,0 +1,27 @@
+Function: read-char
+---------------------------------------
+
+#### syntax: (read-char [*int-file*])
+
+Reads a byte from a file specified by the file handle in *int-file* or
+from the current I/O device - e.g. *stdin* - when no file handle is
+specified. The file handle is obtained from a previous [open](#open)
+operation. Each `read-char` advances the file pointer by one byte. Once
+the end of the file is reached, `nil` is returned.
+
+    (define (slow-file-copy from-file to-file)
+        (set 'in-file (open from-file "read"))
+        (set 'out-file (open to-file "write"))
+        (while (set 'chr (read-char in-file))
+            (write-char out-file chr))
+        (close in-file)
+        (close out-file)
+        "finished")
+
+Use [read-line](#read-line) and [device](#device) to read whole text
+lines at a time. Note that newLISP supplies a fast built-in function
+called [copy-file](#copy-file) for copying files.
+
+See also the [write-char](#write-char) function.
+
+

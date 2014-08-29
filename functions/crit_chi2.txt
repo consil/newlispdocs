@@ -1,0 +1,18 @@
+Function: crit-chi2
+---------------------------------------
+
+#### syntax: (crit-chi2 *num-probability* *int-df*)
+
+Calculates the critical minimum *Chi² * for a given confidence
+probability *num-probability* under the null hypothesis and the degrees
+of freedom in *int-df * for testing the significance of a statistical
+null hypothesis.
+
+Note that versions prior to 10.2.0 took *(1.0 - p)* for the probability
+instead of *p*.
+
+    (crit-chi2 0.01 4)  → 13.27670443
+
+See also the inverse function [prob-chi2](#prob-chi2).
+
+

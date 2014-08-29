@@ -1,0 +1,49 @@
+Function: for
+---------------------------------
+
+#### syntax: (for (*sym* *num-from* *num-to* [*num-step* [*exp-break*]]) *body*)
+
+Repeatedly evaluates the expressions in *body* for a range of values
+specified in *num-from* and *num-to*, inclusive. A step size may be
+specified with *num-step*. If no step size is specified, `1` is assumed.
+
+Optionally, a condition for early loop exit may be defined in
+*exp-break*. If the break expression evaluates to any non-`nil` value,
+the `for` loop returns with the value of *exp-break*. The break
+condition is tested before evaluating *body*. If a break condition is
+defined, *num-step* must be defined, too.
+
+The symbol *sym* is local in dynamic scope to the `for` expression. It
+takes on each value successively in the specified range as an integer
+value if no step size is specified, or as a floating point value when a
+step size is present. After evaluation of the `for` statement *sym*
+assumes its previous value.
+
+    > (for (x 1 10 2) (println x))
+    1
+    3
+    5
+    7
+    9
+
+    > (for (x 8 6 0.5) (println x))
+    8
+    7.5
+    7
+    6.5
+    6
+
+    > (for (x 1 100 2 (> (* x x) 30)) (println x))
+    1
+    3
+    5
+    true
+    > _
+
+The second example uses a range of numbers from highest to lowest. Note
+that the step size is always a positive number. In the third example, a
+break condition is tested.
+
+Use the [sequence](#sequence) function to make a sequence of numbers.
+
+

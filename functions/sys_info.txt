@@ -1,0 +1,60 @@
+Function: sys-info
+--------------------------------------
+
+#### syntax: (sys-info [*int-idx*])
+
+Calling `sys-info` without *int-idx* returns a list of internal resource
+statistics. Ten integers report the following status:
+
+  -----------------------------------------------------------------------------------------------------------
+  offset   description
+  -------- --------------------------------------------------------------------------------------------------
+  0        Number of Lisp cells
+
+  1        Maximum number of Lisp cells constant
+
+  2        Number of symbols
+
+  3        Evaluation/recursion level
+
+  4        Environment stack level
+
+  5        Maximum call stack constant
+
+  6        Pid of the parent process or 0
+
+  7        Pid of running newLISP process
+
+  8        Version number as an integer constant
+
+  9        Operating system constant:\
+            linux=1, bsd=2, osx=3, solaris=4, win32=6, os/2=7, cygwin=8, tru64, unix=9, aix=10, android=11\
+                bit 11 will be set for ffilib (extended import/callback API) versions (add 1024)\
+                bit 10 will be set for IPv6 versions (add 512)\
+                bit 9 will be set for 64-bit (changeable at runtime) versions (add 256)\
+                bit 8 will be set for UTF-8 versions (add 128)\
+                bit 7 will be added for library versions (add 64)
+  -----------------------------------------------------------------------------------------------------------
+
+
+The numbers from `0` to `9` indicate the optional offset in the returned
+list.
+
+It is recommended to use offsets 0 to 5 to address up and including
+"Maximum call stack constant" and to use negative offsets -1 to -4 to
+access the last four entries in the system info list. Future new entries
+will be inserted after offset 5. This way older source code does not
+need to change.
+
+When using *int-idx*, one element of the list will be returned.
+
+    (sys-info)     → (429 268435456 402 1 0 2048 0 19453 10406 1155)
+    (sys-info 3)   → 1 
+    (sys-info -2)  → 10406 ;; version 10.4.6
+
+The number for the maximum of Lisp cells can be changed via the `-m`
+command-line switch. For each megabyte of Lisp cell memory, 64k memory
+cells can be allocated. The maximum call stack depth can be changed
+using the `-s` command-line switch.
+
+

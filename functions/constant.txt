@@ -1,0 +1,54 @@
+Function: constant
+--------------------------------------------------------
+
+#### syntax: (constant *sym-1* *exp-1* [*sym-2* *exp-2*] ...)
+
+Identical to [set](#set) in functionality, `constant` further protects
+the symbols from subsequent modification. A symbol set with `constant`
+can only be modified using the `constant` function again. When an
+attempt is made to modify the contents of a symbol protected with
+`constant`, newLISP generates an error message. Only symbols from the
+current context can be used with `constant`. This prevents the
+overwriting of symbols that have been protected in their home context.
+The last *exp-n* initializer is always optional.
+
+Symbols initialized with [set](#set), [define](#define), or
+[define-macro](#define-macro) can still be protected by using the
+`constant` function:
+
+    (constant 'aVar 123)  → 123
+    (set 'aVar 999) 
+    ERR: symbol is protected in function set: aVar
+
+    (define (double x) (+ x x))
+
+    (constant 'double)
+
+    ;; equivalent to
+
+    (constant 'double (fn (x) (+ x x)))
+
+The first example defines a constant, `aVar`, which can only be changed
+by using another `constant` statement. The second example protects
+`double` from being changed (except by `constant`). Because a function
+definition in newLISP is equivalent to an assignment of a lambda
+function, both steps can be collapsed into one, as shown in the last
+statement line. This could be an important technique for avoiding
+protection errors when a file is loaded multiple times.
+
+The last value to be assigned can be omitted. `constant` returns the
+contents of the last symbol set and protected.
+
+Built-in functions can be assigned to symbols or to the names of other
+built-in functions, effectively redefining them as different functions.
+There is no performance loss when renaming functions.
+
+    (constant 'squareroot sqrt)  → sqrt <406C2E>
+    (constant '+ add)            → add <4068A6>
+
+`squareroot` will behave like `sqrt`. The `+` (plus sign) is redefined
+to use the mixed type floating point mode of `add`. The hexadecimal
+number displayed in the result is the binary address of the built-in
+function and varies on different platforms and OSes.
+
+

@@ -1,0 +1,30 @@
+Function: sgn
+---------------------------------
+
+#### syntax: (sgn *num*)\
+ syntax: (sgn *num* *exp-1* [*exp-2* [*exp-3*]])
+
+In the first syntax, the `sgn` function is a logical function that
+extracts the sign of a real number according to the following rules:
+
+***x \> `0` : sgn(x) = 1\
+ x \< `0` : sgn(x) = -1\
+ x = `0` : sgn(x) = `0`***
+
+    (sgn -3.5)  → -1
+    (sgn 0)     → 0
+    (sgn 123)   → 1
+
+In the second syntax, the result of evaluating one of the optional
+expressions *exp-1*, *exp-2*, or *exp-3* is returned, instead of `-1`,
+`0`, or `1`. If *exp-n* is missing for the case triggered, then `nil` is
+returned.
+
+    (sgn x -1 0 1)         ; works like (sgn x)
+    (sgn x -1 1 1)         ; -1 for negative x all others 1
+    (sgn x nil true true)  ; nil for negative else true
+    (sgn x (abs x) 0)      ; (abs x) for x < 0, 0 for x = 0, else nil
+
+Any expression or constant can be used for *exp-1*, *exp-2*, or *exp-3*.
+
+

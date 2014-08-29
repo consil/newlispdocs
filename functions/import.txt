@@ -1,0 +1,257 @@
+Function: import
+------------------------------------
+
+#### syntax: (import *str-lib-name* *str-function-name* ["cdecl"])\
+ syntax: (import *str-lib-name* *str-function-name* *str-return-type* [*str-param-type* . . .])\
+ syntax: (import *str-lib-name*)
+
+Imports the function specified in *str-function-name* from a shared
+library named in *str-lib-name*. Depending on the syntax used, string
+labels for return and parameter types can be specified
+
+If the library in *str-lib-name* is not in the system's library path,
+the full path name should be specified.
+
+A function can be imported only once. A repeated import of the same
+function will simply return the same - already allocated - function
+address.
+
+On *libffi* enabled versions - capable of the second extended syntax -
+imported symbols are protected against change and can only be modified
+using [constant](#constant).
+
+The third syntax - on OSX, Linux and other Unix only - allows
+pre-loading libraries without importing functions. This is necessary
+when other library imports need access internally to other functions
+from pre-loaded libraries.
+
+Incorrectly using `import` can cause a system bus error or a segfault
+can occur and crash newLISP or leave it in an unstable state.
+
+### The simple `import` syntax
+
+Most library functions can be imported using the simpler first syntax.
+This form is present on all compile flavors of newLISP. The API expects
+all function arguments to be passed on the stack in either *cdecl* or
+*stdcall* conventions. On 32-bit platforms, integers, pointers to
+strings and buffers sometimes floating point values can be passed as
+parameters. On 64-bit platforms only integers can be passed but no
+floating point values. As return values only 32-bit or 64-bit values and
+pointers are allowed. No floating point numbers can be returned. Strings
+must be retrieved with the [get-string](#get-string) helper function.
+Regardless of these limitations, most modules included in the
+distribution use this simple import API.
+
+If pointers are returned to strings or structures the following helper
+functions can be used extract data: [get-char](#get-char),
+[get-int](#get-int), [get-float](#get-float), [get-string](#get-string),
+[unpack](#unpack)
+
+To pass pointers for data structures the following functions help to
+pack data and calculate addresses: [address](#address), [pack](#pack).
+
+To transform newLISP data types into the data types needed by the
+imported function, use the functions [float](#float) for 64-bit double
+floats, [flt](#flt) for 32-bit floats, and [int](#int) for 32-bit
+integers. By default, newLISP passes floating point numbers as 64-bit
+double floats, integers as 32-bit integers, and strings as 32-bit
+integers for string addresses (pointers in C). Floats can only be used
+with 32-bit versions of newLISP and libraries. To use floating point
+numbers in a 64-bit environment use the [extended `import`
+syntax](#extended_import).
+
+    ;; define LIBC platform independent
+
+    (define LIBC (lookup ostype '(
+    ("Win32" "msvcrt.dll")
+    ("OSX" "libc.dylib")
+
+    (printf "%g %s %d %c\n" 1.23 "hello" 999 65)
+    1.23 hello 999 A
+    → 17 ; return value
+
+    ;; import Win32 DLLs in Win32 versions 
+
+    (import "kernel32.dll" "GetTickCount")  → GetTickCount
+    (import "user32.dll" "MessageBoxA")     → MessageBoxA
+    (GetTickCount)                          → 3328896
+
+In the first example, the string "1.23 hello 999 A" is printed as a side
+effect, and the value 17 (number of characters printed) is returned. Any
+C function can be imported from any shared library in this way.
+
+The message box example pops up a Windows dialog box, which may be
+hidden behind the console window. The console prompt does not return
+until the 'OK' button is pressed in the message box.
+
+    ;;this pops up a message box
+
+    (MessageBoxA 0 "This is the body" "Caption" 1) 
+
+The other examples show several imports of Win32 DLL functions and the
+details of passing values *by value* or *by reference*. Whenever strings
+or numbers are passed by reference, space must be reserved beforehand.
+
+    (import "kernel32.dll" "GetWindowsDirectoryA")
+
+    ;; allocating space for a string return value
+    (set 'str (dup "\000" 64))  ; reserve space and initialize
+
+    (GetWindowsDirectoryA str (length str))
+
+    str  → "C:\\WINDOWS\000\000\000 ... "
+
+    ;; use trim or get-string to cut of binary zeros
+    (get-string str)  → "C:\\WINDOWS"
+    (trim str)        → "C:\\WINDOWS"
+
+    (import "kernel32.dll" "GetComputerNameA")
+
+    ;; allocate memory and initialize to zeros
+    (set 'str (dup "\000" 64))
+    (set 'len (length str)
+
+    ;; call the function
+    ;; the length of the string is passed as address reference 
+    ;; string str is automatically past by address (C pointer)
+    (GetComputerNameA str (address len)) 
+
+    str  → "LUTZ-PC\000\000 ... "
+
+    (trim str)  → "LUTZ-PC"
+
+`import` returns the address of the function, which can be used to
+assign a different name to the imported function.
+
+    (set 'imprime (import "libc.so.6" "printf")) 
+    → printf@400862A0
+
+    (imprime "%s %d" "hola" 123)                 
+    → "hola 123"
+
+The Win32 and Cygwin versions of newLISP uses standard call *stdcall*
+conventions to call DLL library routines by default. This is necessary
+for calling DLLs that belong to the Win32 operating system. Most
+third-party DLLs are compiled for C declaration *cdecl* calling
+conventions and may need to specify the string `"cdecl"` as an
+additional last argument when importing functions. newLISP compiled for
+Mac OS X, Linux and other Unix systems uses the *cdecl* calling
+conventions by default and ignores any additional string.
+
+    ;; force cdecl calling conventions on Win32
+    (import "sqlite.dll" "sqlite_open" "cdecl")  → sqlite_open <673D4888>
+
+Imported functions may take up to fourteen arguments. Note that floating
+point arguments take up two spaces each (e.g., passing five floats takes
+up ten of the fourteen parameters).
+
+### The extended `import` syntax
+
+The extended import API works with the second syntax. It is based on the
+popular `libffi` library which is pre-installed on most OS platforms.
+The startup banner of newLISP should show the word `libffi` indicating
+the running version of newLISP is compiled to use the extended `import`
+API. The function [sys-info](#sys-info) can also be used to check for
+`libffi`-support.
+
+The API works with all atomic C data types for passed parameters and
+return values. The extended API requires that parameter types are
+specified in the `import` statement as string type labels. Programs
+written with extended import API will run without change on 32-bit and
+64-bit newLISP and libraries. Integers, floating point values and
+strings can be returned without using helper functions.
+
+The following types can be specified for the return value in
+*str-return-type* and for function parameters in *str-param-type*:
+
+  -----------------------------------------------------------------------------------------------------------------------
+  label                  C type for return value and arguments            newLISP return and argument type
+  ---------------------- ------------------------------------------------ -----------------------------------------------
+  "void"                 void (only as return type)                       `nil` is returned
+
+  "byte"                 byte unsigned 8 bit                              integer
+
+  "char"                 char signed 8 bit                                integer
+
+  "unsigned short int"   unsigned short int 16 bit                        integer
+
+  "short int"            short int signed 16 bit                          integer
+
+  "unsigned int"         unsigned int 32 bit                              integer
+
+  "int"                  int signed 32 bit                                integer
+
+  "long"                 long signed 32 or 64 bit depending on platform   integer
+
+  "long long"            long long signed 64 bit                          integer
+
+  "float"                float 32 bit                                     IEEE-754 64 bit float cut to 32-bit precision
+
+  "double"               double 64 bit                                    IEEE-754 64 bit float
+
+  "char\*"               char\* 32 or 64 bit ptr depending on platform    displayable string return (zero terminated)\
+                                                                          string buffer arg (no addr. since 10.4.2)
+
+  "void\*"               void\* 32 or 64 bit ptr depending on platform    integer address return\
+                                                                          either string buffer or integer address arg
+  -----------------------------------------------------------------------------------------------------------------------
+
+The types `"char*"` and `"void*` can be interchanged and are treated
+identical inside `libffi`. Depending on the type of arguments passed and
+the type of return values, one or the other is used.
+
+Aggregate types can be composed using the [struct](#struct) function.
+
+The following examples show how the extended `import` syntax can handle
+return values of floating point values and strings:
+
+    ;; return a float value, LIBC was defined earlier
+    ;             name   return   arg
+    (import LIBC "atof" "double" "char*")
+    (atof "3.141") → 3.141
+
+    ;; return a copied string
+    ;             name     return  arg-1   arg-2
+    (import LIBC "strcpy" "char*" "char*" "char*")
+    (set 'from "Hello World")
+
+    (set 'to (dup "\000" (length from))) ; reserve memory
+    (strcpy to from) → "Hello World"
+
+The `char*` type takes a string buffer only. The `"void*` type can take
+either a string buffer or a memory address number as input. When using
+`"void*"` as a return type the address number of the result buffer will
+be returned. This is useful when returning pointers to data structures.
+These pointers can then be used with [unpack](#unpack) and
+[struct](#struct) for destructuring. In the following example the return
+type is changed to `void*`:
+
+    (import LIBC "strcpy" "void*" "char*" "char*")
+    (set 'from "Hello World")
+    (set 'to (dup "\000" (length from)))
+
+    (strcpy to from)       → 2449424
+    (address to)           → 2449424
+    (unpack "s11" 2449424) → "Hello World"
+    (get-string 2449424)   → "Hello World"
+    to                     → "Hello World"
+
+A newLISP string is always passed by it's address reference.
+
+For a more complex example see this [OpenGL
+demo](http://www.newlisp.org/syntax.cgi?code/opengl-demo-ffi-lsp.txt).
+
+### Memory management
+
+Any allocation performed by imported foreign functions has to be
+de-allocated manually if there's no call in the imported API to do so.
+See the [Code Patterns in
+newLISP](http://www.newlisp.org/CodePatterns.html) document for an
+example.
+
+In case of calling foreign functions with passing by reference, memory
+for variables needs to be allocated beforehand by newLISP — see import
+of `GetWindowsDirectoryA` above — and hence, memory needs not be
+deallocated manually, because it is managed automatically by newLISP.
+
+

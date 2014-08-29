@@ -1,0 +1,11 @@
+Function: atan
+----------------------------------
+
+#### syntax: (atan *num-radians*)
+
+The arctangent of *num-radians* is calculated and returned.
+
+    (atan 1)        → 0.7853981634
+    (tan (atan 1))  → 1
+
+

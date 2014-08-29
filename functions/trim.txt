@@ -1,0 +1,21 @@
+Function: trim
+--------------------------------------------------------
+
+#### syntax: (trim *str* [*str-char*])\
+ syntax: (trim *str* *str-left-char* *str-right-char*)
+
+The first syntax trims the string *str* from both sides, stripping the
+leading and trailing characters as given in *str-char*. If *str-char*
+contains no character, the space character is assumed. `trim` returns
+the new string.
+
+The second syntax can either trim different characters from both sides
+or trim only one side if an empty string is specified for the other.
+
+    (trim "   hello  ")              → "hello"
+    (trim "----hello-----" "-")      → "hello"
+    (trim "00012340" "0" "")         → "12340"
+    (trim "1234000" "" "0")          → "1234"
+    (trim "----hello=====" "-" "=")  → "hello"
+
+

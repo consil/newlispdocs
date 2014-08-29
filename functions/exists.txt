@@ -1,0 +1,29 @@
+Function: exists
+------------------------------------
+
+#### syntax: (exists *func-condition* *list*)
+
+Successively applies *func-condition* to the elements of *list* and
+returns the first element that meets the condition in *func-condition*.
+If no element meets the condition, `nil` is returned.
+
+    (exists string? '(2 3 4 6 "hello" 7))       → "hello"
+
+    (exists string? '(3 4 2 -7 3 0))            → nil
+
+    (exists zero? '(3 4 2 -7 3 0))              → 0 ; check for 0 or 0.0
+
+    (exists < '(3 4 2 -7 3 0))                  → -7 ; check for negative
+
+    (exists (fn (x) (> x 3)) '(3 4 2 -7 3 0))   → 4
+
+    (exists (fn (x) (= x 10)) '(3 4 2 -7 3 0))  → nil 
+
+If *func-condition* is `nil?`, the result `nil` is ambiguous. In this
+case [index](#index) or [find](#find) are the better method when looking
+for `nil`.
+
+Use the [for-all](#for-all) function to check if a condition is met for
+all elements in a list.
+
+

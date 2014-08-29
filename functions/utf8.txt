@@ -1,0 +1,24 @@
+Function: utf8
+----------------------------------
+
+#### syntax: (utf8 *str-unicode*)
+
+Converts a UCS-4, 4-byte, Unicode-encoded string (*str*) into UTF-8.
+This function is only available on UTF-8–enabled versions of newLISP.
+
+    (unicode "new") 
+    → "n\000\000\000e\000\000\000w\000\000\000\000\000\000\000"
+
+    (utf8 (unicode "new"))  → "new"
+
+The `utf8` function can also be used to test for the presence of
+UTF-8–enabled newLISP:
+
+    (if utf8 (do-utf8-version-of-code) (do-ascii-version-of-code))
+
+On *big endian* CPU architectures, the byte order will be reversed from
+highest to lowest. The `utf8` and [unicode](#unicode) functions are the
+inverse of each other. These functions are only necessary if UCS-4
+Unicode is in use. Most systems use UTF-8 Unicode encoding only.
+
+

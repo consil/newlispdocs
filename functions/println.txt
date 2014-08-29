@@ -1,0 +1,14 @@
+Function: println
+-------------------------------------
+
+#### syntax: (println *exp-1* [*exp-2* ... ])
+
+Evaluates and prints *exp-1*— to the current I/O device, which defaults
+to the console window. A line-feed is printed at the end. See the
+built-in function [device](#device) for details on how to specify a
+different I/O device. `println` works exactly like [print](#print) but
+emits a line-feed character at the end.
+
+See also the [write-line](#write-line) and [print](#print) functions.
+
+

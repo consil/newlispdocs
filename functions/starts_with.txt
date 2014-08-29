@@ -1,0 +1,32 @@
+Function: starts-with
+-----------------------------------------
+
+#### syntax: (starts-with *str* *str-key* [*num-option*])\
+ syntax: (starts-with *list* [*exp*])
+
+In the first version, `starts-with` checks if the string *str* starts
+with a key string in *str-key* and returns `true` or `nil` depending on
+the outcome.
+
+If a regular expression number is specified in *num-option*, *str-key*
+contains a regular expression pattern. See [regex](#regex) for valid
+*option* numbers.
+
+    (starts-with "this is useful" "this")        → true
+    (starts-with "this is useful" "THIS")        → nil
+
+    ;; use regular expressions
+    (starts-with "this is useful" "THIS" 1)      → true
+    (starts-with "this is useful" "this|that" 0) → true
+
+In the second version, `starts-with` checks to see if a list starts with
+the list element in *exp*. `true` or `nil` is returned depending on
+outcome.
+
+    (starts-with '(1 2 3 4 5) 1)             → true
+    (starts-with '(a b c d e) 'b)            → nil
+    (starts-with '((+ 3 4) b c d) '(+ 3 4))  → true
+
+See also the [ends-with](#ends-with) function.
+
+

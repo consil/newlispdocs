@@ -1,0 +1,21 @@
+Function: symbol?
+-------------------------------------
+
+#### syntax: (symbol? *exp*)
+
+Evaluates the *exp* expression and returns `true` if the value is a
+symbol; otherwise, it returns `nil`.
+
+    (set 'x 'y)  → y
+
+    (symbol? x)  → true 
+
+    (symbol? 123)  → nil
+
+    (symbol? (first '(var x y z)))  → true
+
+The first statement sets the contents of `x` to the symbol `y`. The
+second statement then checks the contents of `x`. The last example
+checks the first element of a list.
+
+

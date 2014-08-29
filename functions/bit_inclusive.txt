@@ -1,0 +1,11 @@
+Function: bit-inclusive
+-------------------------------
+
+#### syntax: (| *int-1* *int-2* [*int-3* ... ])
+
+A bitwise `or` operation is performed on the number in *int-1* with the
+number in *int-2*, then successively with *int-3*, etc.
+
+    (| 0x10 0x80 2 1)  → 147
+
+

@@ -1,0 +1,16 @@
+Function: crc32
+-----------------------------------
+
+#### syntax: (crc32 *str-data*)
+
+Calculates a running 32-bit CRC (Circular Redundancy Check) sum from the
+buffer in *str-data*, starting with a CRC of `0xffffffff` for the first
+byte. `crc32` uses an algorithm published by
+[www.w3.org](http://www.w3.org).
+
+    (crc32 "abcdefghijklmnopqrstuvwxyz")  → 1277644989
+
+`crc32` is often used to verify data integrity in unsafe data
+transmissions.
+
+

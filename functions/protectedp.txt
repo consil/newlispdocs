@@ -1,0 +1,14 @@
+Function: protected?
+----------------------------------------
+
+#### syntax: (protected? *sym*)
+
+Checks if a symbol in *sym* is protected. Protected symbols are built-in
+functions, context symbols, and all symbols made constant using the
+[constant](#constant) function:
+
+    (protected? 'println)    → true
+    (constant 'aVar 123)
+    (protected? 'aVar)       → true
+
+

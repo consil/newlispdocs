@@ -1,0 +1,72 @@
+Function: def-new
+-------------------------------------
+
+#### syntax: (def-new *sym-source* [*sym-target*])
+
+This function works similarly to [new](#new), but it only creates a copy
+of one symbol and its contents from the symbol in *sym-source*. When
+*sym-target* is not given, a symbol with the same name is created in the
+current context. All symbols referenced inside *sym-source* will be
+translated into symbol references into the current context, which must
+not be MAIN.
+
+If an argument is present in *sym-target*, the copy will be made into a
+symbol and context as referenced by the symbol in *sym-target*. In
+addition to allowing renaming of the function while copying, this also
+enables the copy to be placed in a different context. All symbol
+references in *sym-source* with the same context as *sym-source* will be
+translated into symbol references of the target context.
+
+`def-new` returns the symbol created:
+
+    > (set 'foo:var '(foo:x foo:y))
+    (foo:x foo:y)
+
+    > (def-new 'foo:var 'ct:myvar)
+    ct:myvar
+
+    > ct:myvar
+    (ct:x ct:y)
+
+    > (context 'K)
+
+    K> (def-new 'foo:var)
+    var
+
+    K> var
+    (x y)
+
+The following example shows how a statically scoped function can be
+created by moving it its own namespace:
+
+    > (set 'temp (lambda (x) (+ x x)))
+    (lambda (x) (+ x x))
+    > (def-new 'temp 'double:double)
+    double:double
+    > (double 10)
+    20
+    > double:double
+    (lambda (double:x) (+ double:x double:x))
+
+The following definition of `def-static` can be used to create functions
+living in their own lexically protected name-space:
+
+    (define (def-static s body) 
+          (def-new 'body (sym s s)))
+
+    (def-static 'acc (lambda (x)
+              (inc sum x)))
+
+    > (acc 1)
+    1
+    > (acc 1)
+    2
+    > (acc 8)
+    10
+    >
+
+The function `def-new` can also be used to configure contexts or context
+objects in a more granular fashion than is possible with [new](#new),
+which copies a whole context.
+
+

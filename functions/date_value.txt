@@ -1,0 +1,33 @@
+Function: date-value
+----------------------------------------
+
+#### syntax: (date-value *int-year* *int-month* *int-day* [*int-hour* *int-min* *int-sec*])\
+ syntax: (date-value)
+
+In the first syntax, `date-value` returns the time in seconds since
+1970-1-1 00:00:00 for a given date and time. The parameters for the
+hour, minutes, and seconds are optional. The time is assumed to be
+Coordinated Universal Time (UTC), not adjusted for the current time
+zone.
+
+In the second syntax, `date-value` returns the time value in seconds for
+the current time.
+
+    (date-value 2002 2 28)       → 1014854400
+    (date-value 1970 1 1 0 0 0)  → 0
+                                     
+    (date (apply date-value (now)))  → "Wed May 24 10:02:47 2006" 
+    (date (date-value))              → "Wed May 24 10:02:47 2006"
+    (date)                           → "Wed May 24 10:02:47 2006"
+
+The function [date-list](#date-list) can be used to transform a
+`date-value` back into a list:
+
+    (date-list 1014854400)  → (2002 2 28 0 0 0)
+    (apply date-value (date-list 1014854400)) → 1014854400
+
+See also [date](#date), [date-list](#date-list),
+[date-parse](#date-parse), [time-of-day](#time-of-day), [time](#time),
+and [now](#now).
+
+

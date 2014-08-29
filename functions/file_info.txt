@@ -1,0 +1,41 @@
+Function: file-info
+---------------------------------------
+
+#### syntax: (file-info *str-name* [*int-index* [*bool-flag*]])
+
+Returns a list of information about the file or directory in
+*str\_name*. The optional index specifies the list member to return.
+When no *bool-flag* is specified or when *bool-flag* evaluates to `nil`
+information about the link is returned if the file is a link to an
+original file. If *bool-flag* evaluates to anything else than `nil`,
+information about the original file referenced by the link is returned.
+
+  offset   contents
+  -------- ---------------------------------
+  0        size
+  1        mode (differs with `true` flag)
+  2        device mode
+  3        user ID
+  4        group ID
+  5        access time
+  6        modification time
+  7        status change time
+
+
+Depending on *bool-flag* set, the function reports on either the link
+(no flag or `nil` flag) or on the original linked file (`true` flag).
+
+    (file-info ".bashrc")   
+    → (124 33188 0 500 0 920951022 920951022 920953074)
+
+    (file-info ".bashrc" 0)  → 124
+
+    (date (file-info "/etc" -1))  → "Mon Mar 8 18:23:17 2005"
+
+In the second example, the last status change date for the directory
+*/etc* is retrieved.
+
+`file-info` gives file statistics (size) for a linked file, not the
+link, except for the *mode* field.
+
+

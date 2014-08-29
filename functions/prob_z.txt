@@ -1,0 +1,14 @@
+Function: prob-z
+------------------------------------
+
+#### syntax: (prob-z *num-z*)
+
+Returns the probability of *num-z*, not to exceed the observed value
+where *num-z* is a normal distributed value with a mean of `0.0` and a
+standard deviation of `1.0`.
+
+    (prob-z 0.0)  → 0.5
+
+See also the inverse function [crit-z](#crit-z).
+
+

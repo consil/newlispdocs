@@ -1,0 +1,17 @@
+Function: list?
+-----------------------------------
+
+#### syntax: (list? *exp*)
+
+Returns `true` only if the value of *exp* is a list; otherwise returns
+`nil`. Note that lambda and lambda-macro expressions are also recognized
+as special instances of a list expression.
+
+    (set 'var '(1 2 3 4))    → (1 2 3 4)
+    (list? var)              → true
+
+    (define (double x) (+ x x))
+
+    (list? double)           → true
+
+

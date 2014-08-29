@@ -1,0 +1,24 @@
+Function: pmt
+---------------------------------
+
+**syntax: (pmt *num-interest* *num-periods* *num-principal*
+[*num-future-value* [*int-type*]])**
+
+Calculates the payment for a loan based on a constant interest of
+*num-interest* and constant payments over *num-periods* of time.
+*num-future-value* is the value of the loan at the end (typically
+`0.0`). If payment is at the end of the period, *int-type* is `0` (zero)
+or *int-type* is omitted; for payment at the beginning of each period,
+*int-type* is 1.
+
+    (pmt (div 0.07 12) 240 100000)  → -775.2989356
+
+The above example calculates a payment of \$775.30 for a loan of
+\$100,000 at a yearly interest rate of 7 percent. It is calculated
+monthly and paid over 20 years (20 \* 12 = 240 monthly periods). This
+illustrates the typical way payment is calculated for mortgages.
+
+See also the [fv](#fv), [irr](#irr), [nper](#nper), [npv](#npv), and
+[pv](#pv) functions.
+
+

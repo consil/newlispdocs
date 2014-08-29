@@ -1,0 +1,12 @@
+Function: string?
+-------------------------------------
+
+#### syntax: (string? *exp*)
+
+Evaluates *exp* and tests to see if it is a string. Returns `true` or
+`nil` depending on the result.
+
+    (set 'var "hello")
+    (string? var)  → true
+
+

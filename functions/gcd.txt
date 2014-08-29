@@ -1,0 +1,22 @@
+Function: gcd
+-----------------------------------------------------
+
+#### syntax: (gcd *int-1* [*int-2* ... ])
+
+Calculates the greatest common divisor of a group of integers. The
+greatest common divisor of two integers that are not both zero is the
+largest integer that divides both numbers. `gcd` will calculate the
+greatest common divisor for the first two integers in *int-i* and then
+further reduce the argument list by calculating the greatest common
+divisor of the result and the next argument in the parameter list.
+
+    (gcd 0)        → 0
+    (gcd 0 0)      → 0
+    (gcd 10)       → 10
+    (gcd 12 36)    → 12
+    (gcd 15 36 6)  → 3 
+
+See [Wikipedia](http://en.wikipedia.org/wiki/Greatest_common_divisor)
+for details and theory about gcd numbers in mathematics.
+
+

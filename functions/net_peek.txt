@@ -1,0 +1,22 @@
+Function: net-peek
+--------------------------------------
+
+#### syntax: (net-peek *int-socket*)
+
+Returns the number of bytes ready for reading on the network socket
+*int-socket*. If an error occurs or the connection is closed, `nil` is
+returned.
+
+    (set 'aSock (net-connect "aserver.com" 123))
+
+    (while ( = (net-peek aSock) 0) 
+        (do-something-else))
+
+    (net-receive aSock buff 1024)
+
+After connecting, the program waits in a while loop until `aSock` can be
+read.
+
+Use the [peek](#peek) function to check file descriptors and `stdin`.
+
+

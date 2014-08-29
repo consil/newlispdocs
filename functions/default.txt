@@ -1,0 +1,22 @@
+Function: default
+-------------------------------------
+
+#### syntax: (default *context*)
+
+Return the contents of the default functor in *context*.
+
+    (define Foo:Foo 123)
+
+    (default Foo) → 123
+
+    (setf (default Foo) 456)
+    (set 'ctx Foo)
+
+    (default ctx) → 456
+    Foo:Foo       → 456
+
+In many situations newLISP defaults automatically to the default functor
+when seeing a context name. In circumstances where this is not the case,
+the `default` function can be used.
+
+

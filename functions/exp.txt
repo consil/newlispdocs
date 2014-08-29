@@ -1,0 +1,13 @@
+Function: exp
+---------------------------------
+
+#### syntax: (exp *num*)
+
+The expression in *num* is evaluated, and the exponential function is
+calculated based on the result. `exp` is the inverse function of
+[log](#log).
+
+    (exp 1)        → 2.718281828
+    (exp (log 1))  → 1
+
+

@@ -1,0 +1,15 @@
+Function: cosh
+----------------------------------
+
+#### syntax: (cosh *num-radians*)
+
+Calculates the hyperbolic cosine of *num-radians*. The hyperbolic cosine
+is defined mathematically as: *(exp (x) + exp (-x)) / 2*. An overflow to
+`inf` may occur if *num-radians* is too large.
+
+    (cosh 1)     → 1.543080635
+    (cosh 10)    → 11013.23292
+    (cosh 1000)  → inf
+    (= (cosh 1) (div (add (exp 1) (exp -1)) 2))  → true
+
+

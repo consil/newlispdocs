@@ -1,0 +1,7 @@
+Function: lambda
+------------------------------------
+
+See the description of [fn](#fn), which is a shorter form of writing
+`lambda`.
+
+

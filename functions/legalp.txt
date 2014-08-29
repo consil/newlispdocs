@@ -1,0 +1,24 @@
+Function: legal?
+------------------------------------
+
+#### syntax: (legal? *str*)
+
+The token in *str* is verified as a legal newLISP symbol. Non-legal
+symbols can be created using the [sym](#sym) function (e.g. symbols
+containing spaces, quotes, or other characters not normally allowed).
+Non-legal symbols are created frequently when using them for associative
+data access:
+
+    (symbol? (sym "one two"))  → true
+
+    (legal? "one two")         → nil  ; contains a space
+
+    (set (sym "one two") 123)  → 123
+
+    (eval (sym "one two"))     → 123
+
+The example shows that the string `"one two"` does not contain a legal
+symbol although a symbol can be created from this string and treated
+like a variable.
+
+

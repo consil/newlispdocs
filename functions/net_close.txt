@@ -1,0 +1,15 @@
+Function: net-close
+---------------------------------------
+
+#### syntax: (net-close *int-socket* [*true*])
+
+Closes a network socket in *int-socket* that was previously created by a
+[net-connect](#net-connect) or [net-accept](#net-accept) function.
+Returns `true` on success and `nil` on failure.
+
+    (net-close aSock)
+
+The optional *true* flag suppresses immediate shutdown of sockets by
+waiting for pending data transmissions to finish.
+
+

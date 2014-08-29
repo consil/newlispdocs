@@ -1,0 +1,36 @@
+Function: set-ref
+-------------------------------------------------------
+
+#### syntax: (set-ref *exp-key* *list* *exp-replacement* [*func-compare*])
+
+Searches for *exp-key* in *list* and replaces the found element with
+*exp-replacement*. The *list* can be nested. The system variables `$it`
+contains the expression found and can be used in *exp-replacement*. The
+function returns the new modified *list*.
+
+    (set 'data '(fruits (apples 123 44) (oranges 1 5 3)))
+
+    (set-ref 'apples data 'Apples)  → (fruits (Apples 123 44) (oranges 1 5 3))
+
+    data → (fruits (Apples 123 44) (oranges 1 5 3)))
+
+`data` could be the context identifier of a default function for passing
+lists by reference:
+
+    (set 'db:db '(fruits (apples 123 44) (oranges 1 5 3)))
+
+    (define (update ct key value)
+        (set-ref key ct value))
+
+    (update db 'apples 'Apples)    → (fruits (Apples 123 44) (oranges 1 5 3))
+    (update db 'oranges 'Oranges)  → (fruits (Apples 123 44) (Oranges 1 5 3))
+
+    db:db → (fruits (Apples 123 44) (Oranges 1 5 3))
+
+For examples on how to use *func-compare* see
+[set-ref-all](#set-ref-all)
+
+For changing all occurrences of an element in a list use
+[set-ref-all](#set-ref-all).
+
+

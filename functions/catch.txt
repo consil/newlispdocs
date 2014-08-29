@@ -1,0 +1,61 @@
+Function: catch
+-----------------------------------
+
+#### syntax: (catch *exp*)\
+ syntax: (catch *exp* *symbol*)
+
+In the first syntax, `catch` will return the result of the evaluation of
+*exp* or the evaluated argument of a [throw](#throw) executed during the
+evaluation of *exp*:
+
+    (catch (dotimes (x 1000) 
+      (if (= x 500) (throw x))))  → 500
+
+This form is useful for breaking out of iteration loops and for forcing
+an early return from a function or expression block:
+
+    (define (foo x)
+       …
+      (if condition (throw 123))
+        …
+      456)
+
+    ;; if condition is true
+
+    (catch (foo p))  → 123
+
+    ;; if condition is not true
+
+    (catch (foo p))  → 456
+
+In the second syntax, `catch` evaluates the expression *exp*, stores the
+result in *symbol*, and returns `true`. If an error occurs during
+evaluation, `catch` returns `nil` and stores the error message in
+*symbol*. This form can be useful when errors are expected as a normal
+potential outcome of a function and are dealt with during program
+execution.
+
+    (catch (func 3 4) 'result)  → nil
+    result  
+    → "ERR: invalid function in function catch : (func 3 4)"
+
+    (constant 'func +)          → + <4068A6>
+    (catch (func 3 4) 'result)  → true
+    result                      → 7
+
+When a [throw](#throw) is executed during the evaluation of *exp*,
+`catch` will return `true`, and the `throw` argument will be stored in
+*symbol*:
+
+    (catch (dotimes (x 100) 
+      (if (= x 50) (throw "fin"))) 'result)  → true
+
+    result  → "fin"
+
+As well as being used for early returns from functions and for breaking
+out of iteration loops (as in the first syntax), the second syntax of
+`catch` can also be used to catch errors. The
+[throw-error](#throw-error) function may be used to throw user-defined
+errors.
+
+

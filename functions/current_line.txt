@@ -1,0 +1,28 @@
+Function: current-line
+------------------------------------------
+
+#### syntax: (current-line)
+
+Retrieves the contents of the last [read-line](#read-line) operation.
+`current-line`'s contents are also implicitly used when
+[write-line](#write-line) is called without a string parameter.
+
+The following source shows the typical code pattern for creating a Unix
+command-line filter:
+
+    #!/usr/bin/newlisp
+     
+    (set 'inFile (open (main-args 2) "read"))
+    (while (read-line inFile) 
+      (if (starts-with (current-line) ";;")
+        (write-line)))
+    (exit)
+
+The program is invoked:
+
+    ./filter myfile.lsp
+
+This displays all comment lines starting with `;;` from a file given as
+a command-line argument when invoking the script `filter`.
+
+

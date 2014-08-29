@@ -1,0 +1,135 @@
+Function: spawn
+-----------------------------------
+
+#### syntax: (spawn *sym* *exp* [true])
+
+Launches the evaluation of *exp* as a child process and immediately
+returns. The symbol in *sym* is quoted and receives the result of the
+evaluation when the function [sync](#sync) is executed. `spawn` is used
+to start parallel evaluation of expressions in concurrent processes. If
+newLISP is running on a multi-core CPU, the underlying operating system
+will distribute spawned processes onto different cores, thereby
+evaluating expressions in parallel and speeding up overall processing.
+
+The optional `true` parameter must be set if [send](#send) or
+[receive](#receive) is used to communicated with the child process
+spawned.
+
+The function `spawn` is not available on Win32.
+
+After successfully starting a child process, the `spawn` expression
+returns the process id of the forked process. The following examples
+shows how the calculation of a range of prime numbers can be split up in
+four sub ranges to speed up the calculation of the whole range:
+
+    ; calculate primes in a range
+    (define (primes from to)
+      (local (plist)
+          (for (i from to)
+              (if (= 1 (length (factor i)))
+                  (push i plist -1)))
+          plist))
+
+    ; start child processes
+    (set 'start (time-of-day))
+
+    (spawn 'p1 (primes 1 1000000))
+    (spawn 'p2 (primes 1000001 2000000))
+    (spawn 'p3 (primes 2000001 3000000))
+    (spawn 'p4 (primes 3000001 4000000))
+
+    ; wait for a maximum of 60 seconds for all tasks to finish
+    (sync 60000) ; returns true if all finished in time
+    ; p1, p2, p3 and p4 now each contain a lists of primes
+
+    (println "time spawn: " (- (time-of-day) start))
+    (println "time simple: " (time  (primes 1 4000000)))
+
+    (exit)
+
+On a 1.83 Intel Core 2 Duo processor, the above example will finish
+after about 13 seconds. Calculating all primes using
+`(primes 1 4000000)` would take about 20 seconds.
+
+The [sync](#sync) function will wait for all child processes to finish
+and receive the evaluation results in the symbols `p1` to `p4`. When all
+results are collected, `sync` will stop waiting and return `true`. When
+the time specified was insufficient , `sync` will return `nil` and
+another `sync` statement could be given to further wait and collect
+results. A short timeout time can be used to do other processing during
+waiting:
+
+    (spawn 'p1 (primes 1 1000000))
+    (spawn 'p2 (primes 1000001 2000000))
+    (spawn 'p3 (primes 2000001 3000000))
+    (spawn 'p4 (primes 3000001 4000000))
+
+    ; print a dot after each 2 seconds of waiting
+    (until (sync 2000) (println "."))
+
+`sync` when used without any parameters, will not wait but immediately
+return a list of pending child processes. For the `primes` example, the
+following `sync` expression could be used to watch the progress:
+
+    (spawn 'p1 (primes 1 1000000))
+    (spawn 'p2 (primes 1000001 2000000))
+    (spawn 'p3 (primes 2000001 3000000))
+    (spawn 'p4 (primes 3000001 4000000))
+
+    ; show a list of pending process ids after each three-tenths of a second
+    (until (sync 300) (println (sync)))
+
+A parameter of `-1` tells `sync` to wait for a very long time (\~ 1193
+hours). A better solution would be to wait for a maximum time, then
+[abort](#abort) all pending child processes:
+
+    (spawn 'p1 (primes 1 1000000))
+    (spawn 'p2 (primes 1000001 2000000))
+    (spawn 'p3 (primes 2000001 3000000))
+    (spawn 'p4 (primes 3000001 4000000))
+
+    ; wait for one minute, then abort and
+    ; report unfinished PIDs
+
+    (if (not (sync 60000))
+        (begin
+            (println "aborting unfinished: " (sync))
+            (abort))
+        (println "all finished successfully")
+    )
+
+The three functions `spawn`, `sync` and `abort` are part of the
+[Cilk](http://supertech.csail.mit.edu/cilk/) API. The original
+implementation also does sophisticated scheduling and allocation of
+threaded tasks to multiple CPU cores. The newLISP implementation of the
+Cilk API lets the operating system of the underlying platform handle
+process management. Internally, the API is implemented using the Unix
+libc functions `fork()`, `waitpid()` and `kill()`. Intercommunications
+between processes and child processes is done using the [send](#send)
+and [receive](#receive) functions.
+
+`spawn` can be called recursively from spawned subtasks:
+
+    (define (fibo n)
+      (local (f1 f2)
+        (if(< n 2) 1
+           (begin
+              (spawn 'f1 (fibo (- n 1)))
+              (spawn 'f2 (fibo (- n 2)))
+              (sync 10000)
+              (+ f1 f2)))))
+
+    (fibo 7)  → 21
+
+With `(fibo 7)` 41 processes will be generated. Although the above code
+shows the working of the Cilk API in a recursive application, it would
+not be practical, as the overhead required to spawn subtasks is much
+higher than the time saved through parallelization.
+
+Since version 10.1 a [send](#send) and [receive](#receive) message
+functions are available for communications between parent and child
+processes. Using these functions any data or expression of any size can
+be transferred. Additionally messaged expressions can be evaluated in
+the recipient's environment.
+
+

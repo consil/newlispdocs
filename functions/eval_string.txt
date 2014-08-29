@@ -1,0 +1,47 @@
+Function: eval-string
+-----------------------------------------
+
+#### syntax: (eval-string *str-source* [*sym-context* [*exp-error* [*int-offset*]]])
+
+The string in *str-source* is compiled into newLISP's internal format
+and then evaluated. The evaluation result is returned. If the string
+contains more than one expression, the result of the last evaluation is
+returned.
+
+An optional second argument can be used to specify the context to which
+the string should be parsed and translated.
+
+If an error occurs while parsing and evaluating *str-source* then
+*exp-error* will be evaluated and the result returned.
+
+*int-offset* specifies an optional offset into *str-source*, where to
+start evaluation.
+
+    (eval-string "(+ 3 4)")  → 7
+    (set 'X 123)             → 123
+    (eval-string "X")        → 123
+
+    (define (repl) ; read print eval loop
+      (while true
+        (println "=> " (eval-string (read-line) MAIN (last-error)))
+      )
+    )
+
+    (set 'a 10)
+    (set 'b 20)
+    (set 'foo:a 11)
+    (set 'foo:b 22)
+
+    (eval-string "(+ a b)")       → 30
+    (eval-string "(+ a b)" 'foo)  → 33
+
+The second example shows a simple newLISP interpreter eval loop.
+
+The last example shows how to specify a target context for translation.
+The symbols `a` and `b` now refer to symbols and their values in context
+`foo` instead of `MAIN`.
+
+See also the function [read-expr](#read-expr) which translates a string
+without evaluating it.
+
+

@@ -1,0 +1,25 @@
+Function: difference
+----------------------------------------
+
+#### syntax: (difference *list-A* *list-B*)\
+ syntax: (difference *list-A* *list-B* *bool*)
+
+In the first syntax, `difference` returns the *set* difference between
+*list-A* and *list-B*. The resulting list only has elements occurring in
+*list-A*, but not in *list-B*. All elements in the resulting list are
+unique, but *list-A* and *list-B* need not be unique. Elements in the
+lists can be any type of Lisp expression.
+
+    (difference '(2 5 6 0 3 5 0 2) '(1 2 3 3 2 1))  → (5 6 0)
+
+In the second syntax, `difference` works in *list* mode. *bool*
+specifies `true` or an expression not evaluating to `nil`. In the
+resulting list, all elements of *list-B* are eliminated in *list-A*, but
+duplicates of other elements in *list-A* are left.
+
+    (difference '(2 5 6 0 3 5 0 2) '(1 2 3 3 2 1) true)  → (5 6 0 5 0)
+
+See also the set functions [intersect](#intersect), [unique](#unique)
+and [union](#union).
+
+

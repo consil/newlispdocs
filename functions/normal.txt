@@ -1,0 +1,27 @@
+Function: normal
+------------------------------------
+
+#### syntax: (normal *float-mean* *float-stdev* *int-n*)\
+ syntax: (normal *float-mean* *float-stdev*)
+
+In the first form, `normal` returns a list of length *int-n* of random,
+continuously distributed floating point numbers with a mean of
+*float-mean* and a standard deviation of *float-stdev*. The random
+generator used internally can be seeded using the [seed](#seed)
+function.
+
+    (normal 10 3 10)
+    → (7 6.563476562 11.93945312 6.153320312 9.98828125
+    7.984375 10.17871094 6.58984375 9.42578125 12.11230469)
+
+In the second form, `normal` returns a single normal distributed
+floating point number:
+
+    (normal 0 1)  → 0.6630859375
+
+See also the [random](#random) and [rand](#rand) functions for evenly
+distributed numbers, [amb](#amb) for randomizing evaluation in a list of
+expressions, and [seed](#seed) for setting a different start point for
+pseudo random number generation.
+
+

@@ -1,0 +1,22 @@
+Function: betai
+-----------------------------------
+
+#### syntax: (betai *num-x* *num-a* *num-b*)
+
+The *Incomplete Beta* function, `betai`, equals the cumulative
+probability of the *Beta* distribution, `betai`, at *x* in *num-x*. The
+cumulative binomial distribution is defined as the probability of an
+event, *pev*, with probability *p* to occur *k* or more times in *N*
+trials:
+
+***pev = Betai(p, k, N - k + 1)***
+
+    (betai 0.5 3 8)  → 0.9453125
+
+The example calculates the probability for an event with a probability
+of 0.5 to occur 3 or more times in 10 trials (8 = 10 - 3 + 1). The
+incomplete Beta distribution can be used to derive a variety of other
+functions in mathematics and statistics. See also the
+[binomial](#binomial) function.
+
+

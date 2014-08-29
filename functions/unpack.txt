@@ -1,0 +1,90 @@
+Function: unpack
+------------------------------------
+
+#### syntax: (unpack *str-format* *str-addr-packed*)\
+ syntax: (unpack *str-format* *num-addr-packed*)\
+ syntax: (unpack *struct* *num-addr-packed*)\
+ syntax: (unpack *struct* *str-addr-packed*)
+
+When the first parameter is a string, `unpack` unpacks a binary
+structure in *str-addr-packed* or pointed to by *num-addr-packed* into
+newLISP variables using the format in *str-format*. `unpack` is the
+reverse operation of `pack`. Using *num-addr-packed* facilitates the
+unpacking of structures returned from imported, shared library
+functions.
+
+If the number specified in *num-addr-packed* is not a valid memory
+address, a system bus error or segfault can occur and crash newLISP or
+leave it in an unstable state.
+
+When the first parameter is the symbol of a [struct](#struct)
+definition, `unpack` uses the format as specified in *struct*. While
+`unpack` with *str-format* literally unpacks as specified, `unpack` with
+*struct* will skip structure aligning pad-bytes depending on data type,
+order of elements and CPU architecture. Refer to the description of the
+[struct](#struct) function for more detail.
+
+The following characters may define a format:
+
+  format   description
+  -------- ----------------------------------------------
+  `c `     a signed 8-bit number
+  `b `     an unsigned 8-bit number
+  `d `     a signed 16-bit short number
+  `u `     an unsigned 16-bit short number
+  `ld`     a signed 32-bit long number
+  `lu`     an unsigned 32-bit long number
+  `Ld`     a signed 64-bit long number
+  `Lu`     an unsigned 64-bit long number
+  `f `     a float in 32-bit representation
+  `lf`     a double float in 64-bit representation
+  `sn`     a string of *n* null padded ASCII characters
+  `nn`     *n* null characters
+  `>`      switches to big endian byte order
+  `<`      switches to little endian byte order
+
+
+    (pack "c c c" 65 66 67)  → "ABC"
+    (unpack "c c c" "ABC")   → (65 66 67)
+
+    (set 's (pack "c d u" 10 12345 56789))
+    (unpack "c d u" s)  → (10 12345 56789)
+
+    (set 's (pack "s10 f" "result" 1.23))
+    (unpack "s10 f" s)  → ("result\000\000\000\000" 1.230000019)
+
+    (set 's (pack "s3 lf" "result" 1.23))
+    (unpack "s3 f" s)  → ("res" 1.23)
+
+    (set 's (pack "c n7 c" 11 22))
+    (unpack "c n7 c" s)  → (11 22))
+
+The `>` and `<` specifiers can be used to switch between *little endian*
+and *big endian* byte order when packing or unpacking:
+
+    ;; on a little endian system (e.g., Intel CPUs)
+    (set 'buff (pack "d" 1))  → "\001\000" 
+
+    (unpack "d" buff)   → (1)
+    (unpack ">d" buff)  → (256)
+
+Switching the byte order will affect all number formats with 16-, 32-,
+or 64-bit sizes.
+
+The `pack` and `unpack` format need not be the same, as in the following
+example:
+
+    (set 's (pack "s3" "ABC"))
+    (unpack "c c c" s)  → (65 66 67)
+
+The examples show spaces between the format specifiers. Although not
+required, they can improve readability.
+
+If the buffer's size at a memory address is smaller than the formatting
+string specifies, some formatting characters may be left unused.
+
+See also the [address](#address), [get-int](#get-int),
+[get-long](#get-long), [get-char](#get-char), [get-string](#get-string),
+and [pack](#pack) functions.
+
+

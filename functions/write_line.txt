@@ -1,0 +1,37 @@
+Function: write-line
+----------------------------------------------------------
+
+#### syntax: (write-line [*int-file* [*str*]])\
+ syntax: (write-line *str-out* [*str*]])
+
+The string in *str* and the line termination character(s) are written to
+the device specified in *int-file*. When the string argument is omitted
+`write-line` writes the contents of the last [read-line](#read-line) to
+*int-file* If the first argument is omitted too then it writes to to
+standard out (STDOUT) or to whatever device is set by [device](#device).
+
+In the second syntax lines are appended to a string in *str-out*.
+
+`write-line` returns the number of bytes written.
+
+    (set 'out-file (open "myfile" "write"))
+    (write-line out-file "hello there")
+    (close out-file)
+
+    (set 'myFile (open "init.lsp" "read")
+    (while (read-line myFile) (write-line))
+
+    (set 'str "")
+    (write-line str "hello")
+    (write-line str "world")
+
+    str  →  "hello\nworld\n"
+
+The first example opens/creates a file, writes a line to it, and closes
+the file. The second example shows the usage of `write-line` without
+arguments. The contents of `init.lsp` are written to the console screen.
+
+See also the function [write](#write) for writing to a device without
+the line-terminating character.
+
+

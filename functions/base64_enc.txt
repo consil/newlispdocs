@@ -1,0 +1,40 @@
+Function: base64-enc
+----------------------------------------
+
+#### syntax: (base64-enc *str* [*bool-flag*])
+
+The string in *str* is encoded into BASE64 format. This format encodes
+groups of 3 \* 8 = 24 input bits into 4 \* 8 = 32 output bits, where
+each 8-bit output group represents 6 bits from the input string. The 6
+bits are encoded into 64 possibilities from the letters A–Z and a–z; the
+numbers 0–9; and the characters + (plus sign) and / (slash). The =
+(equals sign) is used as a filler in unused 3- to 4-byte translations.
+This function is helpful for converting binary content into printable
+characters.
+
+Without the optional *bool-flag* parameter the empty string `""` is
+encoded into `"===="`. If *bool-flag* evaluates to `true`, the empty
+string `""` is translated into `""`. Both translations result in `""`
+when using [base64-dec](base64-dec).
+
+The encoded string is returned.
+
+BASE64 encoding is used with many Internet protocols to encode binary
+data for inclusion in text-based messages (e.g., XML-RPC).
+
+    (base64-enc "Hello World")  → "SGVsbG8gV29ybGQ="
+
+    (base64-enc "")             → "===="
+    (base64-enc "" true)        → ""
+
+Note that `base64-enc` does not insert carriage-return/line-feed pairs
+in longer BASE64 sequences but instead returns a pure BASE64-encoded
+string.
+
+For decoding, use the [base64-dec](#base64-dec) function.
+
+newLISP's BASE64 handling is derived from routines found in the Unix
+[curl](http://curl.haxx.se/) utility and conforms to the RFC 4648
+standard.
+
+

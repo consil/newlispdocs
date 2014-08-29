@@ -1,0 +1,23 @@
+Function: begin
+-----------------------------------
+
+#### syntax: (begin *body*)
+
+The `begin` function is used to group a block of expressions. The
+expressions in *body* are evaluated in sequence, and the value of the
+last expression in *body* is returned.
+
+    (begin
+      (print "This is a block of 2 expressions\n")
+      (print "================================"))
+
+Some built-in functions like [cond](#cond), [define](#define),
+[doargs](#doargs), [dolist](#dolist), [dostring](#dostring),
+[dotimes](#dotimes), [when](#when) and [while](#while) already allow
+multiple expressions in their bodies, but `begin` is often used in an
+[if](#if) expression.
+
+The [silent](#silent) function works like `begin`, but suppresses
+console output on return.
+
+

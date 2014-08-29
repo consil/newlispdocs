@@ -1,0 +1,81 @@
+Function: sym
+---------------------------------
+
+#### syntax: (sym *string* [*sym-context* [*nil-flag*]])\
+ syntax: (sym *number* [*sym-context* [*nil-flag*]])\
+ syntax: (sym *symbol* [*sym-context* [*nil-flag*]])
+
+Translates the first argument in *string*, *number*, or *symbol* into a
+symbol and returns it. If the optional context is not specified in
+*sym-context*, the current context is used when doing symbol lookup or
+creation. Symbols will be created if they do not already exist. When the
+context does not exist and the context is specified by a quoted symbol,
+the symbol also gets created. If the context specification is unquoted,
+the context is the specified name or the context specification is a
+variable containing the context.
+
+`sym` can create symbols within the symbol table that are not legal
+symbols in newLISP source code (e.g., numbers or names containing
+special characters such as parentheses, colons, etc.). This makes `sym`
+usable as a function for associative memory access, much like *hash
+table* access in other scripting languages.
+
+As a third optional argument, `nil` can be specified to suppress symbol
+creation if the symbol is not found. In this case, `sym` returns `nil`
+if the symbol looked up does not exist. Using this last form, `sym` can
+be used to check for the existence of a symbol.
+
+    (sym "some")           → some
+    (set (sym "var") 345)  → 345
+    var                    → 345
+    (sym "aSym" 'MyCTX)    → MyCTX:aSym
+    (sym "aSym" MyCTX)     → MyCTX:aSym  ; unquoted context
+
+    (sym "foo" MyCTX nil)  → nil  ; 'foo does not exist
+    (sym "foo" MyCTX)      → foo  ; 'foo is created
+    (sym "foo" MyCTX nil)  → foo  ; foo now exists
+
+Because the function `sym` returns the symbol looked up or created,
+expressions with `sym` can be embedded directly in other expressions
+that use symbols as arguments. The following example shows the use of
+`sym` as a hash-like function for associative memory access, as well as
+symbol configurations that are not legal newLISP symbols:
+
+    ;; using sym for simulating hash tables
+
+    (set (sym "John Doe" 'MyDB) 1.234)
+    (set (sym "(" 'MyDB) "parenthesis open")
+    (set (sym 12 'MyDB) "twelve")
+
+    (eval (sym "John Doe" 'MyDB))  → 1.234
+    (eval (sym "(" 'MyDB))         → "parenthesis open"
+    (eval (sym 12 'MyDB))          → "twelve"
+
+    ;; delete a symbol from a symbol table or hash
+    (delete (sym "John Doe" 'MyDB))  → true
+
+The last statement shows how a symbol can be eliminated using
+[delete](#delete).
+
+The third syntax allows symbols to be used instead of strings for the
+symbol name in the target context. In this case, `sym` will extract the
+name from the symbol and use it as the name string for the symbol in the
+target context:
+
+    (sym 'myVar 'FOO)  → FOO:myVar
+
+    (define-macro (def-context)
+      (dolist (s (rest (args)))
+        (sym s (first (args)))))
+
+    (def-context foo x y z)
+
+    (symbols foo)  → (foo:x foo:y foo:z)
+
+The `def-context` macro shows how this could be used to create a macro
+that creates contexts and their variables in a dynamic fashion.
+
+A syntax of the [context](#context) function can also be used to create,
+set and evaluate symbols.
+
+

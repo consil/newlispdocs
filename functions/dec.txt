@@ -1,0 +1,44 @@
+Function: dec
+---------------------------------------------------
+
+#### syntax: (dec *place* [*num*])
+
+The number in *place* is decremented by `1.0` or the optional number
+*num* and returned. `dec` performs float arithmetic and converts integer
+numbers passed into floating point type.
+
+*place* is either a symbol or a place in a list structure holding a
+number, or a number returned by an expression.
+
+    (set x 10)    → 10
+    (dec x)       → 9
+    x             → 9
+    (dec x 0.25)  → 8.75
+    x             → 8.75
+
+If the symbol for *place* contains `nil`, it is treated as if containing
+`0.0`:
+
+    z             → nil
+    (dec z)       → -1
+
+    (set z nil)
+    (dec z 0.01)  → -0.01
+
+Places in a list structure or a number returned by another expression
+can be updated too:
+
+    (set 'l '(1 2 3 4))
+
+    (dec (l 3) 0.1) → 3.9
+
+    (dec (first l)) → 0
+
+    l → (0 2 3 3.9)
+
+    (dec (+ 3 4)) → 6
+
+Use the [--](#deci) function to decrement in integer mode. Use the
+[inc](#inc) function to increment numbers floating point mode.
+
+

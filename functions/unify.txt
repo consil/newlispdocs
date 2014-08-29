@@ -1,0 +1,200 @@
+Function: unify
+-----------------------------------
+
+#### syntax: (unify *exp-1* *exp-2* [*list-env*])
+
+Evaluates and matches *exp-1* and *exp-2*. Expressions match if they are
+equal or if one of the expressions is an unbound variable (which would
+then be bound to the other expression). If expressions are lists, they
+are matched by comparing subexpressions. Unbound variables start with an
+uppercase character to distinguish them from symbols. `unify` returns
+`nil` when the unification process fails, or it returns a list of
+variable associations on success. When no variables were bound, but the
+match is still successful, `unify` returns an empty list. newLISP uses a
+modified *J. Alan Robinson* unification algorithm with correctly applied
+*occurs check*. See also *Peter Norvig*'s paper about a common
+[unification algorithm bug](http://norvig.com/unify-bug.pdf), which is
+not present in this implementation.
+
+Since version 10.4.0 the underscore symbol `_` (ASCII 95) matches any
+atom, list or unbound variable and never binds.
+
+Like [match](#match), `unify` is frequently employed as a parameter
+functor in [find](#find), [ref](#ref), [ref-all](#ref-all) and
+[replace](#replace).
+
+    (unify 'A 'A)  → ()  ; tautology
+
+    (unify 'A 123)  → ((A 123))  ; A bound to 123
+
+    (unify '(A B) '(x y))  → ((A x) (B y))  ; A bound to x, B bound to y
+
+    (unify '(A B) '(B abc))  → ((A abc) (B abc))  ; B is alias for A
+
+    (unify 'abc 'xyz)  → nil  ; fails because symbols are different
+
+    (unify '(A A) '(123 456))  → nil  ; fails because A cannot be bound to different values
+
+    (unify '(f A) '(f B))  → ((A B))  ; A and B are aliases
+
+    (unify '(f A) '(g B))  → nil  ; fails because heads of terms are different
+
+    (unify '(f A) '(f A B))  → nil  ; fails because terms are of different arity
+
+    (unify '(f (g A)) '(f B))  → ((B (g A)))  ; B bound to (g A)
+
+    (unify '(f (g A) A) '(f B xyz))  → ((B (g xyz)) (A xyz))  ; B bound to (g xyz) A to xyz
+
+    (unify '(f A) 'A)  → nil  ; fails because of infinite unification (f(f(f …)))
+
+    (unify '(A xyz A) '(abc X X))  →  nil ; indirect alias A to X doesn't match bound terms
+
+    (unify '(p X Y a) '(p Y X X))  → '((Y a) (X a)))  ; X alias Y and binding to 'a
+
+    (unify '(q (p X Y) (p Y X)) '(q Z Z))  → ((Y X) (Z (p X X)))  ; indirect alias
+
+    (unify '(A b _) '(x G z)) → ((A x) (G b)) ; _ matches atom z 
+
+    (unify '(A b c _) '(x G _ z)) → ((A x) (G b)) ; _ never binds, matches c and z
+
+    (unify '(A b _) '(x G (x y z))) → ((A x) (G b)) ; _ matches list (x y z)
+
+    ;; some examples taken from http://en.wikipedia.org/wiki/Unification
+
+`unify` can take an optional binding or association list in *list-env*.
+This is useful when chaining `unify` expressions and the results of
+previous `unify` bindings must be included:
+
+    (unify '(f X) '(f 123))  → ((X 123))
+
+    (unify '(A B) '(X A) '((X 123)))
+    → ((X 123) (A 123) (B 123))
+
+In the previous example, `X` was bound to `123` earlier and is included
+in the second statement to pre-bind `X`.
+
+### Use `unify` with `expand`
+
+Note that variables are not actually bound as a newLISP assignment.
+Rather, an association list is returned showing the logical binding. A
+special syntax of [expand](#expand) can be used to actually replace
+bound variables with their terms:
+
+    (set 'bindings (unify '(f (g A) A) '(f B xyz)))
+    → ((B (g xyz)) (A xyz))
+
+    (expand '(f (g A) A) bindings)  → (f (g xyz) xyz)
+
+    ; or in one statement
+    (expand '(f (g A) A) (unify '(f (g A) A) '(f B xyz)))
+    → (f (g xyz) xyz)
+
+### Use `unify` with `bind` for de-structuring
+
+The function [bind](#bind) can be used to set unified variables:
+
+    (bind (unify '(f (g A) A) '(f B xyz)))
+
+    A → xyz 
+    B → (g xyz)
+
+This can be used for de-structuring:
+
+    (set 'structure '((one "two") 3 (four (x y z))))
+    (set 'pattern '((A B) C (D E)))
+    (bind (unify pattern structure))
+
+    A → one
+    B → "two"
+    C → 3
+    D → four
+    E → (x y z)
+
+`unify` returns an association list and `bind` binds the associations.
+
+### Model propositional logic with `unify`
+
+The following example shows how propositional logic can be modeled using
+`unify` and [expand](#expand):
+
+    ; if somebody is human, he is mortal -> (X human) :- (X mortal)
+    ; socrates is human -> (socrates human)
+    ; is socrates mortal? -> ?  (socrates mortal)
+
+    (expand '(X mortal) 
+             (unify '(X human) '(socrates human))) 
+    → (socrates mortal)
+
+The following is a more complex example showing a small, working PROLOG
+(Programming in Logic) implementation.
+
+    ;; a small PROLOG implementation
+
+    (set 'facts '(
+        (socrates philosopher)
+        (socrates greek)
+        (socrates human)
+        (einstein german)
+        (einstein (studied physics))
+        (einstein human)
+    ))
+
+    (set 'rules '(
+        ((X mortal) <- (X human))
+        ((X (knows physics)) <- (X physicist))
+        ((X physicist) <- (X (studied physics)))
+    ))
+
+
+    (define (query trm)
+        (or  (if (find trm facts) true) (catch (prove-rule trm))))
+
+    (define (prove-rule trm)
+        (dolist (r rules)
+            (if (list? (set 'e (unify trm (first r))))
+                (if (query (expand (last r) e))
+                    (throw true))))
+        nil
+    )
+
+    ; try it
+
+    > (query '(socrates human))
+    true
+    > (query '(socrates (knows physics)))
+    nil
+    > (query '(einstein (knows physics)))
+    true
+
+The program handles a database of `facts` and a database of simple *A is
+a fact if B is a fact* `rules`. A fact is proven true if it either can
+be found in the `facts` database or if it can be proven using a rule.
+Rules can be nested: for example, to prove that somebody
+`(knows physics)`, it must be proved true that somebody is a
+`physicist`. But somebody is only a physicist if that person
+`studied physics`. The `<-` symbol separating the left and right terms
+of the rules is not required and is only added to make the rules
+database more readable.
+
+This implementation does not handle multiple terms in the right premise
+part of the rules, but it does handle backtracking of the `rules`
+database to try out different matches. It does not handle backtracking
+in multiple premises of the rule. For example, if in the following rule
+`A if B and C and D`, the premises `B` and `C` succeed and `D` fails, a
+backtracking mechanism might need to go back and reunify the `B` or `A`
+terms with different facts or rules to make `D` succeed.
+
+The above algorithm could be written differently by omitting
+[expand](#expand) from the definition of `prove-rule` and by passing the
+environment, `e`, as an argument to the `unify` and `query` functions.
+
+A *learning* of proven facts can be implemented by appending them to the
+`facts` database once they are proven. This would speed up subsequent
+queries.
+
+Larger PROLOG implementations also allow the evaluation of terms in
+rules. This makes it possible to implement functions for doing other
+work while processing rule terms. `prove-rule` could accomplish this
+testing for the symbol `eval` in each rule term.
+
+

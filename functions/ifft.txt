@@ -1,0 +1,25 @@
+Function: ifft
+----------------------------------
+
+#### syntax: (ifft *list-num*)
+
+Calculates the inverse discrete Fourier transform on a list of complex
+numbers in *list-num* using the FFT method (Fast Fourier Transform).
+Each complex number is specified by its real part, followed by its
+imaginary part. In case only real numbers are used, the imaginary part
+is set to `0.0` (zero). When the number of elements in *list-num* is not
+an integer power of 2, `ifft` increases the number of elements by
+padding the list with zeroes. When complex numbers are `0` in the
+imaginary part, simple numbers can be used.
+
+    (ifft (fft '((1 0) (2 0) (3 0) (4 0)))) 
+    → ((1 0) (2 0) (3 0) (4 0))
+
+    ;; when imaginary part is 0, plain numbers work too
+
+    (ifft (fft '(1 2 3 4))) 
+    → ((1 0) (2 0) (3 0) (4 0))
+
+The inverse operation of `ifft` is the [fft](#fft) function.
+
+

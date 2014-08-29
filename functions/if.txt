@@ -1,0 +1,63 @@
+Function: if
+--------------------------------
+
+#### syntax: (if *exp-condition* *exp-1* [*exp-2*])\
+ syntax: (if *exp-cond-1* *exp-1* *exp-cond-2* *exp-2* [ ... ])
+
+If the value of *exp-condition* is neither `nil` nor an empty list, the
+result of evaluating *exp-1* is returned; otherwise, the value of
+*exp-2* is returned. If *exp-2* is absent, the value of *exp-condition*
+is returned.
+
+`if` also sets the anaphoric system variable `$it` to the value of the
+conditional expression in `if`.
+
+    (set 'x 50)                   → 50
+    (if (< x 100) "small" "big")  → "small"
+    (set 'x 1000)                 → 1000
+    (if (< x 100) "small" "big")  → "big"
+    (if (> x 2000) "big")         → nil
+
+    ; more than one statement in the true or false
+    ; part must be blocked with (begin ...)
+    (if (= x y)
+    (begin
+    (some-func x)
+    (some-func y))
+    (begin
+    (do-this x y)
+    (do-that x y))
+    )
+
+    ; if also sets the anaphoric system variable $it
+    (set 'lst '(A B C))
+    (if lst (println (last $it)))  → C
+
+The second form of `if` works similarly to [cond](#cond), except it does
+not take parentheses around the condition-body pair of expressions. In
+this form, `if` can have an unlimited number of arguments.
+
+    (define (classify x)
+    (if
+    (< x 0) "negative"
+    (< x 10) "small"
+    (< x 20) "medium"
+    (>= x 30) "big"
+    "n/a"))
+
+    (classify 15)   → "medium"
+    (classify 100)  → "big"
+    (classify 22)   → "n/a"
+    (classify -10)  → "negative"
+
+The last expression, `"n/a"`, is optional. When this option is omitted,
+the evaluation of `(>= x 30)` is returned, behaving exactly like a
+traditional [cond](#cond) but without requiring parentheses around the
+condition-expression pairs.
+
+In any case, the whole `if` expression always returns the last
+expression or condition evaluated.
+
+See also the [when](#when) and [unless](#unless) functions.
+
+

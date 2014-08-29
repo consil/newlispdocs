@@ -1,0 +1,64 @@
+Function: series
+------------------------------------
+
+#### syntax: (series *num-start* *num-factor* *num-count*)\
+ syntax: (series *exp-start* *func* *num-count*)
+
+In the first syntax, `series` creates a geometric sequence with
+*num-count* elements starting with the element in *num-start*. Each
+subsequent element is multiplied by *num-factor*. The generated numbers
+are always floating point numbers.
+
+When *num-count* is less than `1`, then `series` returns an empty list.
+
+    (series 2 2 5)     → (2 4 8 16 32)
+    (series 1 1.2 6)   → (1 1.2 1.44 1.728 2.0736 2.48832)
+    (series 10 0.9 4)  → (10 9 8.1 7.29)
+    (series 0 0 10)    → (0 0 0 0 0 0 0 0 0 0)
+    (series 99 1 5)    → (99 99 99 99 99)
+
+In the second syntax, `series` uses a function specified in *func* to
+transform the previous expression in to the next expression:
+
+    ; embed the function Phi: f(x) = 1 / (1 + x)
+    ; see also http://en.wikipedia.org/wiki/Golden_ratio
+
+    (series 1 (fn (x) (div (add 1 x))) 20)  →
+
+    (1 0.5 0.6666666 0.6 0.625 0.6153846 0.619047 0.6176470 0.6181818 
+     0.6179775 0.6180555 0.6180257 0.6180371 0.6180327 0.6180344 
+     0.6180338 0.6180340 0.6180339 0.6180339 0.6180339)
+
+    ; pre-define the function
+
+    (define (oscillate x) 
+      (if (< x) 
+        (+ (- x) 1) 
+        (- (+ x 1)))
+    )
+
+    (series 1 oscillate 20)  → 
+
+    (1 -2 3 -4 5 -6 7 -8 9 -10 11 -12 13 -14 15 -16 17 -18 19 -20)
+
+    ; any data type is accepted as a start expression
+
+    (series "a" (fn (c) (char (inc (char c)))) 5) → ("a" "b" "c" "d" "e")
+
+    ; dependency of the two previous values in this fibonacci generator
+
+    (let (x 1) (series x (fn (y) (+ x (swap y x))) 10))  →
+
+    (1 2 3 5 8 13 21 34 55 89)
+     
+
+The first example shows a series converging to the *golden ratio, φ*
+(for any starting value). The second example shows how *func* can be
+defined previously for better readability of the `series` statement.
+
+The `series` function also updates the internal list `$idx` index value,
+which can be used inside *func*.
+
+Use the [sequence](#sequence) function to generate arithmetic sequences.
+
+

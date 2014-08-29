@@ -1,0 +1,14 @@
+Function: prob-t
+------------------------------------
+
+#### syntax: (prob-t *num-t* *int-df1*)
+
+Returns the probability of an observed *Student's t* statistic in
+*num-t* with *int-df* degrees of freedom to be equal or greater under
+the null hypothesis.
+
+    (prob-t 1.76 14)  → 0.05011454551
+
+See also the inverse function [crit-t](#crit-t).
+
+

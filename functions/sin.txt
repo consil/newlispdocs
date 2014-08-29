@@ -1,0 +1,12 @@
+Function: sin
+---------------------------------
+
+#### syntax: (sin *num-radians*)
+
+Calculates the sine function from *num-radians* and returns the result.
+
+    (sin 1)                     → 0.8414709838
+    (set 'pi (mul 2 (acos 0)))  → 3.141592654
+    (sin (div pi 2))            → 1
+
+

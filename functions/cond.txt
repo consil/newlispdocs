@@ -1,0 +1,37 @@
+Function: cond
+----------------------------------
+
+#### syntax: (cond (*exp-condition-1* *body-1*) [(*exp-condition-2* *body-2*) ... ])
+
+Like `if`, `cond` conditionally evaluates the expressions within its
+body. The *exp-condition*s are evaluated in turn, until some
+*exp-condition-i* is found that evaluates to anything other than `nil`
+or an empty list `()`. The result of evaluating *body-i* is then
+returned as the result of the entire *cond-expression*. If all
+conditions evaluate to `nil` or an empty list, *cond* returns the value
+of the last *cond-expression*.
+
+    (define (classify x)
+      (cond
+        ((< x 0) "negative")
+        ((< x 10) "small")
+        ((< x 20) "medium")
+        ((>= x 30) "big")))
+
+    (classify 15)   → "medium"
+    (classify 22)   → "nil"
+    (classify 100)  → "big"
+    (classify -10)  → "negative"
+
+When a *body-n* is missing, the value of the last *cond-expression*
+evaluated is returned. If no condition evaluates to `true`, the value of
+the last conditional expression is returned (i.e., `nil` or an empty
+list).
+
+    (cond ((+ 3 4)))  → 7
+
+When used with multiple arguments, the function [if](#if) behaves like
+`cond`, except it does not need extra parentheses to enclose the
+condition-body pair of expressions.
+
+

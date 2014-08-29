@@ -1,0 +1,35 @@
+Function: cons
+----------------------------------
+
+#### syntax: (cons *exp-1* *exp-2*)
+
+If *exp-2* evaluates to a list, then a list is returned with the result
+of evaluating *exp-1* inserted as the first element. If *exp-2*
+evaluates to anything other than a list, the results of evaluating
+*exp-1* and *exp-2* are returned in a list. Note that there is no
+*dotted pair* in newLISP: *cons*ing two atoms constructs a list, not a
+dotted pair.
+
+    (cons 'a 'b)            → (a b)
+    (cons 'a '(b c))        → (a b c)
+    (cons (+ 3 4) (* 5 5))  → (7 25)
+    (cons '(1 2) '(3 4))    → ((1 2) 3 4)
+    (cons nil 1)            → (nil 1)
+    (cons 1 nil)            → (1 nil)
+    (cons 1)                → (1)
+    (cons)          → ()
+
+Unlike other Lisps that return `(s)` as the result of the expression
+`(cons 's nil)`, newLISP's `cons` returns `(s nil)`. In newLISP, `nil`
+is a Boolean value and is not equivalent to an empty list, and a newLISP
+cell holds only one value.
+
+`cons` behaves like the inverse operation of [first](#first) and
+[rest](#rest) (or [first](#first) and [last](#last) if the list is a
+pair):
+
+    (cons (first '(a b c)) (rest '(a b c)))  → (a b c)
+
+    (cons (first '(x y)) (last '(x y)))      → (x y)
+
+

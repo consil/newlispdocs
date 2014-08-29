@@ -1,0 +1,17 @@
+Function: base64-dec
+----------------------------------------
+
+#### syntax: (base64-dec *str*)
+
+The BASE64 string in *str* is decoded. Note that *str* is not verified
+to be a valid BASE64 string. The decoded string is returned.
+
+    (base64-dec "SGVsbG8gV29ybGQ=")  → "Hello World"
+
+For encoding, use the [base64-enc](#base64-enc) function.
+
+newLISP's BASE64 handling is derived from routines found in the Unix
+[curl](http://curl.haxx.se/) utility and conforms to the RFC 4648
+standard.
+
+

@@ -1,0 +1,18 @@
+Function: and
+---------------------------------
+
+#### syntax: (and *exp-1* [*exp-2* ... ])
+
+The expressions *exp-1*, *exp-2*, *etc.* are evaluated in order,
+returning the result of the last expression. If any of the expressions
+yield `nil` or the empty list `()`, evaluation is terminated and `nil`
+or the empty list `()` is returned.
+
+    (set 'x 10)                       → 10
+    (and (< x 100) (> x 2))           → true
+    (and (< x 100) (> x 2) "passed")  → "passed"
+    (and '())                         → ()
+    (and true)                        → true
+    (and)                             → true
+
+

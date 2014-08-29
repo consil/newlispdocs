@@ -1,0 +1,15 @@
+Function: list
+----------------------------------
+
+#### syntax: (list *exp-1* [*exp-2* ... ])
+
+The *exp* are evaluated and the values used to construct a new list.
+Note that arguments of array type are converted to lists.
+
+    (list 1 2 3 4 5)                → (1 2 3 4 5)
+    (list 'a '(b c) (+ 3 4) '() '*) → (a (b c) 7 () *)
+
+See also [cons](#cons) and [push](#push) for other forms of building
+lists.
+
+

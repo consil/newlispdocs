@@ -1,0 +1,26 @@
+Function: pipe
+----------------------------------
+
+#### syntax: (pipe)
+
+Creates an inter-process communications pipe and returns the `read` and
+`write` handles to it within a list.
+
+    (pipe)  → (3 4)  ; 3 for read, 4 for writing
+
+The pipe handles can be passed to a child process launched via
+[process](#process) or to [fork](#fork) for inter-process
+communications.
+
+Note that the pipe does not block when being written to, but it does
+block reading until bytes are available. A [read-line](#read-line)
+blocks until a newline character is received. A [read](#read) blocks
+when fewer characters than specified are available from a pipe that has
+not had the writing end closed by all processes.
+
+More than one pipe can be opened if required.
+
+newLISP can also use *named pipes*. See the [open](#open) function for
+further information.
+
+

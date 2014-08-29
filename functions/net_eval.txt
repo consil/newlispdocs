@@ -1,0 +1,172 @@
+Function: net-eval
+--------------------------------------
+
+#### syntax: (net-eval *str-host* *int-port* *exp* [*int-timeout* [*func-handler*]])\
+ syntax: (net-eval '((*str-host* *int-port* *exp*) ... ) [*int-timeout* [*func-handler*]])
+
+Can be used to evaluate source remotely on one or more newLISP servers.
+This function handles all communications necessary to connect to the
+remote servers, send source for evaluation, and wait and collect
+responses.
+
+The expression in *exp* evaluates to either a string or an expression
+which will be evaluated remotely in the environment of the target node.
+
+The remote TCP/IP servers are started in the following way:
+
+    newlisp -c -d 4711 &
+
+    ; or with logging connections
+
+    newlisp -l -c -d 4711 &
+
+    ; communicate via Uix local domain socket
+
+    newlisp -c /tmp/mysocket
+
+The `-c` option is necessary to suppress newLISP emitting prompts.
+
+The `-d` daemon mode allows newLISP to maintain state between
+connections. When keeping state between connections is not desired, the
+[inetd daemon mode](#inetd_daemon) offers more advantages. The Internet
+`inetd` or `xinetd` services daemon will start a new newLISP process for
+each client connection. This makes for much faster servicing of multiple
+connections. In `-d` daemon mode, each new client request would have to
+wait for the previous request to be finished. See the chapter [inetd
+daemon mode](#inetd_daemon) on how to configure this mode correctly.
+
+Instead of `4711`, any other port number can be used. Multiple nodes can
+be started on different hosts and with the same or different port
+numbers. The `-l` or `-L` logging options can be specified to log
+connections and remote commands.
+
+In the first syntax, `net-eval` talks to only one remote newLISP server
+node, sending the host in *str-host* on port *int-port* a request to
+evaluate the expression *exp*. If *int-timeout* is not given, `net-eval`
+will wait up to 60 seconds for a response after a connection is made.
+Otherwise, if the timeout in milliseconds has expired, `nil` is
+returned; else, the evaluation result of *exp* is returned.
+
+    ; the code to be evaluated is given in a quoted expression
+    (net-eval "192.168.1.94" 4711 '(+ 3 4))       → 7
+
+    ; expression as a string
+    (net-eval "192.168.1.94" 4711 "(+ 3 4)")      → 7
+
+    ; with timeout
+    (net-eval "192.168.1.94" 4711 '(+ 3 4) 1)     → nil  ; timeout to short
+    (net-error)                                   → (17 "ERR: Operation timed out")
+
+    (net-eval "192.168.1.94" 4711 '(+ 3 4) 1000)  → 7
+
+    ; program contained in a variable
+    (set 'prog '(+ 3 4))
+    (net-eval "192.168.1.94" 4711 prog)           → 7
+
+    ; specify a local-domain Unix socket (not available on Win32)
+    (net-eval "/tmp/mysocket" 0 '(+ 3 4))         → 7
+
+The second syntax of `net-eval` returns a list of the results after all
+of the responses are collected or timeout occurs. Responses that time
+out return `nil`. The last example line shows how to specify a
+local-domain Unix socket specifying the socket path and a port number of
+`0`. Connection errors or errors that occur when sending information to
+nodes are returned as a list of error numbers and descriptive error
+strings. See the function [net-error](#net-error) for a list of
+potential error messages.
+
+    ; two different remote nodes different IPs
+    (net-eval '(
+        ("192.168.1.94" 4711 '(+ 3 4)) 
+        ("192.168.1.95" 4711 '(+ 5 6))
+        ) 5000)
+    → (7 11)
+
+    ; two persistent nodes on the same CPU different ports
+    (net-eval '(
+        ("localhost" 8081 '(foo "abc")) 
+        ("localhost" 8082 '(myfunc 123)') 
+        ) 3000)
+
+    ; inetd or xinetd nodes on the same server and port
+    ; nodes are loaded on demand
+    (net-eval '(
+        ("localhost" 2000 '(foo "abc")) 
+        ("localhost" 2000 '(myfunc 123))
+        ) 3000)
+
+The first example shows two expressions evaluated on two different
+remote nodes. In the second example, both nodes run on the local
+computer. This may be useful when debugging or taking advantage of
+multiple CPUs on the same computer. When specifying `0` for the port
+number , `net-eval` takes the host name as the file path to the
+local-domain Unix socket.
+
+Note that definitions of `foo` and `myfunc` must both exist in the
+target environment. This can be done using a `net-eval` sending `define`
+statements before. It also can be done by preloading code when starting
+remote nodes.
+
+When nodes are inetd or xinetd-controlled, several nodes may have the
+same IP address and port number. In this case, the Unix daemon inetd or
+xinetd will start multiple newLISP servers on demand. This is useful
+when testing distributed programs on just one machine. The last example
+illustrates this case. It is also useful on multi core CPUs, where the
+platform OS can distribute different processes on to different CPU
+cores.
+
+The source sent for evaluation can consist of entire multiline programs.
+This way, remote nodes can be loaded with programs first, then specific
+functions can be called. For large program files, the functions
+[put-url](#put-url) or [save](#save) (with a URL file name) can be used
+to transfer programs. The a `net-eval` statement could load these
+programs.
+
+Optionally, a handler function can be specified. This function will be
+repeatedly called while waiting and once for every remote evaluation
+completion.
+
+    (define (myhandler param)
+        (if param
+            (println param))
+    )
+
+    (set 'Nodes '(
+        ("192.168.1.94" 4711)
+        ("192.168.1.95" 4711)
+    ))
+
+    (set 'Progs '(
+        (+ 3 4)
+        (+ 5 6)
+    ))
+
+    (net-eval (map (fn (n p) (list (n 0) (n 1) p)) Nodes Progs) 5000 myhandler)
+    →
+    ("192.168.1.94" 4711 7)
+    ("192.168.1.95" 4711 11)
+
+The example shows how the list of node specs can be assembled from a
+list of nodes and sources to evaluate. This may be useful when
+connecting to a larger number of remote nodes.
+
+    (net-eval (list 
+      (list (Nodes 0 0) (Nodes 0 1) (Progs 0)) 
+      (list (Nodes 1 0) (Nodes 1 1) (Progs 1)) 
+     ) 3000 myhandler)
+
+While waiting for input from remote hosts, `myhandler` will be called
+with `nil` as the argument to `param`. When a remote node result is
+completely received, `myhandler` will be called with `param` set to a
+list containing the remote host name or IP number, the port, and the
+resulting expression. `net-eval` will return `true` before a timeout or
+`nil` if the timeout was reached or exceeded. All remote hosts that
+exceeded the timeout limit will contain a `nil` in their results list.
+
+For a longer example see this program:
+[mapreduce](http://www.newlisp.org/syntax.cgi?code/mapreduce.txt). The
+example shows how a word counting task gets distributed to three remote
+nodes. The three nodes count words in different texts and the master
+node receives and consolidates the results.
+
+

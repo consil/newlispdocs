@@ -1,0 +1,27 @@
+Function: reset
+-----------------------------------
+
+#### syntax: (reset)\
+ syntax: (reset true)
+
+In the first syntax, `reset` returns to the top level of evaluation,
+switches the [trace](#trace) mode off, and switches to the MAIN
+context/namespace. `reset` restores the top-level variable environment
+using the saved variable environments on the stack. It also throws an
+error "user reset - no error" which can be reported with user defined
+error handlers. Since version 10.5.5 `reset` also interrupts command
+line parameter processing.
+
+`reset` may return memory that was claimed by newLISP to the operating
+system. `reset` walks through the entire cell space, which may take a
+few seconds in a heavily loaded system.
+
+`reset` occurs automatically after an error condition.
+
+In the second syntax, `reset` will stop the current process and start a
+new clean newLISP process with the same command-line parameters. This
+mode will only work when newLISP was started using its full path-name,
+e.g. `/usr/bin/newlisp` instead of only `newlisp`. This mode is not
+available on Win32.
+
+

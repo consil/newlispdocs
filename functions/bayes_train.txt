@@ -1,0 +1,97 @@
+Function: bayes-train
+-----------------------------------------
+
+#### syntax: (bayes-train *list-M1* [*list-M2* ... ] *sym-context-D*)
+
+Takes one or more lists of tokens (*M1*, *M2—*) from a joint set of
+tokens. In newLISP, tokens can be symbols or strings (other data types
+are ignored). Tokens are placed in a common dictionary in
+*sym-context-D*, and the frequency is counted for each token in each
+category *Mi*. If the context does not yet exist, it must be quoted.
+
+The *M* categories represent data models for which sequences of tokens
+can be classified (see [bayes-query](#bayes-query)). Each token in *D*
+is a content-addressable symbol containing a list of the frequencies for
+this token within each category. String tokens are prepended with an `_`
+(underscore) before being converted into symbols. A symbol named `total`
+is created containing the total of each category. The `total` symbol
+cannot be part of the symbols passed as an *Mi* category.
+
+The function returns a list of token frequencies found in the different
+categories or models.
+
+    (bayes-train '(A A B C C) '(A B B C C C) 'L)  → (5 6)
+
+    L:A      → (2 1)
+    L:B      → (1 2)
+    L:C      → (2 3)
+    L:total  → (5 6)
+
+    (bayes-train '("one" "two" "two" "three")
+                 '("three" "one" "three") 
+                 '("one" "two" "three") 'S)       
+    → (4 3 3)
+
+    S:_one    → (1 1 1)
+    S:_two    → (2 0 1)
+    S:_three  → (1 2 1)
+    S:total   → (4 3 3)
+
+The first example shows training with two lists of symbols. The second
+example illustrates how an `_` is prepended when training with strings.
+
+`bayes-train` creates symbols from strings prepending an underscore
+character. This is the same way hashes are created and contexts
+populates with symbols by `bayes-train` can be used like hashes:
+
+    ; use a bayes-trained context namespace like a hash dictionary
+
+    (S "two")   → (2 0 1)
+    (S "three") → (1 2 1)
+
+    (S) → (("one" (1 1 1)) ("three" (1 2 1)) ("two" (2 0 1)))
+
+Note that these examples are just for demonstration purposes. In
+reality, training sets may contain thousands or millions of words,
+especially when training natural language models. But small data sets
+may be used when the frequency of symbols just describe already-known
+proportions. In this case, it may be better to describe the model data
+set explicitly, without the `bayes-train` function:
+
+    (set 'Data:tested-positive '(8 18))
+    (set 'Data:tested-negative '(2 72))
+    (set 'Data:total '(10 90))
+
+The last data are from a popular example used to describe the
+[bayes-query](#bayes-query) function in introductory papers and books
+about *bayesian networks*.
+
+Training can be done in different stages by using `bayes-train` on an
+existing trained context with the same number of categories. The new
+symbols will be added, then counts and totals will be correctly updated.
+
+Training in multiple batches may be necessary on big text corpora or
+documents that must be tokenized first. These corpora can be tokenized
+in small portions, then fed into `bayes-train` in multiple stages.
+Categories can also be singularly trained by specifying an empty list
+for the absent corpus:
+
+    (bayes-train shakespeare1 '() 'data)
+    (bayes-train shakespeare2 '() 'data)
+    (bayes-train '() hemingway1 'data)
+    (bayes-train '() hemingway2 'data)
+    (bayes-train shakepeare-rest hemingway-rest 'data)
+
+`bayes-train` will correctly update word counts and totals.
+
+Using `bayes-train` inside a context other than `MAIN` requires the
+training contexts to have been created previously within the `MAIN`
+context via the [context](#context) function.
+
+`bayes-train` is not only useful with the [bayes-query](#bayes-query)
+function, but also as a function for counting in general. For instance,
+the resulting frequencies could be analyzed using
+[prob-chi2](#prob-chi2) against a *null hypothesis* of proportional
+distribution of items across categories.
+
+

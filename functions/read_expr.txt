@@ -1,0 +1,40 @@
+Function: read-expr
+---------------------------------------
+
+#### syntax: (read-expr *str-source* [*sym-context* [*exp-error* [*int-offset*]]])
+
+`read-expr` parses the first expressions it finds in *str-source* and
+returns the translated expression without evaluating it. An optional
+context in *sym-context* specifies a namespace for the translated
+expression.
+
+After a call to `read-expr` the system variable `$count` contains the
+number of characters scanned.
+
+If an error occurs when translating *str-source* the expression in
+*exp-error* is evaluated and the result returned.
+
+*int-offset* specifies an optional offset into *str-source* where
+processing should start. When calling `read-expr` repeatedly this number
+can be updated using `$count`, the number of characters processed.
+
+    (set 'code "; a statement\n(define (double x) (+ x x))")
+
+    (read-expr code) → (define (double x) (+ x x))
+
+    $count → 41
+
+`read-expr` behaves similar to [eval-string](#eval-string) but without
+the evaluation step:
+
+    (read-expr "(+ 3 4)")    → (+ 3 4)
+
+    (eval-string "(+ 3 4)")  → 7
+
+Using `read-expr` a customized code reader can be programmed
+preprocessing expressions before evaluation.
+
+See also [reader-event](#reader-event) for preprocessing expressions
+event-driven.
+
+

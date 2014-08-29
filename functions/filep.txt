@@ -1,0 +1,18 @@
+Function: file?
+-----------------------------------
+
+#### syntax: (file? *str-path-name* [*bool*])
+
+Checks for the existence of a file in *str-name*. Returns `true` if the
+file exists; otherwise, it returns `nil`. This function will also return
+`true` for directories. If the optional *bool* value is `true`, the file
+must not be a directory and *str-path-name* is returned or `nil` if the
+file is a directory. The existence of a file does not imply anything
+about its read or write permissions for the current user.
+
+    (if (file? "afile") (set 'fileNo (open "afile" "read")))
+
+    (file? "/usr/bin/newlisp" true) → "/usr/bin/newlisp"
+    (file? "/usr/bin/foo" true)     → nil
+
+

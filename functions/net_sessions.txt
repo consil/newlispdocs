@@ -1,0 +1,8 @@
+Function: net-sessions
+------------------------------------------
+
+#### syntax: (net-sessions)
+
+Returns a list of active listening and connection sockets.
+
+

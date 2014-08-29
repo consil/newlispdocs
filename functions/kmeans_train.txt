@@ -1,0 +1,161 @@
+Function: kmeans-train
+------------------------------------------
+
+#### syntax: (kmeans-train *matrix-data* *int-k* *context* [*matrix-centroids*])
+
+The function performs Kmeans cluster analysis on *matrix-data*. All *n*
+data records in *matrix-data* are partitioned into a number of *int-k*
+different groups.
+
+Both, the *n \* m* *matrix-data* and the optional *k \* m*
+*matrix-centroids* can be either nested lists or 2-dimensional arrays.
+
+The Kmeans algorithm tries to minimize the sum of squared inner cluster
+distances (SSQ) from the cluster centroid. With each iteration the
+centroids get moved closer to their final position. On some data sets,
+the end result can depend on the starting centroid points. The right
+choice of initial centroids can speed up the process and avoid not
+wanted local minima.
+
+When no optional *matrix-centroids* are given, `kmeans-train` will
+assign an initial random cluster membership to each data row and
+calculate starting centroids.
+
+`kmeans-train` returns a vector of total SSQs, the sum of squared inner
+distances from the centroid inside the cluster for all clusters. The
+Iterating algorithm stops when the change of SSQ from one to the next
+iteration is less than 1e-10.
+
+Other results of the analysis are stored as lists in variables of
+*context*.
+
+The following example analyses 20 data records measuring *m = 3*
+features and tries to partition data into *k = 3* clusters. Other
+numbers than *k = 3* could be tried. The target is a result with few
+clusters of high density measured by the average inner cluster
+distances.
+
+    (set 'data '(
+    (6.57 4.96 11.91) 
+    (2.29 4.18 1.06) 
+    (8.63 2.51 8.11) 
+    (1.85 1.89 0.11) 
+    (7.56 7.93 5.06) 
+    (3.61 7.95 5.11) 
+    (7.18 3.46 8.7) 
+    (8.17 6.59 7.49) 
+    (5.44 5.9 5.57) 
+    (2.43 2.14 1.59) 
+    (2.48 2.26 0.19) 
+    (8.16 3.83 8.93) 
+    (8.49 5.31 7.47) 
+    (3.12 3.1 1.4) 
+    (6.77 6.04 3.76) 
+    (7.01 4.2 11.9) 
+    (6.79 8.72 8.62) 
+    (1.17 4.46 1.02) 
+    (2.11 2.14 0.85) 
+    (9.44 2.65 7.37)))
+
+    (kmeans-train data 3 'MAIN:K) → 
+    (439.7949357 90.7474276 85.06633163 82.74597619)
+
+    ; cluster membership
+    K:labels → (2 3 2 3 1 1 2 1 1 3 3 2 2 3 1 2 1 3 3 2)
+
+    ; the centroid for each cluster
+    K:centroids →
+    ( (6.39 7.188333333 5.935) 
+    (7.925714286 3.845714286 9.198571429) 
+    (2.207142857 2.881428571 0.8885714286) )
+
+The returned list of SSQs shows how in each iteration the sum of inner
+squared distances decreases. The list in `K:labels` shows the membership
+fo each data point in the same order as in the data.
+
+The centroids in `K:centroids` can be used for later classification of
+new data records using [kmeans-query](#kmeans-query).
+
+The average inner `K:deviations` from cluster members to their centroid
+show how dense a cluster is packed. Formally, deviations are calculated
+similarly to Euclidian distances and to standard deviations in
+conventional statistics. Squaring the deviations and multiplying each
+with their cluster size (number of members in the cluster) shows the
+inner SSQ of each cluster:
+
+    ; average inner deviations of cluster members to the centroid
+    ; deviation = sqrt(ssq-of-cluster / n-of-cluster)
+    K:deviations  → (2.457052209 2.260089397 1.240236975)
+
+    ; calculating inner SSQs from cluster deviations
+    (map mul '(6 7 7) (map mul K:deviations K:deviations)) →
+    (36.22263333 35.75602857 10.76731429) ; inner SSQs
+
+    ; SSQ from last iteration as sum of inner SSQs
+    (apply add '(36.22263333 35.75602857 10.76731429)) → 82.74597619
+
+`K:clusters` gives indices of data records into the original data for
+each cluster. With these, individual clusters can be extracted from the
+data for further analysis:
+
+    ; ceach of the result clusters with indices into the data set
+    K:clusters → 
+    ( (4 5 7 8 14 16) 
+    (0 2 6 11 12 15 19) 
+    (1 3 9 10 13 17 18) )
+
+    ; cluster of data records labeled 1 at offset 0
+    (select data (K:clusters 0)) →
+    ( (7.56 7.93 5.06) 
+    (3.61 7.95 5.11) 
+    (8.17 6.59 7.49) 
+    (5.44 5.9 5.57) 
+    (6.77 6.04 3.76) 
+    (6.79 8.72 8.62) )
+
+    ; cluster of data records labeled 2 at offset 1
+    (select data (K:clusters 1)) →
+    ( (6.57 4.96 11.91) 
+    (8.63 2.51 8.11) 
+    (7.18 3.46 8.7) 
+    (8.16 3.83 8.93) 
+    (8.49 5.31 7.47) 
+    (7.01 4.2 11.9) 
+    (9.44 2.65 7.37) )
+
+    ; cluster of data records labeled 3 at offset 2
+    (select data (K:clusters 2)) →
+    ( (2.29 4.18 1.06) 
+    (1.85 1.89 0.11) 
+    (2.43 2.14 1.59) 
+    (2.48 2.26 0.19) 
+    (3.12 3.1 1.4) 
+    (1.17 4.46 1.02) 
+    (2.11 2.14 0.85) )
+
+In the last example the cluster labels (from 1 to 3) are added to the
+data:
+
+    ; append a cluster label to each data record
+    (set 'labeled-data (transpose (push K:labels (transpose data) -1)))
+
+    labeled-data: →
+    ( (6.57 4.96 11.91 2) 
+    (2.29 4.18 1.06 3) 
+    (8.63 2.51 8.11 2) 
+    (1.85 1.89 0.11 3) 
+    (7.56 7.93 5.06 1) 
+    (3.61 7.95 5.11 1) 
+    ... ...
+    (2.11 2.14 0.85 3) 
+    (9.44 2.65 7.37 2) )
+
+The result context should be prefixed with `MAIN` when code is written
+in a namespace context. If the context does not exists already, it will
+be created.
+
+Results in `K:labels`, `K:clusters`, `K:centroids` and `K:deviations`
+will be overwritten, if already present from previous runs of
+`kmeans-train`.
+
+

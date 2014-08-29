@@ -1,0 +1,30 @@
+Function: error-event
+-----------------------------------------
+
+#### syntax: (error-event *sym-event-handler | func-event-handler*)
+
+*sym-event-handler* contains a user-defined function for handling
+errors. Whenever an error occurs, the system performs a [reset](#reset)
+and executes the user-defined error handler. The error handler can use
+the built-in function [last-error](#last-error) to retrieve the number
+and text of the error. The event handler is specified as either a quoted
+symbol or a lambda function.
+
+    (define (my-handler)    
+      (print "error # " (first (last-error)) " has occurred\n") )
+
+    (error-event 'my-handler)  → my-handler
+
+    ;; specify a function directly
+
+    (error-event my-handler)  → $error-event
+
+    (error-event 
+      (fn () (print "error # " (first (last-error)) " has occurred\n")))
+
+    (error-event exit)  → $error-event
+
+For a different way of handling errors, see the [catch](#catch)
+function. Use [throw-error](#throw-error) to throw user-defined errors.
+
+

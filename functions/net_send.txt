@@ -1,0 +1,23 @@
+Function: net-send
+--------------------------------------
+
+#### syntax: (net-send *int-socket* *str-buffer* [*int-num-bytes*])
+
+Sends the contents of *str-buffer* on the connection specified by
+*int-socket*. If *int-num-bytes* is specified, up to *int-num-bytes* are
+sent. If *int-num-bytes* is not specified, the entire contents will be
+sent. `net-send` returns the number of bytes sent or `nil` on failure.
+
+On failure, use [net-error](#net-error) to get more error information.
+
+    (set 'buf "hello there")
+
+    (net-send sock buf)       → 11
+    (net-send sock buf 5)     → 5
+
+    (net-send sock "bye bye") → 7
+
+The first `net-send` sends the string `"hello there"`, while the second
+`net-send` sends only the string `"hello"`.
+
+

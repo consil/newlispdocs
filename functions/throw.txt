@@ -1,0 +1,37 @@
+Function: throw
+-----------------------------------
+
+#### syntax: (throw *exp*)
+
+Works together with the [catch](#catch) function. `throw` forces the
+return of a previous `catch` statement and puts the *exp* into the
+result symbol of `catch`.
+
+    (define (throw-test)
+        (dotimes (x 1000) 
+            (if (= x 500) (throw "interrupted"))))
+
+    (catch (throw-test) 'result)  → true
+
+    result  → "interrupted"
+
+    (catch (throw-test))  → "interrupted"
+
+The last example shows a shorter form of [catch](#catch), which returns
+the `throw` result directly.
+
+`throw` is useful for breaking out of a loop or for early return from
+user-defined functions or expression blocks. In the following example,
+the `begin` block will return `X` if `(foo X)` is `true`; else `Y` will
+be returned:
+
+    (catch (begin
+        …
+        (if (foo X) (throw X) Y)
+        …
+    ))
+
+`throw` will *not* cause an error exception. Use
+[throw-error](#throw-error) to throw user error exceptions.
+
+

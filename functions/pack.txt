@@ -1,0 +1,113 @@
+Function: pack
+----------------------------------
+
+#### syntax: (pack *str-format* *exp-1* [*exp-2* ... ])\
+ syntax: (pack *str-format* *list*)\
+ syntax: (pack *struct* *exp-1* [*exp-2* ... ])\
+ syntax: (pack *struct* *list*)
+
+When the first parameter is a string, `pack` packs one or more
+expressions (*exp-1* to *exp-n*) into a binary format specified in the
+format string *str-format*, and returning the binary structure in a
+string buffer. The symmetrical [unpack](#unpack) function is used for
+unpacking. The expression arguments can also be given in a *list*.
+`pack` and `unpack` are useful when reading and writing binary files
+(see [read](#read) and [write](#write)) or when unpacking binary
+structures from return values of imported C functions using `import`.
+
+When the first parameter is the symbol of a [struct](#struct)
+definition, `pack` uses the format as specified in *struct*. While
+`pack` with *str-format* literally packs as specified, `pack` with
+*struct* will insert structure aligning pad-bytes depending on data
+type, order of elements and CPU architecture. Refer to the description
+of the [struct](#struct) function for more detail.
+
+The following characters are used in *str-format*:
+
+  format   description
+  -------- ----------------------------------------------
+  `c `     a signed 8-bit number
+  `b `     an unsigned 8-bit number
+  `d `     a signed 16-bit short number
+  `u `     an unsigned 16-bit short number
+  `ld`     a signed 32-bit long number
+  `lu`     an unsigned 32-bit long number
+  `Ld`     a signed 64-bit long number
+  `Lu`     an unsigned 64-bit long number
+  `f `     a float in 32-bit representation
+  `lf`     a double float in 64-bit representation
+  `sn`     a string of *n* null padded ASCII characters
+  `nn`     *n* null characters
+  `>`      switch to big endian byte order
+  `<`      switch to little endian byte order
+
+
+`pack` will convert all floats into integers when passed to `b`, `c`,
+`d`, `ld`, or `lu` formats. It will also convert integers into floats
+when passing them to `f` and `lf` formats.
+
+    (pack "c c c" 65 66 67)  → "ABC"
+    (unpack "c c c" "ABC")   → (65 66 67)
+
+    (pack "c c c" 0 1 2)             → "\000\001\002"
+    (unpack "c c c" "\000\001\002")  → (0 1 2)
+
+    (set 's (pack "c d u" 10 12345 56789))
+    (unpack "c d u" s)  → (10 12345 56789)
+
+    (set 's (pack "s10 f" "result" 1.23))
+    (unpack "s10 f" s)
+    → ("result\000\000\000\000" 1.230000019)
+
+    (pack "n10") → "\000\000\000\000\000\000\000\000\000\000"
+
+    (set 's (pack "s3 lf" "result" 1.23))
+    (unpack "s3 f" s)  → ("res" 1.23)
+
+    (set 's (pack "c n7 c" 11 22))
+    (unpack "c n7 c" s)  → (11 22))
+
+    (unpack "b" (pack "b" -1.0))  → (255)
+    (unpack "f" (pack "f" 123))   → (123)
+
+The last two statements show how floating point numbers are converted
+into integers when required by the format specification.
+
+The expressions to pack can also be given in a list:
+
+    (set 'lst '("A" "B" "C"))
+    (set 'adr (pack "lululu" lst))
+    (map get-string (unpack "lululu" adr))    → ("A" "B" "C")
+
+Note that the list should be referenced directly in `pack`, so the
+pointers passed by `adr` are valid. `adr` would be written as
+`char * adr[]` in the C-programming language and represents a 32-bit
+pointer to an array of 32-bit string pointers.
+
+The `>` and `<` specifiers can be used to switch between *little endian*
+and *big endian* byte order when packing or unpacking:
+
+    (pack "d" 1)   → "\001\000"  ;; on little endian CPU
+    (pack ">d" 1)  → "\000\001"  ;; force big endian
+
+    (pack "ld" 1)   → "\001\000\000\000" ;; on little endian CPU
+    (pack "<ld" 1)  → "\000\000\000\001" ;; force big endian
+
+    (pack ">u <u" 1 1) → "\000\001\001\000" ;; switch twice
+
+Switching the byte order will affect all number formats with 16-, 32-,
+or 64-bit sizes.
+
+The pack and unpack format need not be the same:
+
+    (set 's (pack "s3" "ABC"))
+    (unpack "c c c" s)  → (65 66 67)
+
+The examples show spaces between the format specifiers. These are not
+required but can be used to improve readability.
+
+See also the [address](#address), [get-int](#get-int),
+[get-long](#get-long), [get-char](#get-char), [get-string](#get-string),
+and [unpack](#unpack) functions.
+
+

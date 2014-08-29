@@ -1,0 +1,29 @@
+Function: chop
+--------------------------------------------------------
+
+#### syntax: (chop *str* [*int-chars*])\
+ syntax: (chop *list* [*int-elements*])
+
+If the first argument evaluates to a string, `chop` returns a copy of
+*str* with the last *int-char* characters omitted. If the *int-char*
+argument is absent, one character is omitted. `chop` does not alter
+*str*.
+
+If the first argument evaluates to a list, a copy of *list* is returned
+with *int-elements* omitted (same as for strings).
+
+    (set 'str "newLISP")  → "newLISP"
+                          
+    (chop str)    → "newLIS"
+    (chop str 2)  → "newLI"
+                          
+    str  → "newLISP"
+
+    (set 'lst '(a b (c d) e))
+
+    (chop lst)    → (a b (c d))
+    (chop lst 2)  → (a b)
+                          
+    lst  → (a b (c d) e)
+
+

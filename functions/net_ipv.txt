@@ -1,0 +1,30 @@
+Function: net-ipv
+-------------------------------------
+
+#### syntax: (net-ipv *int-version*)\
+ syntax: (net-ipv)
+
+Switches between IPv4 and IPv6 internet protocol versions. *int-version*
+contains either a 4 for IPv4 or a 6 for IPv6. When no parameter is
+given, `net-ipv` returns the current setting.
+
+    (net-ipv)      → 4
+    (net-ipv 6)    → 6
+
+By default newLISP starts up in IPv4 mode. The IPv6 protocol mode can
+also be specified from the commandline when starting newlisp:
+
+    newlisp -6
+
+Once a socket is connected with either [net-connect](#net-connect) or
+listened on with [net-listen](#net-listen), the
+[net-accept](#net-accept), [net-select](#net-select),
+[net-send](#net-send), [net-receive](#net-receive) and
+[net-receive-from](#net-receive-from) functions automatically adjust to
+the address protocol used when creating the sockets. Different
+connections with different IPv4/6 settings can be open at the same time.
+
+Note, that currently [net-packet](#net-packet) does not support IPv6 and
+will work in IPv4 mode regardless of settings.
+
+

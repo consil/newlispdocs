@@ -1,0 +1,25 @@
+Function: until
+-----------------------------------
+
+#### syntax: (until *exp-condition* [*body*])
+
+Evaluates the condition in *exp-condition*. If the result is `nil` or
+the empty list `()`, the expressions in *body* are evaluated. Evaluation
+is repeated until the exp-condition results in a value other than `nil`
+or the empty list. The result of the last expression evaluated in *body*
+is the return value of the `until` expression. If *body* is empty, the
+result of last *exp-condition* is returned. `until` works like
+([while](#while) ([not](#not) …)).
+
+`until` also updates the system iterator symbol `$idx`.
+
+    (device (open "somefile.txt" "read"))
+    (set 'line-count 0)
+    (until (not (read-line)) (inc line-count))
+    (close (device))
+    (print "the file has " line-count " lines\n")
+
+Use the [do-until](#do-until) function to test the condition *after*
+evaluation of the body expressions.
+
+

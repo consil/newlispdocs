@@ -1,0 +1,178 @@
+Function: replace
+-------------------------------------------------------
+
+#### syntax: (replace *exp-key* *list* *exp-replacement* [*func-compare*])\
+ syntax: (replace *exp-key* *list*)\
+ syntax: (replace *str-key* *str-data* *exp-replacement*)\
+ syntax: (replace *str-pattern* *str-data* *exp-replacement* *int-regex-option*)
+
+### List replacement
+
+If the second argument is a list, `replace` replaces all elements in the
+list *list* that are equal to the expression in *exp-key*. The element
+is replaced with *exp-replacement*. If *exp-replacement* is missing, all
+instances of *exp-key* will be deleted from *list*.
+
+Note that `replace` is destructive. It changes the list passed to it and
+returns the changed list. The number of replacements made is contained
+in the system variable `$count` when the function returns. During
+executions of the replacement expression, the anaphoric system variable
+`$it` is set to the expression to be replaced.
+
+Optionally, *func-compare* can specify a comparison operator or
+user-defined function. By default, *func-compare* is the `=` (equals
+sign).
+
+    ;; list replacement
+
+    (set 'aList '(a b c d e a b c d))
+
+    (replace 'b aList 'B)  → (a B c d e a B c d)
+    aList  → (a B c d e a B c d)
+    $count → 2  ; number of replacements
+
+    ;; list replacement with special compare functor/function
+
+    ; replace all numbers where 10 < number
+    (set 'L '(1 4 22 5 6 89 2 3 24))
+
+    (replace 10 L 10 <) → (1 4 10 5 6 10 2 3 10)
+    $count → 3
+
+    ; same as:
+
+    (replace 10 L 10 (fn (x y) (< x y))) → (1 4 10 5 6 10 2 3 10)
+
+    ; change name-string to symbol, x is ignored as nil
+
+    (set 'AL '((john 5 6 4) ("mary" 3 4 7) (bob 4 2 7 9) ("jane" 3)))
+
+    (replace nil AL (cons (sym ($it 0)) (rest $it)) 
+                    (fn (x y) (string? (y 0)))) ; parameter x = nil not used
+    → ((john 5 6 4) (mary 3 4 7) (bob 4 2 7 9) (jane 3))
+
+    ; use $count in the replacement expression
+    (replace 'a '(a b a b a b) (list $count $it) =) →  ((1 a) b (2 a) b (3 a) b)
+
+Using the [match](#match) and [unify](#unify) functions, list searches
+can be formulated that are as powerful as regular expression string
+searches:
+
+    ; calculate the sum in all associations with 'mary
+
+    (set 'AL '((john 5 6 4) (mary 3 4 7) (bob 4 2 7 9) (jane 3)))
+
+    (replace '(mary *)  AL (list 'mary (apply + (rest $it))) match)
+    → ((john 5 6 4) (mary 14) (bob 4 2 7 9) (jane 3))
+    $count → 1
+
+    ; make sum in all expressions
+
+    (set 'AL '((john 5 6 4) (mary 3 4 7) (bob 4 2 7 9) (jane 3)))
+
+    (replace '(*) AL (list ($it 0) (apply + (rest $it))) match)
+    → ((john 15) (mary 14) (bob 22) (jane 3))
+    $count → 4
+
+    ; using unify, replace only if elements are equal
+    (replace '(X X) '((3 10) (2 5) (4 4) (6 7) (8 8)) (list ($it 0) 'double ($it 1)) unify)
+    → ((3 10) (2 5) (4 double 4) (6 7) (8 double 8))
+     
+
+### List removal
+
+The last form of `replace` has only two arguments: the expression *exp*
+and *list*. This form removes all *exp*s found in *list*.
+
+    ;; removing elements from a list
+
+    (set 'lst '(a b a a c d a f g))
+    (replace 'a lst)  → (b c d f g)
+    lst               → (b c d f g)
+
+    $count → 4
+
+### String replacement without regular expression
+
+If all arguments are strings, `replace` replaces all occurrences of
+*str-key* in *str-data* with the evaluated *exp-replacement*, returning
+the changed string. The expression in *exp-replacement* is evaluated for
+every replacement. The number of replacements made is contained in the
+system variable `$count`. This form of `replace` can also process binary
+`0`s (zeros).
+
+    ;; string replacement
+    (set 'str "this isa sentence")
+    (replace "isa" str "is a")  → "this is a sentence"
+
+    $count → 1
+
+### Regular expression replacement
+
+The presence of a fourth parameter indicates that a regular expression
+search should be performed with a regular expression pattern specified
+in *str-pattern* and an option number specified in *int-option* (e.g.,
+`1` (one) for case-insensitive searching or `0` (zero) for a standard
+Perl Compatible Regular Expression (PCRE) search). See [regex](#regex)
+above for details.
+
+By default, `replace` replaces all occurrences of a search string even
+if a beginning-of-line specification is included in the search pattern.
+After each replace, a new search is started at a new position in
+*str-data*. Setting the option bit to `0x8000` in *int-option* will
+force `replace` to replace only the first occurrence. The changed string
+is returned.
+
+`replace` with regular expressions also sets the internal variables
+`$0, $1,` and `$2—` with the contents of the expressions and
+subexpressions found. The anaphoric system variable `$it` is set to the
+same value as `$0`. These can be used to perform replacements that
+depend on the content found during replacement. The symbols
+`$it, $0, $1,` and `$2—` can be used in expressions just like any other
+symbols. If the replacement expression evaluates to something other than
+a string, no replacement is made. As an alternative, the contents of
+these variables can also be accessed by using `($ 0), ($ 1), ($ 2),` and
+so forth. This method allows indexed access (e.g., `($ i)`, where `i` is
+an integer).
+
+After all replacements are made, the number of replacements is contained
+in the system variable `$count`.
+
+    ;; using the option parameter to employ regular expressions
+
+    (set 'str "ZZZZZxZZZZyy")     → "ZZZZZxZZZZyy"
+    (replace "[x|y]" str "PP" 0)  → "ZZZZZPPZZZZPPPP"
+    str                           → "ZZZZZPPZZZZPPPP"
+
+    ;; using system variables for dynamic replacement
+
+    (set 'str "---axb---ayb---")
+    (replace "(a)(.)(b)" str (append $3 $2 $1) 0) 
+    → "---bxa---bya---"
+
+    str  → "---bxa---bya---"
+
+    ;; using the 'replace once' option bit 0x8000
+
+    (replace "a" "aaa" "X" 0)  → "XXX"
+
+    (replace "a" "aaa" "X" 0x8000)  → "Xaa"
+
+    ;; URL translation of hex codes with dynamic replacement
+
+    (set 'str "xxx%41xxx%42")
+    (replace "%([0-9A-F][0-9A-F])" str 
+                   (char (int (append "0x" $1))) 1)
+
+    str    → "xxxAxxxB"
+
+    $count → 2
+
+The [setf](#setf) function together with [nth](#nth), [first](#first) or
+[last](#last) can also be used to change elements in a list.
+
+See [directory](#directory), [find](#find), [find-all](#find-all),
+[parse](#parse), [regex](#regex), and [search](#search) for other
+functions using regular expressions.
+
+

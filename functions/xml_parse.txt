@@ -1,0 +1,237 @@
+Function: xml-parse
+---------------------------------------
+
+#### syntax: (xml-parse *string-xml* [*int-options* [*sym-context* [*func-callback*]]])
+
+Parses a string containing XML 1.0 compliant, *well-formed* XML.
+`xml-parse` does not perform DTD validation. It skips DTDs (Document
+Type Declarations) and processing instructions. Nodes of type ELEMENT,
+TEXT, CDATA, and COMMENT are parsed, and a newLISP list structure is
+returned. When an element node does not have attributes or child nodes,
+it instead contains an empty list. Attributes are returned as
+association lists, which can be accessed using [assoc](#assoc). When
+`xml-parse` fails due to malformed XML, `nil` is returned and
+[xml-error](#xml-error) can be used to access error information.
+
+    (set 'xml 
+      "<person name='John Doe' tel='555-1212'>nice guy</person>")
+
+    (xml-parse xml) 
+    → (("ELEMENT" "person" 
+        (("name" "John Doe") 
+         ("tel" "555-1212"))
+        (("TEXT" "nice guy"))))
+
+### Modifying the translation process.
+
+Optionally, the *int-options* parameter can be specified to suppress
+whitespace, empty attribute lists, and comments. It can also be used to
+transform tags from strings into symbols. Another function,
+[xml-type-tags](#xml-type-tags), serves for translating the XML tags.
+The following option numbers can be used:
+
+  option   description
+  -------- ----------------------------------------------------
+  1        suppress whitespace text tags
+  2        suppress empty attribute lists
+  4        suppress comment tags
+  8        translate string tags into symbols
+  16       add SXML (S-expression XML) attribute tags (@ ...)
+
+
+Options can be combined by adding the numbers (e.g., `3` would combine
+the options for suppressing whitespace text tags/info and empty
+attribute lists).
+
+The following examples show how the different options can be used:
+
+ **XML source:**
+
+    <?xml version="1.0" ?>
+    <DATABASE name="example.xml">
+    <!--This is a database of fruits-->
+        <FRUIT>
+            <NAME>apple</NAME>
+            <COLOR>red</COLOR>
+            <PRICE>0.80</PRICE>
+        </FRUIT>
+
+        <FRUIT>
+            <NAME>orange</NAME>
+            <COLOR>orange</COLOR>
+            <PRICE>1.00</PRICE>
+        </FRUIT>
+
+        <FRUIT>
+           <NAME>banana</NAME>
+           <COLOR>yellow</COLOR>
+           <PRICE>0.60</PRICE>
+        </FRUIT>
+    </DATABASE>
+
+### Parsing without any options:
+
+    (xml-parse (read-file "example.xml"))
+    → (("ELEMENT" "DATABASE" (("name" "example.xml")) (("TEXT" "\r\n\t") 
+        ("COMMENT" "This is a database of fruits") 
+        ("TEXT" "\r\n\t") 
+        ("ELEMENT" "FRUIT" () (("TEXT" "\r\n\t\t") ("ELEMENT" "NAME" () 
+           (("TEXT" "apple"))) 
+          ("TEXT" "\r\n\t\t") 
+          ("ELEMENT" "COLOR" () (("TEXT" "red"))) 
+          ("TEXT" "\r\n\t\t") 
+          ("ELEMENT" "PRICE" () (("TEXT" "0.80"))) 
+          ("TEXT" "\r\n\t"))) 
+        ("TEXT" "\r\n\r\n\t") 
+        ("ELEMENT" "FRUIT" () (("TEXT" "\r\n\t\t") ("ELEMENT" "NAME" () 
+           (("TEXT" "orange"))) 
+          ("TEXT" "\r\n\t\t") 
+          ("ELEMENT" "COLOR" () (("TEXT" "orange"))) 
+          ("TEXT" "\r\n\t\t") 
+          ("ELEMENT" "PRICE" () (("TEXT" "1.00"))) 
+          ("TEXT" "\r\n\t"))) 
+        ("TEXT" "\r\n\r\n\t") 
+        ("ELEMENT" "FRUIT" () (("TEXT" "\r\n\t\t") ("ELEMENT" "NAME" () 
+           (("TEXT" "banana"))) 
+          ("TEXT" "\r\n\t\t") 
+          ("ELEMENT" "COLOR" () (("TEXT" "yellow"))) 
+          ("TEXT" "\r\n\t\t") 
+          ("ELEMENT" "PRICE" () (("TEXT" "0.60"))) 
+          ("TEXT" "\r\n\t"))) 
+        ("TEXT" "\r\n"))))
+
+The `TEXT` elements containing only whitespace make the output very
+confusing. As the database in `example.xml` only contains data, we can
+suppress whitespace, empty attribute lists and comments with option
+`(+ 1 2 4)`:
+
+### Filtering whitespace TEXT, COMMENT tags, and empty attribute lists:
+
+    (xml-parse (read-file "example.xml") (+ 1 2 4))
+    → (("ELEMENT" "DATABASE" (("name" "example.xml")) ( 
+         ("ELEMENT" "FRUIT" (
+           ("ELEMENT" "NAME" (("TEXT" "apple"))) 
+           ("ELEMENT" "COLOR" (("TEXT" "red"))) 
+           ("ELEMENT" "PRICE" (("TEXT" "0.80"))))) 
+         ("ELEMENT" "FRUIT" (
+           ("ELEMENT" "NAME" (("TEXT" "orange"))) 
+           ("ELEMENT" "COLOR" (("TEXT" "orange"))) 
+           ("ELEMENT" "PRICE" (("TEXT" "1.00"))))) 
+         ("ELEMENT" "FRUIT" (
+           ("ELEMENT" "NAME" (("TEXT" "banana"))) 
+           ("ELEMENT" "COLOR" (("TEXT" "yellow"))) 
+           ("ELEMENT" "PRICE" (("TEXT" "0.60"))))))))
+
+The resulting output looks much more readable, but it can still be
+improved by using symbols instead of strings for the tags "FRUIT",
+"NAME", "COLOR", and "PRICE", as well as by suppressing the XML type
+tags "ELEMENT" and "TEXT" completely using the
+[xml-type-tags](#xml-type-tags) directive.
+
+### Suppressing XML type tags with [xml-type-tags](#xml-type-tags) and translating string tags into symbol tags:
+
+    ;; suppress all XML type tags for TEXT and ELEMENT
+    ;; instead of "CDATA", use cdata and instead of "COMMENT", use !--
+
+    (xml-type-tags nil 'cdata '!-- nil) 
+
+    ;; turn on all options for suppressing whitespace and empty
+    ;; attributes, translate tags to symbols
+
+    (xml-parse (read-file "example.xml") (+ 1 2 8))
+    → ((DATABASE (("name" "example.xml")) 
+         (!-- "This is a database of fruits") 
+         (FRUIT (NAME "apple") (COLOR "red") (PRICE "0.80")) 
+         (FRUIT (NAME "orange") (COLOR "orange") (PRICE "1.00")) 
+         (FRUIT (NAME "banana") (COLOR "yellow") (PRICE "0.60"))))
+
+When tags are translated into symbols by using option `8`, a context can
+be specified in *sym-context*. If no context is specified, all symbols
+will be created inside the current context.
+
+    (xml-type-tags nil nil nil nil)
+    (xml-parse "<msg>Hello World</msg>" (+ 1 2 4 8 16) 'CTX)
+    → ((CTX:msg "Hello World"))
+
+Specifying `nil` for the XML type tags TEXT and ELEMENT makes them
+disappear. At the same time, parentheses of the child node list are
+removed so that child nodes now appear as members of the list, starting
+with the tag symbol translated from the string tags "FRUIT", "NAME",
+etcetera.
+
+### Parsing into SXML (S-expressions XML) format:
+
+Using [xml-type-tags](#xml-type-tags) to suppress all XML-type
+tags—along with the option numbers `1`, `2`, `4`, `8`, and `16`—SXML
+formatted output can be generated:
+
+    (xml-type-tags nil nil nil nil)
+    (xml-parse (read-file "example.xml") (+ 1 2 4 8 16))
+    → ((DATABASE (@ (name "example.xml")) 
+        (FRUIT (NAME "apple") (COLOR "red") (PRICE "0.80")) 
+        (FRUIT (NAME "orange") (COLOR "orange") (PRICE "1.00")) 
+        (FRUIT (NAME "banana") (COLOR "yellow") (PRICE "0.60"))))
+
+If the original XML tags contain a namespace part separated by a `:`,
+that colon will be translated into a `.` dot in the resulting newLISP
+symbol.
+
+Note that using option number `16` causes an `@` (at symbol) to be added
+to attribute lists.
+
+See also the [xml-type-tags](#xml-type-tags) function for further
+information on XML parsing.
+
+### Parsing into a specified context
+
+When parsing XML expressions, XML tags are translated into newLISP
+symbols, when option 8 is specified. The *sym-context* option specifies
+the target context for the symbol creation:
+
+    (xml-type-tags nil nil nil nil)
+    (xml-parse (read-file "example.xml") (+ 1 2 4 8 16) 'CTX)
+    →((CTX:DATABASE (@ (CTX:name "example.xml")) 
+        (CTX:FRUIT (CTX:NAME "apple") (CTX:COLOR "red") (CTX:PRICE "0.80")) 
+        (CTX:FRUIT (CTX:NAME "orange") (CTX:COLOR "orange") (CTX:PRICE "1.00")) 
+        (CTX:FRUIT (CTX:NAME "banana") (CTX:COLOR "yellow") (CTX:PRICE "0.60"))))
+
+If the context does not exist, it will be created. If it exists, the
+quote can be omitted or the context can be referred to by a variable.
+
+### Using a call back function
+
+Normally, `xml-parse` will not return until all parsing has finished.
+Using the *func-callback* option, `xml-parse` will call back after each
+tag closing with the generated S-expression and a start position and
+length in the source XML:
+
+    ;; demo callback feature
+    (define (xml-callback s-expr start size)
+        (if (or (= (s-expr 0) 'NAME) (= (s-expr 0) 'COLOR) (= (s-expr 0) 'PRICE))
+            (begin
+                (print "parsed expression:" s-expr)
+                (println ", source:" (start size example-xml))
+            )
+        )
+    )
+
+    (xml-type-tags nil 'cdata '!-- nil)
+    (xml-parse  (read-file "example.xml") (+ 1 2 8) MAIN xml-callback)
+
+The following output will be generated by the callback function
+`xml-callback`:
+
+    parsed expression:(NAME "apple"), source:<NAME>apple</NAME>
+    parsed expression:(COLOR "red"), source:<COLOR>red</COLOR>
+    parsed expression:(PRICE "0.80"), source:<PRICE>0.80</PRICE>
+    parsed expression:(NAME "orange"), source:<NAME>orange</NAME>
+    parsed expression:(COLOR "orange"), source:<COLOR>orange</COLOR>
+    parsed expression:(PRICE "1.00"), source:<PRICE>1.00</PRICE>
+    parsed expression:(NAME "banana"), source:<NAME>banana</NAME>
+    parsed expression:(COLOR "yellow"), source:<COLOR>yellow</COLOR>
+    parsed expression:(PRICE "0.60"), source:<PRICE>0.60</PRICE>
+
+The example callback handler function filters the tags of interest and
+processes them as they occur.
+
+

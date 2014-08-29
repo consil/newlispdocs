@@ -1,0 +1,46 @@
+Function: trace
+-----------------------------------
+
+#### syntax: (trace [*bool*])
+
+Tracing is switched on when *bool* evaluates to anything other than
+`nil`. When no argument is supplied, `trace` evaluates to `true` or
+`nil` depending on the current trace mode. If trace mode is switched on,
+newLISP goes into debugging mode after entering the next user defined
+function, displaying the function and highlighting the current
+expression upon entry and exit.
+
+Highlighting is done by bracketing the expression between two \# (number
+sign) characters. This can be changed to a different character using
+[trace-highlight](#trace-highlight). Upon exit from the expression, the
+result of its evaluation is also reported.
+
+newLISP execution stops with a prompt line at each entry and exit of an
+expression.
+
+    [-> 2] s|tep n|ext c|ont q|uit >
+
+At the prompt, an `s`, `n`, `c`, or `q` can be entered to step into or
+merely execute the next expression. Any expression can be entered at the
+prompt for evaluation. Entering the name of a variable, for example,
+would evaluate to its contents. In this way, a variable's contents can
+be checked during debugging or set to different values.
+
+    ;; switches newLISP into debugging mode
+    (trace true)  → true 
+
+    ;; the debugger will show each step
+    (my-func a b c)
+
+    ;; switched newLISP out of debugging mode
+    (trace nil)  → nil 
+
+To set break points where newLISP should interrupt normal execution and
+go into debugging mode, put `(trace true)` statements into the newLISP
+code where execution should switch on the debugger.
+
+Use the [debug](#debug) function as a shortcut for the above example:
+
+    (debug (my-func a b c))
+
+

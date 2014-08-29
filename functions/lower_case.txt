@@ -1,0 +1,17 @@
+Function: lower-case
+--------------------------------------------------------------
+
+#### syntax: (lower-case *str*)
+
+Converts the characters of the string in *str* to lowercase. A new
+string is created, and the original is left unaltered.
+
+    (lower-case "HELLO WORLD")  → "hello world"
+    (set 'Str "ABC")
+    (lower-case Str)  → "abc"
+    Str               → "ABC"
+
+See also the [upper-case](#upper-case) and [title-case](#title-case)
+functions.
+
+

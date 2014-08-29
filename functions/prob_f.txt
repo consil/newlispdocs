@@ -1,0 +1,14 @@
+Function: prob-f
+------------------------------------
+
+#### syntax: (prob-f *num-f* *int-df1* *int-df2*)
+
+Returns the probability of an observed *F* statistic in *num-f* with
+*int-df1* and *int-df2* degrees of freedom to be equal or greater under
+the null hypothesis.
+
+    (prob-f 2.75 10 12)  → 0.0501990804
+
+See also the inverse function [crit-f](#crit-f).
+
+

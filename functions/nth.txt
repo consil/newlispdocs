@@ -1,0 +1,116 @@
+Function: nth
+-------------------------------------------------------
+
+#### syntax: (nth *int-index* *list*)\
+ syntax: (nth *int-index* *array*)\
+ syntax: (nth *int-index* *str*)\
+ syntax: (nth *list-indices* *list*)\
+ syntax: (nth *list-indices* *array*)
+
+In the first syntax group `nth` uses *int-index* an index into the
+*list*, *array* or *str* found and returning the element found at that
+index. See also [Indexing elements of strings and lists](#indexing).
+
+Multiple indices may be specified to recursively access elements in
+nested lists or arrays. If there are more indices than nesting levels,
+the extra indices are ignored. When multiple indices are used, they must
+be put in a list as shown in the second syntax group.
+
+    (set 'L '(a b c))
+    (nth 0 L)    → a
+    ; or simply
+    (L 0) → a
+
+    (set 'names '(john martha robert alex)) 
+    → (john martha robert alex)
+
+    (nth 2 names)    → robert
+    ; or simply
+    (names 2)        → robert
+
+    (names -1)       → alex
+
+
+    ; multiple indices
+    (set 'persons '((john 30) (martha 120) ((john doe) 17)))
+
+    (persons 1 1)           → 120
+
+    (nth '(2 0 1) persons)  → doe
+
+    ; or simply
+    (persons 2 0 1)        → doe
+
+    ; multiple indices in a vector
+    (set 'v '(2 0 1))
+    (persons v)       → doe
+    (nth v persons)   → doe
+
+    ; negative indices
+    (persons -2 0)    → martha
+
+    ; out-of-bounds indices cause error
+    (persons 10)  → ERR: list index out of bounds
+    (person -5)   → ERR: list index out of bounds
+
+The list `L` can be the context of the default functor `L:L`. This
+allows lists passed by reference:
+
+    (set 'L:L '(a b c d e f g))
+
+    (define (second ctx)
+        (nth 1 ctx))
+
+    (reverse L) → (g f e d c b a)
+    L:L → (g f e d c b a)
+
+    ;; passing the list in L:L by reference
+    (second L)   → b
+
+    ;; passing the list in L:L by value
+    (second L:L) → b
+
+Reference passing is faster and uses less memory in big lists and should
+be used on lists with more than a few hundred items.
+
+Note that the *implicit indexing* version of `nth` is not breaking
+newLISP syntax rules but should be understood as a logical expansion of
+newLISP syntax rules to other data types than built-in functions or
+lambda expressions. A list in the functor position of an s-expression
+assumes self-indexing functionality using the index arguments following.
+
+The implicit indexed syntax forms are faster but the other form with an
+explicit `nth` may be more readable in some situations.
+
+`nth` works on [arrays](#array) just like it does on lists:
+
+    (set 'aArray (array 2 3 '(a b c d e f))) 
+    → ((a b c) (d e f))
+    (nth 1 aArray)      →  (d e f)
+    (aArray 1)          →  (d e f)
+
+    (nth '(1 0) aArray)    → d
+    (aArray 1 0)           → d
+    (aArray '(1 0))        → d
+
+    (set 'vec '(1 0))
+    (aArray vec)           → d
+
+In the String version, `nth` returns the character found at the position
+*int-index* in *str* and returns it as a string.
+
+    (nth  0 "newLISP")   → "n"
+
+    ("newLISP" 0)        → "n"
+
+    ("newLISP" -1)       → "P"
+
+Note that [nth](#nth) works on character boundaries rather than byte
+boundaries when using the UTF-8–enabled version of newLISP. To access
+ASCII and binary string buffers on single byte boundaries use
+[slice](#slice).
+
+See also [setf](#setf) for modifying multidimensional lists and arrays
+and [push](#push) and [pop](#pop) for modifying lists.
+
+

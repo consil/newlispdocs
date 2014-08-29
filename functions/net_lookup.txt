@@ -1,0 +1,21 @@
+Function: net-lookup
+----------------------------------------
+
+#### syntax: (net-lookup *str-ip-number*)\
+ syntax: (net-lookup *str-hostname* [*bool*])
+
+Returns either a hostname string from *str-ip-number* in IP dot format
+or the IP number in dot format from *str-hostname*:
+
+    (net-lookup "209.24.120.224")    → "www.nuevatec.com"
+    (net-lookup "www.nuevatec.com")  → "209.24.120.224"
+
+    (net-lookup "216.16.84.66.sbl-xbl.spamhaus.org" true)
+    → "216.16.84.66"
+
+Optionally, a *bool* flag can be specified in the second syntax. If the
+expression in *bool* evaluates to anything other than `nil`,
+host-by-name lookup will be forced, even if the name string starts with
+an IP number.
+
+

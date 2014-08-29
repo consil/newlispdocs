@@ -1,0 +1,79 @@
+Function: pop
+-------------------------------------------------------------------------
+
+#### syntax: (pop *list* [*int-index-1* [*int-index-2* ... ]])\
+ syntax: (pop *list* [*list-indexes*])\
+ syntax: (pop *str* [*int-index* [*int-length*]])
+
+Using `pop`, elements can be removed from lists and characters from
+strings.
+
+In the first syntax, `pop` extracts an element from the list found by
+evaluating *list*. If a second parameter is present, the element at
+*int-index* is extracted and returned. See also [Indexing elements of
+strings and lists](#indexing).
+
+In the second version, indices are specified in the list *list-indexes*.
+This way, `pop` works easily together with [ref](#ref) and
+[ref-all](#ref-all), which return lists of indices.
+
+`pop` changes the contents of the target list. The popped element is
+returned.
+
+    (set 'pList '((f g) a b c "hello" d e 10))
+
+    (pop pList)  → (f g)
+    (pop pList)  → a
+    pList        → (b c "hello" d e 10)
+
+    (pop pList 3)    → d
+    (pop pList 100)  → 10
+    pList            → (b c "hello" e)
+
+    (pop pList -1)  → e
+    pList           → (b c "hello")
+
+    (pop pList -2)  → c
+    pList           → (b "hello")
+
+    (set 'pList '(a 2 (x y (p q) z)))
+
+    (pop pList -1 2 0)  → p
+
+    ;; use indices in a list
+    (set 'pList '(a b (c d () e)))
+
+    (push 'x pList '(2 2 0))  
+    → (a b (c d (x) e))
+
+    pList
+    → (a b (c d (x) e))
+
+    (ref 'x pList)  → (2 2 0)
+
+    (pop pList '(2 2 0))  → x
+
+`pop` can also be used on strings with one index:
+
+    ;; use pop on strings
+
+    (set 'str "newLISP")
+
+    (pop str -4 4)  → "LISP"
+
+    str  → "new"
+
+    (pop str 1)  → "e"
+
+    str  → "nw"
+
+    (set 'str "x")
+
+    (pop str)  → "x"
+    (pop str)  → ""
+
+Popping an empty string will return an empty string.
+
+See also the [push](#push) function, the inverse operation to `pop`.
+
+

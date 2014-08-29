@@ -1,0 +1,33 @@
+Function: get-float
+---------------------------------------
+
+#### syntax: (get-float *int-address*)
+
+Gets a 64-bit double float from an address specified in *int-address*.
+This function is helpful when using imported shared library functions
+(with `import`) that return an address pointer to a double float or a
+pointer to a structure containing double floats.
+
+    double float * foo(void)
+    {
+    double float * result;
+    …
+    *result = 123.456;
+    return(result);
+    }
+
+The previous C function is compiled into a shared library.
+
+    (import "mylib.so" "foo")
+    (get-float (foo))  → 123.456
+
+`foo` is imported and returns a pointer to a double float when called.
+Note that `get-float` is unsafe when used with an incorrect address in
+*int-address* and may result in the system crashing or becoming
+unstable.
+
+See also the [address](#address), [get-int](#get-int),
+[get-long](#get-long), [get-char](#get-char), [get-string](#get-string),
+[pack](#pack), and [unpack](#unpack) functions.
+
+

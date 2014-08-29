@@ -1,0 +1,20 @@
+Function: term
+----------------------------------
+
+#### syntax: (term *symbol*)
+
+Returns as a string, the term part of a *symbol* without the context
+prefix.
+
+    (set 'ACTX:var 123)
+    (set 'sm 'ACTX:var)
+    (string sm)     → "ACTX:var"
+    (term sm)      → "var"
+
+    (set 's 'foo:bar)
+    (= s (sym (term s) (prefix s)))
+
+See also [prefix](#prefix) to extract the namespace or context prefix
+from a symbol.
+
+

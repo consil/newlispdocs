@@ -1,0 +1,29 @@
+Function: destroy
+-------------------------------------
+
+#### syntax: (destroy *int-pid*)\
+ syntax: (destroy *int-pid* *int-signal*)
+
+Destroys a process with process id in *int-pid* and returns `true` on
+success or `nil` on failure. The process id is normally obtained from a
+previous call to [fork](#fork) on Mac OS X and other Unix or
+[process](#process) on all platforms. On Unix, `destroy` works like the
+system utility *kill* using the SIGKILL signal.
+
+CAUTION! If *int-pid* is `0` the signal is sent to all processes whose
+group ID is equal to the process group ID of the sender. If *int-pid* is
+`-1` all processes with the current user id will be killed, if newLISP
+is started with super user privileges, all processes except system
+processes are destroyed.
+
+When specifying *int-signal*, `destroy` works like a Unix `kill` command
+sending the specified Unix signal to the process in *int-pid*. This
+second syntax is not available on Win32.
+
+    (set 'pid (process "/usr/bin/bc" bcin bcout)) 
+    (destroy pid)
+
+    (set 'pid (fork (dotimes (i 1000) (println i) (sleep 10))))
+    (sleep 100) (destroy pid)
+
+

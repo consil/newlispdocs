@@ -1,0 +1,78 @@
+Function: setq_setf
+---------------------------------------------------------
+
+#### syntax: (setq *place-1* *exp-1* [*place-2* *exp-2* ... ])
+
+`setq` and `setf` work alike in newLISP and set the contents of a
+symbol, list, array or string or of a list, array or string place
+reference. Like [set](#set), `setq` and `setf` can take multiple
+argument pairs. Although both `setq` and `setf` point to the same
+built-in function internally, throughout this manual `setq` is used when
+setting a symbol reference and `setf` is used when setting list or array
+references.
+
+    (setq x 123)  → 123
+
+    ; multiple arguments
+
+    (setq x 1 y 2 z 3)  → 3 
+
+    x  → 1
+    y  → 2
+    z  → 3
+
+    ; with nth or implicit indices
+    (setq L '(a b (c d) e f g))
+
+    (setf (L 1) 'B)      → B
+    ; or the same
+    (setf (nth 1 L) 'B)
+    L                    → (a B (c d) e f g)
+
+    (setf (L 2 0) 'C)    → C
+    L                    → (a B (C d) e f g)
+
+    (setf (L 2) 'X)   
+    L                    → (A B X e f g)
+
+    ; with assoc
+    (setq L '((a 1) (b 2)))
+    (setf (assoc 'b L) '(b 3)) → (b 3)
+    L                          → ((a 1) (b 3))
+
+    ; with lookup
+    (setf (lookup 'b L) 30) → 30
+    L                       → ((a 1) (b 30))
+
+    ; several list accessors can be nested
+    (setq L '((a 1) (b 2)))
+
+    (push 'b (setf (assoc 'b l) '(b 4))) 'b) → b
+    L                                        →((a 1) (b b 4)))
+
+    ; on strings
+    (set 's "NewISP")
+
+    (setf (s 0) "n") → "n"
+    s → "newISP"
+
+    (setf (s 3) "LI") → "LI"
+    s → "newLISP"
+
+Often the new value set is dependent on the old value. `setf` can use
+the anaphoric system variable `$it` to refer to the old value inside the
+`setf` expression:
+
+    (setq L '((apples 4) (oranges 1))) 
+
+    (setf (L 1 1) (+ $it 1)) → 2
+
+    L                        → ((apples 4) (oranges 2))
+
+    (set 's "NewLISP")
+
+    (setf (s 0) (lower-case $it)) → "n")
+
+    s → "newLISP"
+
+

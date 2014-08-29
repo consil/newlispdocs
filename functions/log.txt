@@ -1,0 +1,21 @@
+Function: log
+---------------------------------
+
+#### syntax: (log *num*)\
+ syntax: (log *num* *num-base*)
+
+In the first syntax, the expression in *num* is evaluated and the
+natural logarithmic function is calculated from the result.
+
+    (log 1)         → 0
+    (log (exp 1))   → 1
+
+In the second syntax, an arbitrary base can be specified in *num-base*.
+
+    (log 1024 2)             → 10
+    (log (exp 1) (exp 1))    →  1
+
+See also [exp](#exp), which is the inverse function to `log` with base
+***e*** (2.718281828).
+
+

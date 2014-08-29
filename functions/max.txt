@@ -1,0 +1,12 @@
+Function: max
+---------------------------------
+
+#### syntax: (max *num-1* [*num-2* ... ])
+
+Evaluates the expressions *num-1*— and returns the largest number.
+
+    (max 4 6 2 3.54 7.1)  → 7.1
+
+See also the [min](#min) function.
+
+

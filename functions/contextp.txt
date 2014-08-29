@@ -1,0 +1,27 @@
+Function: context?
+--------------------------------------
+
+#### syntax: (context? *exp*)\
+ syntax: (context? *exp* *str-sym*)
+
+In the first syntax, *context?* is a predicate that returns `true` only
+if *exp* evaluates to a context; otherwise, it returns `nil`.
+
+    (context? MAIN)  → true
+    (set 'x 123)
+    (context? x)     → nil
+
+    (set 'FOO:q "hola")  → "hola"
+    (set 'ctx FOO)
+    (context? ctx)       → true  ; ctx contains context foo
+
+The second syntax checks for the existence of a symbol in a context. The
+symbol is specified by its name string in *str-sym*.
+
+    (context? FOO "q")  → true
+    (context? FOO "p")  → nil
+
+Use [context](#context) to change and create namespaces and to create
+hash symbols in contexts.
+
+

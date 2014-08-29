@@ -1,0 +1,34 @@
+Function: read-file
+---------------------------------------
+
+#### syntax: (read-file *str-file-name*)
+
+Reads a file in *str-file-name* in one swoop and returns a string buffer
+containing the data.
+
+On failure the function returns `nil`. For error information, use
+[sys-error](#sys-error) when used on files. When used on URLs
+[net-error](#net-error) gives more error information.
+
+    (write-file "myfile.enc" 
+        (encrypt (read-file "/home/lisp/myFile") "secret"))
+
+The file `myfile` is read, then encrypted using the password `"secret"`
+before being written back into a new file titled `"myfile.enc"` in the
+current directory.
+
+`read-file` can take an `http://` or `file://` URL in *str-file-name*.
+When the prefix is `http://`, `read-file` works exactly like
+[get-url](#get-url) and can take the same additional parameters.
+
+    (read-file "http://asite.com/somefile.tgz" 10000)
+
+The file `somefile.tgz` is retrieved from the remote location
+`http://asite.com`. The file transfer will time out after 10 seconds if
+it is not finished. In this mode, `read-file` can also be used to
+transfer files from remote newLISP server nodes.
+
+See also the [write-file](#write-file) and [append-file](#append-file)
+functions.
+
+

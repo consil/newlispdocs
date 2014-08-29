@@ -1,0 +1,34 @@
+Function: device
+------------------------------------
+
+#### syntax: (device [*int-io-handle*])
+
+*int-io-handle* is an I/O device number, which is set to 0 (zero) for
+the default STD I/O pair of handles, 0 for *stdin* and 1 for *stdout*.
+*int-io-handle* may also be a file handle previously obtained using
+[open](#open). In this case both, input and output are channeled through
+this handle. When no argument is supplied, the current I/O device number
+is returned.
+
+The I/O channel specified by `device` is used internally by the
+functions [print](#print), [println](#println), [write](#write),
+[write-line](#write-line) and [read-char](#read-char),
+[read-line](#read-line). When the current I/O device is 0 or 1,
+[print](#print) sends output to the console window and
+[read-line](#read-line) accepts input from the keyboard. If the current
+I/O device has been set by opening a file, then [print](#print) and
+[read-line](#read-line) work on that file.
+
+Note, that on Unix like operating systems, stdin channel 0 can also be
+used for output and stdout channel 1 can also be used for reading input.
+This is not the case on Windows, where 0 is strictly for input and
+stdout 1 strictly for output.
+
+    (device (open "myfile" "write"))  → 5
+    (print "This goes in myfile")     → "This goes in myfile"
+    (close (device))                  → true
+
+Note that using [close](#close) on `device` automatically resets
+`device` to 0 (zero).
+
+

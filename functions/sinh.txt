@@ -1,0 +1,15 @@
+Function: sinh
+----------------------------------
+
+#### syntax: (sinh *num-radians*)
+
+Calculates the hyperbolic sine of *num-radians*. The hyperbolic sine is
+defined mathematically as: *(exp (x) - exp (-x)) / 2*. An overflow to
+`inf` may occur if *num-radians* is too large.
+
+    (sinh 1)     → 1.175201194
+    (sinh 10)    → 11013.23287
+    (sinh 1000)  → inf
+    (sub (tanh 1) (div (sinh 1) (cosh 1))) → 0
+
+

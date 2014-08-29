@@ -1,0 +1,31 @@
+Function: ends-with
+---------------------------------------
+
+#### syntax: (ends-with *str-data* *str-key* [*num-option*])\
+ syntax: (ends-with *list* *exp*)
+
+In the first syntax, `ends-with` tests the string in *str-data* to see
+if it ends with the string specified in *str-key*. It returns `true` or
+`nil` depending on the outcome.
+
+If a regular expression *option* number is specified, *str-key* contains
+a regular expression pattern. See [regex](#regex) for valid numbers for
+*option*.
+
+    (ends-with "newLISP" "LISP")         → true
+    (ends-with "newLISP" "lisp")         → nil
+    ;; use regular expressions
+    (ends-with "newLISP" "lisp|york" 1)  → true
+
+In the second syntax, `ends-with` checks if a list ends with the list
+element in *exp*. `true` or `nil` is returned depending on outcome.
+
+    (ends-with '(1 2 3 4 5) 5)             → true
+    (ends-with '(a b c d e) 'b)            → nil
+    (ends-with '(a b c (+ 3 4)) '(+ 3 4))  → true
+
+The last example shows that *exp* could be a list by itself.
+
+See also the [starts-with](#starts-with) function.
+
+

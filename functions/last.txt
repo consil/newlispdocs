@@ -1,0 +1,28 @@
+Function: last
+--------------------------------------------------------
+
+#### syntax: (last *list*)\
+ syntax: (last *array*)\
+ syntax: (last *str*)
+
+Returns the last element of a list or a string.
+
+    (last '(1 2 3 4 5))  → 5
+    (last '(a b (c d)))  → (c d)
+
+    (set 'A (array 3 2 (sequence 1 6)))
+    → ((1 2) (3 4) (5 6))
+    (last A)             → (5 6)
+
+    (last '())           → ERR: list is empty
+
+In the second version the last character in the string *str* is returned
+as a string.
+
+    (last "newLISP")  → "P"
+
+Note that [last](#last) works on character boundaries rather than byte
+boundaries when the UTF-8–enabled version of newLISP is used. See also
+[first](#first), [rest](#rest) and [nth](#nth).
+
+

@@ -1,0 +1,45 @@
+Function: inc
+---------------------------------------------------
+
+#### syntax: (inc *place* [*num*])
+
+Increments the number in *place* by `1.0` or by the optional number
+*num* and returns the result. `inc` performs float arithmetic and
+converts integer numbers passed into floating point type.
+
+*place* is either a symbol or a place in a list structure holding a
+number, or a number returned by an expression.
+
+    (set 'x 0)    → 0
+    (inc x)       → 1
+    x             → 1
+    (inc x 0.25)  → 1.25
+    x             → 1.25
+    (inc x)       → 2.25
+
+If a symbol for *place* contains `nil`, it is treated as if containing
+`0.0`:
+
+    z             → nil
+    (inc z)       → 1
+
+    (set 'z nil)
+    (inc z 0.01)  → 0.01
+
+Places in a list structure or a number returned by another expression
+can be updated too:
+
+    (set 'l '(1 2 3 4))
+
+    (inc (l 3) 0.1) → 4.1
+
+    (inc (first l)) → 2
+
+    l → (2 2 3 4.1)
+
+    (inc (+ 3 4)) → 8
+
+Use the [++](#inci) function for incrementing numbers in integer mode.
+Use [dec](#dec) to decrement numbers in floating point mode.
+
+

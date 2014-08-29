@@ -1,0 +1,112 @@
+Function: macro
+-----------------------------------
+
+#### syntax: (macro (*sym-name* [*sym-param-1* ... ]) [*body-1* ... ])
+
+The `macro` function is used to define expansion macros. The syntax of
+`macro` is identical to the syntax of [define-macro](#define-macro). But
+while `define-macro` defines are *fexprs* functions to be evaluated at
+run-time, `macro` defines a function to be used during the source
+loading and reading process to transform certain expression call
+patterns into different call patterns.
+
+    (macro (double X) (+ X X)) → (lambda-macro (X) (expand '(+ X X)))
+
+    (double 123) → 246
+
+Internally all `macro` defined symbol call patterns are translated using
+the [expand](#expand) expression during source reading. This can be
+shown using the [read-expr](#read-expr) function:
+
+    (read-expr "(double 123)") → (+ 123 123)
+
+All variable names to be expanded must start in upper-case. Macros can
+be nested containing other macros defined earlier. But `macro`
+definitions cannot be repeated for the same symbol during the same
+newLISP session. To redefine a macro, e.g. for reading source with a
+different definition of an exisiting `macro` definition, use the
+[define](#define) function in the following way:
+
+    ; change existing macro 'double' to allow floating point parameters
+    ; use upper-case for variables for expansion
+
+    (define double (lambda-macro (X) (expand '(add X X))))
+    → (lambda-macro (X) (expand '(add X X)))
+
+    (double 1.23) → 2.46
+
+Note, that [define](#define) can be used only to re-define macros, not
+to create new macros. Internally newLISP knows that `macro` defined
+symbols are executed during source reading, not evaluation.
+
+### Using `map` and `apply` with `macro`
+
+When mapping macros using [map](#map) or [apply](#apply) the expansion
+function is mapped:
+
+    > (macro (double X) (+ X X))
+    (lambda-macro (X) (expand '(+ X X)))
+
+    > (map double '(1 2 3 4 5))
+    ((+ 1 1) (+ 2 2) (+ 3 3) (+ 4 4) (+ 5 5))
+
+    > (map eval (map double '(1 2 3 4 5)))
+    (2 4 6 8 10)
+
+    > (apply double '(10))
+    (+ 10 10)
+    >
+
+This is useful to find out how the expansion mechanism of our `macro`
+definition works during source load time.
+
+### Differences between `macro` and `define-macro` and potential problems.
+
+`macro` definitions are not susceptible to *variable capture* as are
+fexprs made with [define-macro](define-macro):
+
+    (define-macro (fexpr-add A B) 
+        (+ (eval A) (eval B)))
+
+    (macro (mac-add A B) 
+        (+ A B))
+
+    (set 'A 11 'B 22)
+
+    ; variable capture when using the same symbols 
+    ; used as locals in define-macro for callling
+
+    (fexpr-add A B) →
+    ; or
+    (fexpr-add B A) →
+    ERR: value expected : A
+    called from user defined function fexpr-add
+
+    ; no variable capture when doing the same with 
+    ; expansion macros
+
+    (mac-add A B) → 33
+
+    (mac-add B A) → 33
+
+But expansion macros using `macro` are susceptible to unwanted double
+evaluation, just like `define-macro is`:
+
+    (define-macro (fexpr-double X) 
+        (+ (eval X) (eval X)))
+
+    (macro (mac-double X) 
+        (+ X X))
+
+    (set 'a 10)
+    (fexpr-double (inc a)) → 23 ; not 22 as expected
+
+    (set 'a 10)
+    (mac-double (inc a)) → 23 ; not 22 as expected
+
+In both cases the incoming expression `(inc a)` gets evaulated twice.
+This must be considered when writing both, `macro` or `define-macro`
+expressions and symbols occur more than once in the body of the
+definition.
+
+

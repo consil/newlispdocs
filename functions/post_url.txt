@@ -1,0 +1,52 @@
+Function: post-url
+--------------------------------------
+
+#### syntax: (post-url *str-url* *str-content* [*str-content-type* [*str-option*] [*int-timeout* [ *str-header*]]])
+
+Sends an HTTP POST request to the URL in *str-url*. POST requests are
+used to post information collected from web entry forms to a web site.
+Most of the time, the function `post-url` mimics what a web browser
+would do when sending information collected in an HTML form to a server,
+but it can also be used to upload files (see an HTTP reference). The
+function returns the page returned from the server in a string.
+
+When `post-url` encounters an error, it returns a string description of
+the error beginning with `ERR:`.
+
+The last parameter, *int-timeout*, is for an optional timeout value,
+which is specified in milliseconds. When no response from the host is
+received before the timeout has expired, the string `ERR: timeout` is
+returned.
+
+    ;; specify content type
+    (post-url "http://somesite.com/form.pl" 
+              "name=johnDoe&city=New%20York" 
+              "application/x-www-form-urlencoded")
+
+    ;; specify content type and timeout
+    (post-url "http://somesite.com/form.pl" 
+              "name=johnDoe&city=New%20York" 
+              "application/x-www-form-urlencoded" 8000)
+
+    ;; assumes default content type and no timeout
+    (post-url "http://somesite.com/form.pl"
+              "name=johnDoe&city=New%20York" 
+
+The above example uploads a user name and city using a special format
+called `application/x-www-form-urlencoded`. `post-url` can be used to
+post other content types such as files or binary data. See an HTTP
+reference for other content-type specifications and data encoding
+formats. When the content-type parameter is omitted, `post-url` assumes
+`application/x-www-form-urlencoded` as the default content type.
+
+### Additional parameters
+
+When *str-content-type* is specified, the *str-option* `"header"` or
+`"list"` can be specified as the return page. If the *int-timeout*
+option is specified, the custom header option *str-header* can be
+specified, as well. See the function [get-url](#get-url) for details on
+both of these options.
+
+See also the [get-url](#get-url) and [put-url](#put-url) functions.
+
+

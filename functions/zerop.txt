@@ -1,0 +1,24 @@
+Function: zero?
+-------------------------------------------------------
+
+#### syntax: (zero? *exp*)
+
+Checks the evaluation of *exp* to see if it equals `0` (zero).
+
+    (set 'value 1.2)
+    (set 'var 0)
+    (zero? value)  → nil
+    (zero? var)    → true
+
+    (map zero? '(0 0.0 3.4 4))  → (true true nil nil)
+
+    (map zero? '(nil true 0 0.0 "" ()))  → (nil nil true true nil nil)
+
+`zero?` will return `nil` on data types other than numbers.
+
+
+<span class="divider">( ∂ )</span>
+
+
+------------------------------------------------------------------------
+

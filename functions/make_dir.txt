@@ -1,0 +1,24 @@
+Function: make-dir
+--------------------------------------
+
+#### syntax: (make-dir *str-dir-name* [*int-mode*])
+
+Creates a directory as specified in *str-dir-name*, with the optional
+access mode *int-mode*. Returns `true` or `nil` depending on the
+outcome. If no access mode is specified, most Unix systems default to
+`drwxr-xr-x`.
+
+On Unix systems, the access mode specified will also be masked by the
+OS's *user-mask* set by the system administrator. The *user-mask* can be
+retrieved on Unix systems using the command `umask` and is usually
+`0022` (octal), which masks write (and creation) permission for
+non-owners of the file.
+
+    ;; 0 (zero) in front of 750 makes it an octal number
+
+    (make-dir "adir" 0750)  
+
+This example creates a directory named `adir` in the current directory
+with an access mode of `0750` (octal 750 = `drwxr-x---`).
+
+

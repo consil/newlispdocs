@@ -1,0 +1,33 @@
+Function: first
+---------------------------------------------------------
+
+#### syntax: (first *list*)\
+ syntax: (first *array*)\
+ syntax: (first *str*)
+
+Returns the first element of a list or the first character of a string.
+The operand is not changed. This function is equivalent to *car* or
+*head* in other Lisp dialects.
+
+    (first '(1 2 3 4 5))       → 1
+    (first '((a b) c d))       → (a b)
+    (set 'aList '(a b c d e))  → (a b c d e)
+    (first aList)              → a
+    aList                      → (a b c d e)
+    (set 'A (array 3 2 (sequence 1 6)))
+    →  ((1 2) (3 4) (5 6))
+    (first A)                  → (1 2)
+
+    (first '())                → ERR: list is empty
+
+In the third syntax, the first character is returned from the string in
+*str* as a string.
+
+    (first "newLISP")         → "n"
+    (first (rest "newLISP"))  → "e"
+
+Note that [first](#first) works on character boundaries rather than byte
+boundaries when the UTF-8–enabled version of newLISP is used. See also
+the functions [last](#last) and [rest](#rest).
+
+

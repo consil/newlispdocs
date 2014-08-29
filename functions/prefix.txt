@@ -1,0 +1,21 @@
+Function: prefix
+------------------------------------
+
+#### syntax: (prefix *sym*)
+
+Returns the context of a symbol in *sym*:
+
+    (setf s 'Foo:bar)      → Foo:bar
+    (prefix s)             → Foo
+    (context? (prefix s))  → true
+
+    (term s)                         → "bar"
+    (= s (sym (term s) (prefix s)))  → true
+
+    >(context (prefix s))   ; switches to context Foo
+    Foo
+    Foo>
+
+See also [term](#term) to extract the term part of a symbol.
+
+

@@ -1,0 +1,19 @@
+Function: net-accept
+----------------------------------------
+
+#### syntax: (net-accept *int-socket*)
+
+Accepts a connection on a socket previously put into listening mode.
+Returns a newly created socket handle for receiving and sending data on
+this connection.
+
+    (set 'socket (net-listen 1234))
+    (net-accept socket)
+
+Note that for ports less than 1024, newLISP must be started in superuser
+mode on Unix-like operating systems.
+
+See also the files `server` and `client` examples in the `examples/`
+directory of the source distribution.
+
+

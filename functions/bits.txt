@@ -1,0 +1,24 @@
+Function: bits
+----------------------------------
+
+#### syntax: (bits *int* [*bool*])
+
+Transforms a number in *int* to a string of 1's and 0's or a list, if
+*bool* evaluates to anything not `nil`.
+
+In string representation bits are in high to low order. In list
+presentation 1's and 0's are represented as `true` and `nil` and in
+order from the lowest to the highest bit. This allows direct indexing
+and program control switching on the result.
+
+    (bits 1234)      → "10011010010"
+
+    (int (bits 1234) 0 2) → 1234
+
+    (bits 1234 true)     → (nil true nil nil true nil true true nil nil true)
+
+    ((bits 1234 true) 0) → nil ; indexing of the result
+
+[int](#int) with a base of 2 is the inverse function to `bits`.
+
+

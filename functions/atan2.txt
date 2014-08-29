@@ -1,0 +1,16 @@
+Function: atan2
+-----------------------------------
+
+#### syntax: (atan2 *num-Y-radians* *num-X-radians*)
+
+The `atan2` function computes the principal value of the arctangent of Y
+/ X in radians. It uses the signs of both arguments to determine the
+quadrant of the return value. `atan2` is useful for converting Cartesian
+coordinates into polar coordinates.
+
+    (atan2 1 1)                       → 0.7853981634
+    (div (acos 0) (atan2 1 1))        → 2
+    (atan2 0 -1)                      → 3.141592654
+    (= (atan2 1 2) (atan (div 1 2)))  → true
+
+

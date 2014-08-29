@@ -1,0 +1,18 @@
+Function: number?
+---------------------------------------------------------
+
+#### syntax: (number? *exp*)
+
+`true` is returned only if *exp* evaluates to a floating point number or
+an integer; otherwise, `nil` is returned.
+
+    (set 'x 1.23)
+    (set 'y 456)
+    (number? x)      → true
+    (number? y)      → true
+    (number? "678")  → nil  
+
+See the functions [float?](#floatp) and [integer?](#integerp) to test
+for a specific number type.
+
+

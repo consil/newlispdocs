@@ -1,0 +1,50 @@
+Function: dolist
+------------------------------------
+
+#### syntax: (dolist (*sym* *list* [*exp-break*]) *body*)
+
+The expressions in *body* are evaluated for each element in *list*. The
+variable in *sym* is set to each of the elements before evaluation of
+the body expressions. The variable used as loop index is local and
+behaves according to the rules of dynamic scoping.
+
+Optionally, a condition for early loop exit may be defined in
+*exp-break*. If the break expression evaluates to any non-`nil` value,
+the `dolist` loop returns with the value of *exp-break*. The break
+condition is tested before evaluating *body.*
+
+    (set 'x 123)
+    (dolist (x '(a b c d e f g))  ; prints: abcdefg
+        (print x))  → g          ; return value
+
+    (dolist (x '(a b c d e f g) (= x 'e))  ; prints: abcd
+        (print x))
+
+    ;; x is local in dolist
+    ;; x has still its old value outside the loop
+
+    x  → 123  ; x has still its old value
+
+This example prints `abcdefg` in the console window. After the execution
+of `dolist`, the value for `x` remains unchanged because the `x` in
+`dolist` has local scope. The return value of `dolist` is the result of
+the last evaluated expression.
+
+The internal system variable `$idx` keeps track of the current offset
+into the list passed to `dolist`, and it can be accessed during its
+execution:
+
+    (dolist (x '(a b d e f g))
+      (println $idx ":" x))  → g
+
+    0:a
+    1:b
+    2:d
+    3:e
+    4:f
+    5:g
+
+The console output is shown in boldface. `$idx` is protected and cannot
+be changed by the user.
+
+

@@ -1,0 +1,6 @@
+Function: lambda-macro
+------------------------------------------
+
+See the description of [define-macro](#define-macro).
+
+

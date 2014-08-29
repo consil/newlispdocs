@@ -1,0 +1,32 @@
+Function: print
+-----------------------------------
+
+#### syntax: (print *exp-1* [*exp-2* ... ])
+
+Evaluates and prints *exp-1*— to the current I/O device, which defaults
+to the console window. See the built-in function [device](#device) for
+details on how to specify a different I/O device.
+
+List expressions are indented by the nesting levels of their opening
+parentheses.
+
+Several special characters may be included in strings encoded with the
+escape character `\`:
+
+  character   description
+  ----------- ----------------------------------------------------------
+  `\n`        the line-feed character (ASCII 10)
+  `\r`        the carriage-return character (ASCII 13)
+  `\t`        the tab character (ASCII 9)
+  `\nnn`      where `nnn` is a decimal ASCII code between 000 and 255
+  `\xnn`      where `nn` is a hexadecimal ASCII code between 00 and FF
+
+
+    (print (set 'res (+ 1 2 3))) 
+    (print "the result is" res "\n")
+
+    "\065\066\067"  → "ABC"
+
+To finish printing with a line-feed, use [println](#println).
+
+

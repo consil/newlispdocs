@@ -1,0 +1,102 @@
+Function: _callback_
+----------------------------------------
+
+#### syntax: (callback *int-index* *sym-function*)\
+ syntax: (callback *sym-function* *str-return-type* [*str\_param\_type* ...])\
+ syntax: (callback *sym-function*)
+
+In the first **simple `callback` syntax** up to sixteen (0 to 15)
+*callback* functions for up to eight parameters can be registered with
+imported libraries. The `callback` function returns a procedure address
+that invokes a user-defined function in *sym-function*. The following
+example shows the usage of callback functions when importing the
+[OpenGL](http://www.opengl.org) graphics library:
+
+If more than sixteen callback functions are required, slots must be
+reassigned to a different callback function.
+
+    ...
+    (define (draw)
+        (glClear GL_COLOR_BUFFER_BIT )
+        (glRotated rotx 0.0 1.0 0.0)
+        (glRotated roty 1.0 0.0 0.0)
+        (glutWireTeapot 0.5)
+        (glutSwapBuffers))
+
+    (define (keyboard key x y)
+        (if (= (& key 0xFF) 27) (exit)) ; exit program with ESC
+        (println "key:" (& key 0xFF) " x:" x  " y:" y))
+
+    (define (mouse button state x y)
+        (if (= state 0)
+            (glutIdleFunc 0) ; stop rotation on button press
+            (glutIdleFunc (callback 4 'rotation)))
+        (println "button: " button " state:" state " x:" x " y:" y))
+
+    (glutDisplayFunc (callback 0 'draw))
+    (glutKeyboardFunc (callback 1 'keyboard))
+    (glutMouseFunc (callback 2 'mouse))
+    ...
+
+The address returned by `callback` is registered with the
+[Glut](http://www.opengl.org/documentation/specs/glut/spec3/spec3.html)
+library. The above code is a snippet from the file `opengl-demo.lsp`, in
+the `examples/` directory of the source distribution of newLISP and can
+also be downloaded from
+[newlisp.org/downloads/OpenGL](http://www.newlisp.org/downloads/OpenGL/).
+
+In the second **extended `callback` syntax** type specifiers are used to
+describe the functions return and parameter value types when the
+function is called. An unlimited number of callback functions can be
+registered with the second syntax, and return values are passed back to
+the calling function. The symbol in *sym-function* contains a newLISP
+defined function used as a callback function callable from a C program.
+
+In the third syntax `callback` returns a previously returned C-callable
+address for that symbol.
+
+While the first simple `callback` syntax only handles integers and
+pointer values, `callback` in the expanded syntax can also handle simple
+and double precision floating point numbers passed in an out of the
+`callback` function.
+
+Both the simple and extended syntax can be mixed inside the same
+program.
+
+The following example shows the [import](#import) of the `qsort` C
+library function, which takes as one of it's arguments the address of a
+comparison function. The comparison function in this case is written in
+newLISP and called into by the imported `qsort` function:
+
+    ; C void qsort(...) takes an integer array with number and width
+    ; of array elements and a pointer to the comparison function
+    (import "libc.dylib" "qsort" "void" "void*" "int" "int" "void*")
+
+    (set 'rlist '(2 3 1 2 4 4 3 3 0 3))
+    ; pack the list into an C readable 32-bit integer array
+    (set 'carray (pack (dup "ld " 10) rlist))
+
+    ; the comparison callback function receives pointers to integers
+    (define (cmp a b) 
+        (- (get-int a) (get-int b)))
+
+    ; generate a C callable address for cmp
+    (set 'func (callback 'cmp "int" "void*" "void*"))
+
+    ; sort the carray
+    (qsort carray 10 4 func)
+
+    ; unpack the sorted array into a LISP list
+    (unpack (dup "ld" 10) carray)  →  (0 1 2 2 3 3 3 3 4 4) 
+
+As type specifiers the same string tags can be used as in the
+[import](#import) function. All pointer types are passed as numbers in
+and out of the `callback` function. The functions [get-char](#get-char),
+[get-int](#get-int), [get-long](#get-long) and [get-string](#get-string)
+can be used to extract numbers of different precision from parameters.
+Use [pack](#pack) and [unpack](#unpack) to extract data from binary
+buffers and structures.
+
+Note that newLISP as already a fast built-in [sort](#sort) function.
+
+

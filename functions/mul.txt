@@ -1,0 +1,14 @@
+Function: mul
+---------------------------------
+
+#### syntax: (mul *num-1* *num-2* [*num-3* ... ])
+
+Evaluates all expressions *num-1*—, calculating and returning the
+product. `mul` can perform mixed-type arithmetic, but it always returns
+floating point numbers. Any floating point calculation with `NaN` also
+returns `NaN`.
+
+    (mul 1 2 3 4 5 1.1)  → 132
+    (mul 0.5 0.5)        → 0.25
+
+

@@ -1,0 +1,21 @@
+Function: nper
+----------------------------------
+
+#### syntax: (nper *num-interest* *num-pmt* *num-pv* [*num-fv* [*int-type*]])
+
+Calculates the number of payments required to pay a loan of *num-pv*
+with a constant interest rate of *num-interest* and payment *num-pmt*.
+If payment is at the end of the period, *int-type* is `0` (zero) or
+*int-type* is omitted; for payment at the beginning of each period,
+*int-type* is 1.
+
+    (nper (div 0.07 12) 775.30 -100000)  → 239.9992828
+
+The example calculates the number of monthly payments required to pay a
+loan of \$100,000 at a yearly interest rate of 7 percent with payments
+of \$775.30.
+
+See also the [fv](#fv), [irr](#irr), [npv](#npv), [pmt](#pmt), and
+[pv](#pv) functions.
+
+

@@ -1,0 +1,12 @@
+Function: asin
+----------------------------------
+
+#### syntax: (asin *num-radians*)
+
+Calculates the arcsine function from the number in *num-radians* and
+returns the result.
+
+    (asin 1)  → 1.570796327
+    (sin (asin 1)) → 1
+
+

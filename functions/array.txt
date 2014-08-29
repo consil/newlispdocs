@@ -1,0 +1,91 @@
+Function: array
+-----------------------------------
+
+#### syntax: (array *int-n1* [*int-n2* ... ] [*list-init*])
+
+Creates an array with *int-n1* elements, optionally initializing it with
+the contents of *list-init*. Up to sixteen dimensions may be specified
+for multidimensional arrays.
+
+Internally, newLISP builds multidimensional arrays by using arrays as
+the elements of an array. newLISP arrays should be used whenever random
+indexing into a large list becomes too slow. Not all list functions may
+be used on arrays. For a more detailed discussion, see the chapter on
+[arrays](#arrays).
+
+    (array 5)                  → (nil nil nil nil nil)
+
+    (array 5 (sequence 1  5))  → (1 2 3 4 5)
+
+    (array 10 '(1 2))          → (1 2 1 2 1 2 1 2 1 2)
+
+Arrays can be initialized with objects of any type. If fewer
+initializers than elements are provided, the list is repeated until all
+elements of the array are initialized.
+
+
+    (set 'myarray (array 3 4 (sequence 1 12)))
+    → ((1 2 3 4) (5 6 7 8) (9 10 11 12))
+
+Arrays are modified and accessed using most of the same functions used
+for modifying lists:
+
+    (setf (myarray 2 3) 99) → 99)
+    myarray → ((1 2 3 4) (5 6 7 8) (9 10 11 99))
+
+    (setf (myarray 1 1) "hello")  → "hello"
+
+    myarray → ((1 2 3 4) (5 "hello" 7 8) (9 10 11 99))
+
+    (setf (myarray 1) '(a b c d)) → (a b c d)
+    myarray → ((1 2 3 4) (a b c d) (9 10 11 99))
+
+    (nth 1 myarray)     → (a b c d)  ; access a whole row
+                        
+    ;; use implicit indexing and slicing on arrays
+                        
+    (myarray 1)     → (a b c d)
+                        
+    (myarray 0 -1)  → 4
+
+    (2 myarray)     → ((9 10 11 99)) 
+
+    (-3 2 myarray)  → ((1 2 3 4) (a b c d)) 
+
+Care must be taken to use an array when replacing a whole row.
+
+[array-list](#array-list) can be used to convert arrays back into lists:
+
+    (array-list myarray)  → ((1 2 3 4) (a b c d) (1 2 3 99))
+
+To convert a list back into an array, apply [flat](#flat) to the list:
+
+    (set 'aList '((1 2) (3 4)))             → ((1 2) (3 4))
+
+    (set 'aArray (array 2 2 (flat aList)))  → ((1 2) (3 4))
+
+The [array?](#arrayp) function can be used to check if an expression is
+an array:
+
+    (array? myarray)               → true
+                                   
+    (array? (array-list myarray))  → nil
+
+When serializing arrays using the function [source](#source) or
+[save](#save), the generated code includes the `array` statement
+necessary to create them. This way, variables containing arrays are
+correctly serialized when saving with [save](#save) or creating source
+strings using [source](#source).
+
+    (set 'myarray (array 3 4 (sequence 1 12)))
+
+    (save "array.lsp" 'myarray)
+
+    ;; contents of file arraylsp ;;
+
+    (set 'myarray (array 3 4 (flat '(
+      (1 2 3 4) 
+      (5 6 7 8) 
+      (9 10 11 12)))))
+
+

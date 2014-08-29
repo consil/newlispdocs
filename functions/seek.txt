@@ -1,0 +1,33 @@
+Function: seek
+----------------------------------
+
+#### syntax: (seek *int-file* [*int-position*])
+
+Sets the file pointer to the new position *int-position* in the file
+specified by *int-file*.The new position is expressed as an offset from
+the beginning of the file, `0` (zero) meaning the beginning of the file.
+If no *int-position* is specified, `seek` returns the current position
+in the file. If *int-file* is `0` (zero), on BSD, `seek` will return the
+number of characters printed to STDOUT, and on Linux and Win32, it will
+return `-1`. On failure, `seek` returns `nil`. When *int-position* is
+set to `-1`, `seek` sets the file pointer to the end of the file.
+
+`seek` can set the file position past the current end of the file.
+Subsequent writing to this position will extend the file and fill unused
+positions with zero's. The blocks of zeros are not actually allocated on
+disk, so the file takes up less space and is called a *sparse file*.
+
+    (set 'file (open "myfile" "read"))  → 5 
+    (seek file 100)                     → 100
+    (seek file)                         → 100
+
+    (open "newlisp_manual.html" "read")
+    (seek file -1)  ; seek to EOF
+    → 593816     
+
+    (set 'fle (open "large-file" "read") 
+    (seek file 30000000000)  → 30000000000
+
+newLISP supports file position numbers up to 9,223,372,036,854,775,807.
+
+

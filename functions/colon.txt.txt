@@ -1,0 +1,58 @@
+Function: :
+-------------------------------
+
+#### syntax: (: *sym-function* *list-object* [ ... ])
+
+The colon is used not only as a syntactic separator between namespace
+prefix and the term inside but also as an operator. When used as an
+operator, the colon `:` constructs a context symbol from the context
+name in the object list and the symbol following the colon. The object
+list in *list-object* can be followed by other parameters.
+
+The `:` operator implements *polymorphism* of object methods, which are
+part of different object classes represented by contexts (namespaces).
+In newLISP, an object is represented by a list, the first element of
+which is the symbol (name) of its class context. The class context
+implements the functions applicable to the object. No space is required
+between the colon and the symbol following it.
+
+    (define (Rectangle:area)
+        (mul (self 3) (self 4)))
+
+    (define (Circle:area)
+        (mul (pow (self 3) 2) (acos 0) 2))
+
+    (define (Rectangle:move dx dy)
+        (inc (self 1) dx) 
+        (inc (self 2) dy)) 
+
+    (define (Circle:move p dx dy)
+        (inc (self 1) dx) (inc (self 2) dy)) 
+
+    (set 'myrect '(Rectangle 5 5 10 20)) ; x y width height
+    (set 'mycircle '(Circle 1 2 10)) ; x y radius
+
+    ;; using the : (colon) operator to resolve to a specific context
+
+    (:area myrect)     → 200
+    (:area mycircle)   → 314.1592654
+
+    ;; map class methods uses curry to enclose the colon operator and class function
+
+    (map (curry :area) (list myrect mycircle)) → (200 314.1592654)
+
+    (map (curry :area) '((Rectangle 5 5 10 20) (Circle 1 2 10))) → (200 314.1592654) 
+
+    ;; change object attributes using a function and re-assigning
+    ;; to the objects name
+
+    (:move myrect 2 3)       
+    myrect   → (Rectangle 7 8 10 20)
+
+    (:move mycircle 4 5)   
+    mycircle → (Circle 5 7 10)
+
+Inside the FOOP methods the [self](#self) function is used to access the
+target object of the method.
+
+

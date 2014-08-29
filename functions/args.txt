@@ -1,0 +1,62 @@
+Function: args
+----------------------------------
+
+#### syntax: (args)\
+ syntax: (args *int-idx-1* [*int-idx-2* ... ])
+
+Accesses a list of all unbound arguments passed to the currently
+evaluating [define](#define), [define-macro](#define-macro) lambda, or
+lambda-macro expression. Only the arguments of the current function or
+macro that remain after local variable binding has occurred are
+available. The `args` function is useful for defining functions or
+macros with a variable number of parameters.
+
+`args` can be used to define hygienic macros that avoid the danger of
+variable capture. See [define-macro](#define-macro).
+
+    (define-macro (print-line)
+        (dolist (x (args))
+            (print x "\n")))
+                            
+    (print-line "hello" "World")
+
+This example prints a line-feed after each argument. The macro mimics
+the effect of the built-in function [println](#println).
+
+In the second syntax, `args` can take one or more indices (*int-idx-n*).
+
+    (define-macro (foo)
+        (print (args 2) (args 1) (args 0)))
+
+    (foo x y z) 
+    zyx 
+
+    (define (bar)
+        (args 0 2 -1))
+
+    (bar '(1 2 (3 4)))  → 4
+
+The function `foo` prints out the arguments in reverse order. The `bar`
+function shows `args` being used with multiple indices to access nested
+lists.
+
+Remember that `(args)` only contains the arguments not already bound to
+local variables of the current function or macro:
+
+    (define (foo a b) (args))
+      
+    (foo 1 2)        → ()
+                     
+    (foo 1 2 3 4 5)  → (3 4 5)
+
+In the first example, an empty list is returned because the arguments
+are bound to the two local symbols, `a` and `b`. The second example
+demonstrates that, after the first two arguments are bound (as in the
+first example), three arguments remain and are then returned by `args`.
+
+`(args)` can be used as an argument to a built-in or user-defined
+function call, but it should not be used as an argument to another
+macro, in which case `(args)` would not be evaluated and would therefore
+have the wrong contents in the new macro environment.
+
+

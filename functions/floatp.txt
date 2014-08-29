@@ -1,0 +1,12 @@
+Function: float?
+------------------------------------
+
+#### syntax: (float? *exp*)
+
+`true` is returned only if *exp* evaluates to a floating point number;
+otherwise, `nil` is returned.
+
+    (set 'num 1.23)
+    (float? num)  → true
+
+

@@ -1,0 +1,21 @@
+Function: sequence
+--------------------------------------
+
+#### syntax: (sequence *num-start* *num-end* [*num-step*])
+
+Generates a sequence of numbers from *num-start* to *num-end* with an
+optional step size of *num-step*. When *num-step* is omitted, the value
+`1` (one) is assumed. The generated numbers are of type integer (when no
+optional step size is specified) or floating point (when the optional
+step size is present).
+
+    (sequence 10 5)     → (10 9 8 7 6 5)
+    (sequence 0 1 0.2)  → (0 0.2 0.4 0.6 0.8 1)
+    (sequence 2 0 0.3)  → (2 1.7 1.4 1.1 0.8 0.5 0.2)
+
+Note that the step size must be a positive number, even if sequencing
+from a higher to a lower number.
+
+Use the [series](#series) function to generate geometric sequences.
+
+

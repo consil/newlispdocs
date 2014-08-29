@@ -1,0 +1,33 @@
+Function: pop-assoc
+---------------------------------------------------------
+
+#### syntax: (pop-assoc *exp-key* *list-assoc*)\
+ syntax: (pop-assoc *list-keys* *list-assoc*)
+
+Removes an association referred to by the key in *exp-key* from the
+association list in *list-assoc* and returns the popped expression.
+
+    ;; simple associations
+
+    (set 'L '((a 1) (b 2) (c 3)))
+    (pop-assoc 'b L) → (b 2)
+    L → ((a 1) (c 3))
+
+    ;; nested associations
+
+    (set 'L '((a (b 1) (c (d 2)))))
+    (pop-assoc 'a L) → (a (b 1) (c (d 2)))
+    L → ()
+
+    (set 'L '((a (b 1) (c (d 2)))))
+    (pop-assoc '(a b) L)  → (b 1)
+    L →  ((a (c (d 2))))
+
+    (set 'L '((a (b 1) (c (d 2)))))
+    (pop-assoc '(a c) L)  → (c (d 2))
+    L → ((a (b 1))))
+
+See also [assoc](#assoc) for retrieving associations and [setf](#setf)
+for modifying association lists.
+
+

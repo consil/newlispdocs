@@ -1,0 +1,11 @@
+Function: bit-exclusively
+--------------------------------
+
+#### syntax: (\^ *int-1* *int-2* [*int-3* ... ])
+
+A bitwise `xor` operation is performed on the number in *int-1* with the
+number in *int-2*, then successively with *int-3*, etc.
+
+    (^ 0xAA 0x55)  → 255
+
+

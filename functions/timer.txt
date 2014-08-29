@@ -1,0 +1,83 @@
+Function: timer
+-----------------------------------
+
+#### syntax: (timer *sym-event-handler | func-event-handler* *num-seconds* [*int-option*])\
+ syntax: (timer *sym-event-handler | func-event-handler*)\
+ syntax: (timer)
+
+Starts a one-shot timer firing off the Unix signal `SIGALRM`,
+`SIGVTALRM`, or `SIGPROF` after the time in seconds (specified in
+*num-seconds*) has elapsed. When the timer fires, it calls the
+user-defined function in *sym-* or *func-event-handler*.
+
+On Linux/Unix, an optional `0`, `1`, or `2` can be specified to control
+how the timer counts. With default option `0`, real time is measured.
+Option `1` measures the time the CPU spends processing in the process
+owning the timer. Option `2` is a combination of both called *profiling
+time*. See the Unix man page `setitimer()` for details.
+
+The event handler can start the timer again to achieve a continuous flow
+of events. Starting with version 8.5.9, seconds can be defined as
+floating point numbers with a fractional part (e.g., `0.25` for 250
+milliseconds).
+
+Defining `0` (zero) as time shuts the running timer down and prevents it
+from firing.
+
+When called with *sym-* or *func-event-handler*, `timer` returns the
+elapsed time of the timer in progress. This can be used to program time
+lines or schedules.
+
+`timer` called without arguments returns the symbol of the current event
+handler.
+
+    (define (ticker) 
+        (println (date)) (timer 'ticker 1.0))
+
+    > (ticker)
+    Tue Apr 12 20:44:48 2005 ; first execution of ticker
+    → ticker                ; return value from ticker
+
+    > Tue Apr 12 20:44:49 2005    ; first timer event
+    Tue Apr 12 20:44:50 2005 ; second timer event ...
+    Tue Apr 12 20:44:51 2005
+    Tue Apr 12 20:44:52 2005
+
+The example shows an event handler, `ticker`, which starts the timer
+again after each event.
+
+Note that a timer cannot interrupt an ongoing built-in function. The
+timer interrupt gets registered by newLISP, but a timer handler cannot
+run until one expression is evaluated and the next one starts. To
+interrupt an ongoing I/O operation with `timer`, use the following
+pattern, which calls [net-select](#net-select) to test if a socket is
+ready for reading:
+
+    define (interrupt)
+        (set 'timeout true))
+            
+    (set 'listen (net-listen 30001))
+    (set 'socket (net-accept listen))
+            
+    (timer 'interrupt 10)
+    ;; or specifying the function directly
+    (timer (fn () (set 'timeout true)) 10)
+            
+    (until (or timeout done)
+        (if (net-select socket "read" 100000)
+            (begin
+                (net-receive socket buffer 1024)
+                (set 'done true)))
+    )
+                                                                                    
+    (if timeout
+        (println "timeout")
+        (println buffer))
+                                                                                  
+    (exit)
+
+In this example, the `until` loop will run until something can be read
+from `socket`, or until ten seconds have passed and the `timeout`
+variable is set.
+
+

@@ -1,0 +1,13 @@
+Function: beta
+----------------------------------
+
+#### syntax: (beta *cum-a* *num-b*)
+
+The *Beta* function, `beta`, is derived from the *log Gamma* `gammaln`
+function as follows:
+
+***beta = exp(gammaln(a) + gammaln(b) - gammaln(a + b))***
+
+    (beta 1 2)  → 0.5
+
+

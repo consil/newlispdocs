@@ -1,0 +1,25 @@
+Function: mod
+---------------------------------
+
+#### syntax: (mod *num-1* *num-2* [*num-3* ... ])\
+ syntax: (mod *num-1*)
+
+Calculates the modular value of the numbers in *num-1* and *num-2*.
+`mod` computes the remainder from the division of the numerator *num-i*
+by the denominator *num-i + 1*. Specifically, the return value is
+*numerator - n \* denominator*, where `n` is the quotient of the
+numerator divided by the denominator, rounded towards zero to an
+integer. The result has the same sign as the numerator and its magnitude
+is less than the magnitude of the denominator.
+
+In the second syntax `1` is assumed for *num-2* and the result is the
+fractional part of *num-1*.
+
+    (mod 10.5 3.3)   →  0.6
+    (mod -10.5 3.3)  → -0.6
+    (mod -10.5)      → -0.5
+
+Use the [%](#arithmetic) (percent sign) function when working with
+integers only.
+
+

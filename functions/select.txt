@@ -1,0 +1,37 @@
+Function: select
+----------------------------------------------------------
+
+#### syntax: (select *list* *list-selection*)\
+ syntax: (select *list* [*int-index\_i* ... ])\
+ syntax: (select *string* *list-selection*)\
+ syntax: (select *string* [*int-index\_i* ... ])
+
+In the first two forms, `select` picks one or more elements from *list*
+using one or more indices specified in *list-selection* or the
+*int-index\_i*.
+
+    (set 'lst '(a b c d e f g))
+
+    (select lst '(0 3 2 5 3))  → (a d c f d)
+
+    (select lst '(-2 -1 0))  → (f g a)
+
+    (select lst -2 -1 0)  → (f g a)
+
+In the second two forms, `select` picks one or more characters from
+*string* using one or more indices specified in *list-selection* or the
+*int-index\_i*.
+
+    (set 'str "abcdefg") 
+
+    (select str '(0 3 2 5 3))  → "adcfd"
+
+    (select str '(-2 -1 0))  → "fga"
+
+    (select str -2 -1 0)  → "fga"
+
+Selected elements can be repeated and do not have to appear in order,
+although this speeds up processing. The order in *list-selection* or
+*int-index\_i* can be changed to rearrange elements.
+
+

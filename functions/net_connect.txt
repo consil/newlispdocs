@@ -1,0 +1,172 @@
+Function: net-connect
+-----------------------------------------
+
+#### syntax: (net-connect *str-remote-host* *int-port* [*int-timeout-ms*])\
+ syntax: (net-connect *str-remote-host* *int-port* [*str-mode* [*int-ttl*]])\
+ syntax: (net-connect *str-file-path*)
+
+In the first syntax, connects to a remote host computer specified in
+*str-remote-host* and a port specified in *int-port*. Returns a socket
+handle after having connected successfully; otherwise, returns `nil`.
+
+    (set 'socket (net-connect "example.com" 80))
+    (net-send socket "GET /\r\n\r\n")
+    (net-receive socket buffer 10000)
+    (println buffer)
+    (exit)
+
+If successful, the `net-connect` function returns a socket number which
+can be used to send and receive information from the host. In the
+example a HTTP GET request is sent and subsequently a web page received.
+Note that newLISP has already a built-in function [get-url](#get-url)
+offering the same functionality.
+
+Optionally a timeout value *int-timeout* in milliseconds can be
+specified. Without a timeout value the function will wait up to 10
+seconds for an open port. With a timeout value the function can be made
+to return on an unavailable port much earlier or later. The following
+example shows a port scanner looking for open ports:
+
+    (set 'host (main-args 2))
+    (println "Scanning: " host)
+    (for (port 1 1024)
+        (if (set 'socket (net-connect host port 500))
+            (println "open port: " port " " (or (net-service port "tcp") ""))
+            (print port "\r"))
+    )
+
+The programs takes the host string from the shell command line as either
+a domain name or an IP number in dot notation then tries to open each
+port from 1 to 1024. For each open port the port number and the service
+description string is printed. If no description is available, an empty
+string "" is output. For closed ports the function outputs numbers in
+the shell window staying on the same line.
+
+On Unix `net-connect` may return with `nil` before the timeout expires,
+when the port is not available. On Win32 `net-connect` will always wait
+for the timeout to expire before failing with `nil`.
+
+### UDP communications
+
+In the second syntax, a third parameter, the string `"udp"` or `"u"` can
+be specified in the optional *str-mode* to create a socket suited for
+UDP (User Datagram Protocol) communications. In UDP mode, `net-connect`
+does *not* try to connect to the remote host, but creates the socket and
+binds it to the remote address, if an address is specified. A subsequent
+[net-send](#net-send) will send a UDP packet containing that target
+address. When using [net-send-to](#net-send-to), only one of the two
+functions `net-connect` or `net-send-to` should provide a target
+address. The other function should specify and empty string `""` as the
+target address.
+
+    ;; example server
+    (net-listen 4096 "226.0.0.1" "udp")  → 5
+    (net-receive-from 5 20)
+
+    ;; example client I
+    (net-connect "226.0.0.1" 4096 "udp") → 3
+    (net-send 3 "hello")
+
+    ;; example client II
+    (net-connect "" 4096 "udp") → 3
+    (net-send-to "226.0.0.1" 4096 "hello" 3)
+
+The functions [net-receive](#net-receive) and
+[net-receive-from](#net-receive-from) can both be used and will perform
+UDP communications when the `"udp"` option as been used in `net-listen`
+or `net-connect`. [net-select](#net-select) and [net-peek](#net-peek)
+can be used to check for received data in a non-blocking fashion.
+
+[net-listen](#net-listen) binds a specific local address and port to the
+socket. When `net-connect` is used, the local address and port will be
+picked by the socket-stack functions of the host OS.
+
+### UDP multicast communications
+
+When specifying `"multi"` or `"m"` as a third parameter for *str-mode*,
+a socket for UDP multicast communications will be created. Optionally,
+the fourth parameter `int-ttl` can be specified as a TTL (time to live)
+value. If no *int-ttl* value is specified, a value of 3 is assumed.
+
+Note that specifying UDP multicast mode in `net-connect` does not
+actually establish a connection to the target multicast address but only
+puts the socket into UDP multicasting mode. On the receiving side, use
+[net-listen](#net-listen) together with the UDP multicast option.
+
+    ;; example client I
+    (net-connect "" 4096 "multi")  → 3
+    (net-send-to "226.0.0.1" 4096 "hello" 3)
+
+    ;; example client II
+    (net-connect "226.0.0.1" 4096 "multi")  → 3
+    (net-send 3 "hello")
+
+    ;; example server
+    (net-listen 4096 "226.0.0.1" "multi")  → 5
+    (net-receive-from 5 20)               
+    → ("hello" "192.168.1.94" 32769)
+
+On the server side, [net-peek](#net-peek) or [net-select](#net-select)
+can be used for non-blocking communications. In the above example, the
+server would block until a datagram is received.
+
+The address `226.0.0.1` is just one multicast address in the Class D
+range of multicast addresses from `224.0.0.0` to `239.255.255.255`.
+
+The [net-send](#net-send) and [net-receive](#net-receive) functions can
+also be used instead of [net-send-to](#net-send-to) and
+[net-receive-from](#net-receive-from).
+
+### UDP broadcast communications
+
+Specifying the string `"broadcast"` or `"b"` in the third parameter,
+*str-mode*, causes UDP broadcast communications to be set up. In this
+case, the broadcast address ending in 255 is used.
+
+    ;; example client
+    (net-connect "192.168.2.255" 3000 "broadcast")  → 3
+    (net-send 3 "hello")
+
+    ;; example server
+    (net-listen 3000 "" "udp")  → 5
+
+    (net-receive 5 buff 10)
+    buff  → "hello"
+    ;; or
+    (net-receive-from 5 10)
+    → ("hello" "192.168.2.1" 46620)
+
+Note that on the receiving side, [net-listen](#net-listen) should be
+used with the default address specified with an `""` (empty string).
+Broadcasts will not be received when specifying an address. As with all
+UDP communications, [net-listen](#net-listen) does not actually put the
+receiving side in listen mode, but rather sets up the sockets for the
+specific UDP mode.
+
+The [net-select](#net-select) or [net-peek](#net-peek) functions can be
+used to check for incoming communications in a non-blocking fashion.
+
+### Local domain Unix sockets
+
+In the third syntax, `net-connect` connects to a server on the local
+file system via a *local domain Unix socket* named using
+*str-file-path*. Returns a socket handle after having connected
+successfully; otherwise, returns `nil`.
+
+    (net-connect "/tmp/mysocket")  → 3
+
+    ; on OS/2 use "\\socket\\" prefix
+
+    (net-connect "\\socket\\mysocket")
+
+A *local domain* file system socket is created and returned. On the
+server side, *local domain* sockets have been created using
+[net-listen](#net-listen) and [net-accept](#net-accept). After the
+connection has been established the functions [net-select](#net-select),
+[net-send](#net-send) and [net-receive](#net-receive) can be used as
+usual for TCP/IP stream communications. This type of connection can be
+used as a fast bi-directional communications channel between processes
+on the same file system. This type of connection is not available on
+Win32 platforms.
+
+

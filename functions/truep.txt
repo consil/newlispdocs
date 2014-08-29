@@ -1,0 +1,16 @@
+Function: true?
+-----------------------------------
+
+#### syntax: (true? *exp*)
+
+If the expression in *exp* evaluates to anything other than `nil` or the
+empty list `()`, `true?` returns `true`; otherwise, it returns `nil`.
+
+    (map true? '(x 1 "hi" (a b c) nil ()))
+    → (true true true true nil nil)
+    (true? nil)  → nil
+    (true? '())  → nil
+
+`true?` behaves like [if](#if) and rejects the empty list `()`.
+
+

@@ -1,0 +1,15 @@
+Function: crit-t
+------------------------------------
+
+#### syntax: (crit-t *num-probability* *int-df*)
+
+Calculates the critical minimum *Student's t* for a given confidence
+probability *num-probability* under the null hypothesis and the degrees
+of freedom in *int-df * for testing the significance of a statistical
+null hypothesis.
+
+    (crit-t 0.05 14)  → 1.761310142
+
+See also the inverse function [prob-t](#prob-t).
+
+

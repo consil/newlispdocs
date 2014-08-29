@@ -1,0 +1,77 @@
+Function: match
+-----------------------------------
+
+#### syntax: (match *list-pattern* *list-match* [*bool*])
+
+The pattern in *list-pattern* is matched against the list in
+*list-match*, and the matching expressions are returned in a list. The
+three wildcard characters `?`, `+`, and `*` can be used in
+*list-pattern*.
+
+Wildcard characters may be nested. `match` returns a list of matched
+expressions. For each `?` (question mark), a matching expression element
+is returned. For each `+` (plus sign) or `*` (asterisk), a list
+containing the matched elements is returned. If the pattern cannot be
+matched against the list in *list-match*, `match` returns `nil`. If no
+wildcard characters are present in the pattern an empty list is
+returned.
+
+Optionally, the Boolean value `true` (or any other expression not
+evaluating to `nil`) can be supplied as a third argument. This causes
+`match` to show all elements in the returned result.
+
+`match` is frequently employed as a functor parameter in [find](#find),
+[ref](#ref), [ref-all](#ref-all) and [replace](#replace) and is
+internally used by [find-all](#find-all) for lists.
+
+    (match '(a ? c) '(a b c))  → (b)
+
+    (match '(a ? ?) '(a b c))  → (b c)
+
+    (match '(a ? c) '(a (x y z) c))  → ((x y z))
+
+    (match '(a ? c) '(a (x y z) c) true)  → (a (x y z) c)
+
+    (match '(a ? c) '(a x y z c))  → nil
+
+
+    (match '(a * c) '(a x y z c))  → ((x y z))
+
+    (match '(a (b c ?) x y z) '(a (b c d) x y z))  → (d)
+
+    (match '(a (*) x ? z) '(a (b c d) x y z))  → ((b c d) y)
+
+
+    (match '(+) '())  → nil
+
+    (match '(+) '(a))  → ((a))
+
+    (match '(+) '(a b))  → ((a b))
+
+    (match '(a (*) x ? z) '(a () x y z))  → (() y)
+
+    (match '(a (+) x ? z) '(a () x y z))  → nil 
+
+Note that the `*` operator tries to grab the fewest number of elements
+possible, but `match` backtracks and grabs more elements if a match
+cannot be found.
+
+The `+` operator works similarly to the `*` operator, but it requires at
+least one list element.
+
+The following example shows how the matched expressions can be bound to
+variables.
+
+    (map set '(x y) (match '(a (? c) d *) '(a (b c) d e f)))
+
+    x  → b
+    y  → (e f)
+
+Note that `match` for strings has been eliminated. For more powerful
+string matching, use [regex](#regex), [find](#find),
+[find-all](#find-all) or [parse](#parse).
+
+[unify](#unify) is another function for matching expressions in a PROLOG
+like manner.
+
+

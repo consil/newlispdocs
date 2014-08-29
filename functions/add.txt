@@ -1,0 +1,13 @@
+Function: add
+---------------------------------
+
+#### syntax: (add *num-1* [*num-2* ... ])
+
+All of the numbers in *num-1*, *num-2*, and on are summed. `add` accepts
+float or integer operands, but it always returns a floating point
+number. Any floating point calculation with `NaN` also returns `NaN`.
+
+    (add 2 3.25 9)   → 14.25
+    (add 1 2 3 4 5)  → 15
+
+

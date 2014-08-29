@@ -1,0 +1,41 @@
+Function: wait-pid
+--------------------------------------
+
+#### syntax: (wait-pid *int-pid* [*int-options* | `nil`])
+
+Waits for a child process specified in *int-pid* to end. The child
+process was previously started with [process](#process) or
+[fork](#fork). When the child process specified in *int-pid* ends, a
+list of pid and status value is returned. The status value describes the
+reason for termination of the child process. The interpretation of the
+returned status value differs between Linux and other flavors of Unix.
+Consult the Linux/Unix man pages for the `waitpid` command (without the
+hyphen used in newLISP) for further information.
+
+When `-1` is specified for *int-pid*, pid and status information of any
+child process started by the parent are returned. When `0` is specified,
+`wait-pid` only watches child processes in the same process group as the
+calling process. Any other negative value for *int-pid* reports child
+processes in the same process group as specified with a negative sign in
+*int-pid*.
+
+An option can be specified in *int-option*. See Linux/Unix documentation
+for details on integer values for *int-options*. As an alternative,
+`nil` can be specified. This option causes `wait-pid` to be
+non-blocking, returning right away with a `0` in the pid of the list
+returned. This option used together with an *int-pid* parameter of `-1`
+can be used to continuously loop and act on returned child processes.
+
+This function is only available on Mac OS X, Linux and other Unix-like
+operating systems.
+
+    (set 'pid (fork (my-process))) → 8596
+
+    (set 'ret (wait-pid pid))  → (8596 0) ; child has exited
+
+    (println "process: " pid " has finished with status: " (last ret))
+
+The process `my-process` is started, then the main program blocks in the
+`wait-pid` call until `my-process` has finished.
+
+

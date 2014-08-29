@@ -1,0 +1,40 @@
+Function: reverse
+-------------------------------------------------------
+
+#### syntax: (reverse *list*)\
+ syntax: (reverse *array*)\
+ syntax: (reverse *string*)
+
+In the first and second form, `reverse` reverses and returns the *list*
+or *array*. Note that `reverse` is destructive and changes the original
+list or array.
+
+    ; reverse a list
+    (set 'l '(a b c d e f))
+
+    (reverse l)  → (f e d c b a)
+    l            → (f e d c b a)
+    i
+    ; reverse an array
+    (set 'a (array 3 2 '(1 2 3 4 5 6))) → ((1 2) (3 4) (5 6))
+
+    (reverse a)                         → ((5 6) (3 4) (1 2))
+    a                                   → ((5 6) (3 4) (1 2))
+
+In the third form, `reverse` is used to reverse the order of characters
+in a string.
+
+    ; reverse byte character string
+
+    (set 'str "newLISP")
+
+    (reverse str)  → "PSILwen"
+    str            → "PSILwen"
+
+    ; reverse a multibyte character UTF-8 string, explode is UTF-8 sensitive
+
+    (join (reverse (explode "ΑΒΓΔΕΖΗΘ")))  → "ΘΗΖΕΔΓΒΑ"
+
+See also the [sort](#sort) function.
+
+

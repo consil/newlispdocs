@@ -1,0 +1,68 @@
+Function: kmeans-query
+------------------------------------------
+
+#### syntax: (kmeans-query *list-data* *matrix-centroids*)\
+ syntax: (kmeans-query *list-data* *matrix-data)*
+
+In the first usage, `kmeans-query` calculates the Euclidian distances
+from the data vector given in *list-data* to the centroids given in
+*matrix-centroids*. The data vector in *list-data* has *m* elements. The
+2-dimensional list in *matrix-centroids*, result from a previous
+[kmeans-train](#kmeans-train) clustering, has *k* rows and *m* columns
+for *k* centroids measuring *m* features.
+
+    ; centroids from previous kmeans-train
+    K:centroids →
+    ( (6.39 7.188333333 5.935) 
+    (7.925714286 3.845714286 9.198571429) 
+    (2.207142857 2.881428571 0.8885714286) )
+
+    (kmeans-query '(1 2 3) K:centroids) →
+    (8.036487279 9.475994267 2.58693657) ; distances to cluster 1, 2 and 3
+
+The data record `(1 2 3)` shows the smallest distance to the 3rd cluster
+centroid and would be classified as belonging to that cluster.
+
+In the second application `kmeans-query` calculates Euclidian distances
+to a list of other data points which are not centroids. The following
+example calculates distances of the `(1 2 3)` data vector to all
+original points from the original [kmeans-train](#kmeans-train) data
+analysis.
+
+The data in *matrix-data* can be either a nested list or a 2-dimensional
+array.
+
+This vector could be sorted for a subsequent kNN (k Nearest Neighbor)
+analysis:
+
+    (kmeans-query '(1 2 3) data) →
+    (10.91671196 3.190626898 9.19723328 3.014415366 9.079763213 
+    6.83130295 8.533111976 9.624816881 6.444261013 2.013107051 
+    3.186549858 9.475199206 9.32936761 2.874786949 7.084638311 
+    10.96221237 10.50080473 3.162419959 2.423674896 9.526436899)
+
+    ; show distances to members in each cluster
+
+    ; for cluster labeled 1
+    (select (kmeans-query '(1 2 3) data) (K:clusters 0)) → 
+    (9.079763213 6.83130295 9.624816881 6.444261013 7.084638311 10.50080473)
+
+    ; for cluster labeled 2
+    (select (kmeans-query '(1 2 3) data) (K:clusters 1)) →
+    (10.91671196 9.19723328 8.533111976 9.475199206 9.32936761 10.96221237 9.526436899)
+
+    ; for cluster labeled 3
+    (select (kmeans-query '(1 2 3) data) (K:clusters 2)) →
+    (3.190626898 3.014415366 2.013107051 3.186549858 2.874786949 3.162419959 2.423674896)
+
+We see that the smallest distances are shown for the data points in the
+3rd cluster at offset 2.
+
+If the numbers of elements - features - in records of *list-data* is
+different from the number of columns in the data or centroid matrix,
+then the smaller is taken for calculating the Euclidian distances. This
+is useful when the last column of the data matrix does not contain
+feature data, but labels identifying the cluster membership of a data
+point.
+
+

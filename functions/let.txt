@@ -1,0 +1,43 @@
+Function: let
+---------------------------------
+
+#### syntax: (let ((*sym1* [*exp-init1*]) [(*sym2* [*exp-init2*]) ... ]) *body*)\
+ syntax: (let (*sym1* *exp-init1* [*sym2* *exp-init2* ... ]) *body*)
+
+One or more variables *sym1*, *sym2*, ... are declared locally and
+initialized with expressions in *exp-init1*, *exp-init2*, etc. In the
+fully parenthesized first syntax, initializers are optional and assumed
+`nil` if missing.
+
+When the local variables are initialized, the initializer expressions
+evaluate using symbol bindings as before the `let` statement. To
+incrementally use symbol bindings as evaluated during the initialization
+of locals in `let`, use [letn](#letn).
+
+One or more expressions in *exp-body* are evaluated using the local
+definitions of *sym1*, *sym2* etc. `let` is useful for breaking up
+complex expressions by defining local variables close to the place where
+they are used. The second form omits the parentheses around the variable
+expression pairs but functions identically.
+
+    (define (sum-sq a b)
+        (let ((x (* a a)) (y (* b b)))
+            (+ x y)))
+
+    (sum-sq 3 4) → 25
+
+    (define (sum-sq a b)           ; alternative syntax
+        (let (x (* a a) y (* b b))
+            (+ x y)))
+
+The variables `x` and `y` are initialized, then the expression `(+ x y)`
+is evaluated. The let form is just an optimized version and syntactic
+convenience for writing:
+
+    ((lambda (sym1 [sym2 ... ]) exp-body ) exp-init1 [ exp-init2 ])
+
+See also [letn](#letn) for an incremental or nested form of `let` and
+local for initializing to `nil`. See [local](#local) for automatic
+initialization of variables to `nil`.
+
+

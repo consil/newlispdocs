@@ -1,0 +1,72 @@
+Function: net-select
+----------------------------------------
+
+#### syntax: (net-select *int-socket* *str-mode* *int-micro-seconds*)\
+ syntax: (net-select *list-sockets* *str-mode* *int-micro-seconds*)
+
+In the first form, `net-select` finds out about the status of one socket
+specified in *int-socket*. Depending on *str-mode*, the socket can be
+checked if it is ready for reading or writing, or if the socket has an
+error condition. A timeout value is specified in *int-micro-seconds*.
+
+In the second syntax, `net-select` can check for a list of sockets in
+*list-sockets*.
+
+The following value can be given for *str-mode*:
+
+`"read"` or `"r"` to check if ready for reading or accepting.\
+ `"write"` or `"w"` to check if ready for writing.\
+ `"exception"` or `"e"` to check for an error condition.\
+
+Read, send, or accept operations can be handled without blocking by
+using the `net-select` function. `net-select` waits for a socket to be
+ready for the value given in *int-micro-seconds*, then returns `true` or
+`nil` depending on the readiness of the socket. During the select loop,
+other portions of the program can run. On error, [net-error](#net-error)
+is set. When `-1` is specified for *int-micro-seconds*, `net-select`
+will never time out.
+
+    (set 'listen-socket (net-listen 1001))
+
+    ;; wait for connection
+    (while (not (net-select listen-socket "read" 1000))
+        (if (net-error) (print (net-error))))
+
+    (set 'connection (net-accept listen-socket))
+    (net-send connection "hello")
+
+    ;; wait for incoming message
+    (while (not (net-select connection "read" 1000))
+        (do-something)) 
+
+    (net-receive connection buff 1024)
+
+When `net-select` is used, several listen and connection sockets can be
+watched, and multiple connections can be handled. When used with a list
+of sockets, `net-select` will return a list of ready sockets. The
+following example would listen on two sockets and continue accepting and
+servicing connections:
+
+    (set 'listen-list '(1001 1002))
+
+    ; accept-connection, read-connection and write-connection
+    ; are user defined functions
+
+    (while (not (net-error))
+        (dolist (conn (net-select listen-list "r" 1000))
+        (accept-connection conn))  ; build an accept-list
+
+        (dolist (conn (net-select accept-list "r" 1000))
+        (read-connection conn))    ; read on connected sockets
+
+        (dolist (conn (net-select accept-list "w" 1000))
+        (write-connection conn)))  ; write on connected sockets
+
+In the second syntax, a list is returned containing all the sockets that
+passed the test; if timeout occurred, an empty list is returned. An
+error causes [net-error](#net-error) to be set.
+
+Note that supplying a nonexistent socket to `net-select` will cause an
+error to be set in [net-error](#net-error).
+
+

@@ -1,0 +1,29 @@
+Function: exec
+----------------------------------
+
+#### syntax: (exec *str-process*)\
+ syntax: (exec *str-process* [*str-stdin*])
+
+In the first form, `exec` launches a process described in *str-process*
+and returns all standard output as a list of strings (one for each line
+in standard out (STDOUT)). `exec` returns `nil` if the process could not
+be launched. If the process could be launched but only returns and error
+and no valid output, the empty list will be returned.
+
+    (exec "ls *.c")  → ("newlisp.c" "nl-math.c" "nl-string.c")
+
+The example starts a process and performs the shell command `ls`,
+capturing the output in an array of strings.
+
+In the second form, `exec` creates a process pipe, starts the process in
+*str-process*, and receives from *str-stdin* standard input for this
+process. The return value is `true` if the process was successfully
+launched; otherwise it is `nil`.
+
+    (exec "cgiProc" query)
+
+In this example, cgiProc could be a cgi processor (e.g., Perl or
+newLISP) that receives and processes standard input supplied by a string
+contained in the variable query.
+
+

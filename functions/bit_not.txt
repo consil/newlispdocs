@@ -1,0 +1,12 @@
+Function: bit-not
+--------------------------------
+
+#### syntax: (\~ *int*)
+
+A bitwise `not` operation is performed on the number in *int*, reversing
+all of the bits.
+
+    (format "%X" (~ 0xFFFFFFAA))  → "55"
+    (~ 0xFFFFFFFF)                → 0
+
+

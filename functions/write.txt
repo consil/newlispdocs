@@ -1,0 +1,37 @@
+Function: write
+-----------------------------------------------------
+
+#### syntax: (write)\
+ syntax: (write *int-file* *str-buffer* [*int-size*])\
+ syntax: (write *str* *str-buffer* [*int-size*])
+
+In the second syntax `write` writes *int-size* bytes from a buffer in
+*str-buffer* to a file specified in *int-file*, previously obtained from
+a file `open` operation. If *int-size* is not specified, all data in
+*sym-buffer* or *str-buffer* is written. `write` returns the number of
+bytes written or `nil` on failure.
+
+If all parameters are omitted, `write` writes the contents from the last
+[read-line](#read-line) to standard out (STDOUT).
+
+`write` is a shorter writing of `write-buffer`. The longer form still
+works but is deprecated and should be avoided in new code.
+
+    (set 'handle (open "myfile.ext" "write"))
+    (write handle data 100)   
+    (write handle "a quick message\n")
+
+The code in the example writes 100 bytes to the file `myfile.ext` from
+the contents in `data`.
+
+In the third syntax, `write` can be used for destructive string
+appending:
+
+    (set 'str "")
+    (write str "hello world")
+
+    str   → "hello world"
+
+See also the [read](#read) function.
+
+

@@ -1,0 +1,73 @@
+Function: define
+------------------------------------------------------
+
+#### syntax: (define (*sym-name* [*sym-param-1* ... ]) [*body-1* ... ])\
+ syntax: (define (*sym-name* [(*sym-param-1* *exp-default*) ... ]) [*body-1* ... ])\
+ syntax: (define *sym-name* *exp*)
+
+Defines the new function *sym-name*, with optional parameters
+*sym-param-1*—. `define` is equivalent to assigning a lambda expression
+to *sym-name*. When calling a defined function, all arguments are
+evaluated and assigned to the variables in *sym-param-1*—, then the
+*body-1—* expressions are evaluated. When a function is defined, the
+lambda expression bound to *sym-name* is returned.
+
+All parameters defined are optional. When a user-defined function is
+called without arguments, those parameters assume the value `nil`. If
+those parameters have a default value specified in *exp-default*, they
+assume that value.
+
+The return value of `define` is the assigned *lambda* expression. When
+calling a user-defined function, the return value is the last expression
+evaluated in the function body.
+
+    (define (area x y) (* x y))  → (lambda (x y) (* x y))
+    (area 2 3)                   → 6
+
+As an alternative, `area` could be defined as a function without using
+`define`.
+
+    (set 'area (lambda (x y) (* x y))
+
+*lambda* or *fn* expressions may be used by themselves as *anonymous*
+functions without being defined as a symbol:
+
+    ((lambda ( x y) (* x y)) 2 3)  → 6
+    ((fn ( x y) (* x y)) 2 3)      → 6
+
+`fn` is just a shorter form of writing `lambda`.
+
+Parameters can have default values specified:
+
+    (define (foo (a 1) (b 2))
+      (list a b))
+        
+    (foo)      → (1 2)
+    (foo 3)    → (3 2)
+    (foo 3 4)  → (3 4)
+
+Expressions in *exp-default* are evaluated in the function's current
+environment.
+
+    (define (foo (a 10) (b (div a 2))) 
+      (list a b))
+
+    (foo)      → (10 5)
+    (foo 30)   → (30 15)
+    (foo 3 4)  → (3 4)
+
+The second version of `define` works like the [set](#set) function.
+
+    (define x 123)  →   123
+    ;; is equivalent to
+    (set 'x 123)    →   123
+
+    (define area (lambda ( x y) (* x y)))
+    ;; is equivalent to
+    (set 'area (lambda ( x y) (* x y)))
+    ;; is equivalent to
+    (define (area x y) (* x y))
+
+Trying to redefine a protected symbol will cause an error message.
+
+

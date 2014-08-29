@@ -1,0 +1,17 @@
+Function: atom?
+-----------------------------------
+
+#### syntax: (atom? *exp*)
+
+Returns `true` if the value of *exp* is an atom, otherwise `nil`. An
+expression is an atom if it evaluates to nil, true, an integer, a float,
+a string, a symbol or a primitive. Lists, lambda or lambda-macro
+expressions, and quoted expressions are not atoms.
+
+    (atom? '(1 2 3))      → nil
+    (and (atom? 123)
+         (atom? "hello")
+         (atom? 'foo))    → true
+    (atom? ''foo)         → nil
+
+

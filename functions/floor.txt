@@ -1,0 +1,13 @@
+Function: floor
+-----------------------------------
+
+#### syntax: (floor *number*)
+
+Returns the next lowest integer below *number* as a floating point.
+
+    (floor -1.5)  → -2
+    (floor 3.4)   → 3
+
+See also the [ceil](#ceil) function.
+
+

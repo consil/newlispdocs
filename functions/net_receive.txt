@@ -1,0 +1,51 @@
+Function: net-receive
+-----------------------------------------------------------
+
+#### syntax: (net-receive *int-socket* *sym-buffer* *int-max-bytes* [*wait-string*])
+
+Receives data on the socket *int-socket* into a string contained in
+*sym-buffer*. *sym-buffer* can also be a default functor specified by a
+context symbol for reference passing in and out of user-defined
+functions.
+
+A maximum of *int-max-bytes* is received. `net-receive` returns the
+number of bytes read. If there is a break in the connection, `nil` is
+returned. The space reserved in *sym-buffer* is exactly the size of
+bytes read.
+
+Note that `net-receive` is a blocking call and does not return until the
+data arrives at *int-socket*. Use [net-peek](#net-peek) or
+[net-select](#net-select) to find out if a socket is ready for reading.
+
+Optionally, a *wait-string* can be specified as a fourth parameter.
+`net-receive` then returns after a character or string of characters
+matching *wait-string* is received. The *wait-string* will be part of
+the data contained in *sym-buffer*.
+
+    (define (gettime)
+        (set 'socket (net-connect "netcom.com" 13))
+        (net-receive socket buf 256)
+        (print buf "\n")
+        (net-close socket))
+
+When calling `gettime`, the program connects to port 13 of the server
+netcom.com. Port 13 is a date-time service on most server installations.
+Upon connection, the server sends a string containing the date and time
+of day.
+
+    (define (net-receive-line socket sBuff)
+        (net-receive socket sBuff 256 "\n"))
+
+    (set 'bytesReceived (net-receive-line socket 'sm))
+
+The second example defines a new function `net-receive-line`, which
+returns after receiving a newline character (a string containing one
+character in this example) or 256 characters. The "\\n" string is part
+of the contents of sBuff.
+
+Note that when the fourth parameter is specified, `net-receive` is
+slower than the normal version because information is read
+character-by-character. In most situations, the speed difference can be
+neglected.
+
+

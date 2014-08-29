@@ -1,0 +1,95 @@
+Function: get-url
+-------------------------------------
+
+#### syntax: (get-url *str-url* [*str-option*] [*int-timeout* [*str-header*]])
+
+Reads a web page or file specified by the URL in *str-url* using the
+HTTP GET protocol. Both `http://` and `file://` URLs are handled.
+`"header"` can be specified in the optional argument *str-option* to
+retrieve only the header. The option `"list"` causes header and page
+information to be returned as separate strings in a list.
+
+A `"debug"` option can be specified either alone or after the `"header"`
+or `"list"` option separated by one character, i.e. `"header debug"` or
+`"list debug"`. Including "debug" outputs all outgoing information to
+the console window.
+
+The optional argument *int-timeout* can specify a value in milliseconds.
+If no data is available from the host after the specified timeout,
+`get-url` returns the string `ERR: timeout`. When other error conditions
+occur, `get-url` returns a string starting with `ERR:` and the
+description of the error.
+
+`get-url` handles redirection if it detects a `Location:` spec in the
+received header and automatically does a second request. `get-url` also
+understands the `Transfer-Encoding: chunked` format and will unpack data
+into an unchunked format.
+
+`get-url` requests are also understood by newLISP server nodes.
+
+    (get-url "http://www.nuevatec.com")
+    (get-url "http://www.nuevatec.com" 3000)
+    (get-url "http://www.nuevatec.com" "header")
+    (get-url "http://www.nuevatec.com" "header" 5000)
+    (get-url "http://www.nuevatec.com" "list")
+
+    (get-url "file:///home/db/data.txt") ; access local file system
+
+    (env "HTTP_PROXY" "http://ourproxy:8080")
+    (get-url "http://www.nuevatec.com/newlisp/")
+
+The index page from the site specified in *str-url* is returned as a
+string. In the third line, only the HTTP header is returned in a string.
+Lines 2 and 4 show a timeout value being used.
+
+The second example shows usage of a `file://` URL to access
+`/home/db/data.txt` on the local file system.
+
+The third example illustrates the use of a proxy server. The proxy
+server's URL must be in the operating system's environment. As shown in
+the example, this can be added using the [env](#env) function.
+
+The *int-timeout* can be followed by an optional custom header in
+*str-header*:
+
+### Custom header
+
+The custom header may contain options for browser cookies or other
+directives to the server. When no *str-header* is specified, newLISP
+sends certain header information by default. After the following
+request:
+
+    (get-url "http://somehost.com" 5000)
+
+newLISP will configure and send the request and header below:
+
+    GET / HTTP/1.1        
+    Host: somehost.com
+    User-Agent: newLISP v8800
+    Connection: close
+
+As an alternative, the *str-header* option could be used:
+
+    (get-url "http://somehost.com" 5000 
+    "User-Agent: Mozilla/4.0\r\nCookie: name=fred\r\n")
+
+newLISP will now send the following request and header:
+
+    GET / HTTP/1.1        
+    Host: somehost.com
+    User-Agent: Mozilla/4.o
+    Cookie: name=fred
+    Connection: close
+
+Note that when using a custom header, newLISP will only supply the `GET`
+request line, as well as the `Host:` and `Connection:` header entries.
+newLISP inserts all other entries supplied in the custom header between
+the `Host:` and `Connection:` entries. Each entry must end with a
+carriage return line-feed pair: `\r\n`.
+
+See an HTTP transactions reference for valid header entries.
+
+Custom headers can also be used in the [put-url](#put-url) and
+[post-url](#post-url) functions.
+
+

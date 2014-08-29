@@ -1,0 +1,188 @@
+Function: bayes-query
+-----------------------------------------
+
+#### syntax: (bayes-query *list-L* *context-D* [*bool-chain* [*bool-probs*]])
+
+Takes a list of tokens (*list-L*) and a trained dictionary (*context-D*)
+and returns a list of the combined probabilities of the tokens in one
+category (*A* or *Mc*) versus a category (*B*) or against all other
+categories (*Mi*). All tokens in *list-L* should occur in *context-D*.
+When using the default *R.A. Fisher inverse Chi² * mode, nonexistent
+tokens will skew results toward equal probability in all categories.
+
+Non-existing tokens will not have any influence on the result when using
+the true *Chain Bayesian* mode with *bool-chain* set to `true`. The
+optional last flag, *bool-probs*, indicates whether frequencies or
+probability values are used in the data set. The
+[bayes-train](#bayes-train) function is typically used to generate a
+data set's frequencies.
+
+Tokens can be strings or symbols. If strings are used, they are
+prepended with an underscore before being looked up in *context-D*. If
+[bayes-train](#bayes-train) was used to generate *context-D*'s
+frequencies, the underscore was automatically prepended during the
+learning process.
+
+Depending on the flag specified in *bool-probs*,
+[bayes-query](#bayes-query) employs either the R. A. Fisher inverse Chi²
+method of compounding probabilities or the Chain Bayesian method. By
+default, when no flag or `nil` is specified in *bool-probs*, the inverse
+Chi² method of compounding probabilities is used. When specifying `true`
+in *bool-probs*, the Chain Bayesian method is used.
+
+If the inverse Chi² method is used, the total number of tokens in the
+different training set's categories should be equal or similar. Uneven
+frequencies in categories will skew the results.
+
+For two categories *A* and *B*, `bayes-query` uses the following
+formula:
+
+***p(A|tkn) = p(tkn|A) \* p(A) / ( p(tkn|A) \* p(A) + p(tkn|B) \* p(B)
+)***
+
+For *N* categories, the formula can be generalized to:
+
+***p(Mc|tkn) = p(tkn|Mc) \* p(Mc) / sum-i-N( p(tkn|Mi) \* p(Mi) )***
+
+The probabilities (*p(Mi)* or *p(A)*, along with *p(B)*) represent the
+*Bayesian prior probabilities*. *p(Mc|tkn)* and *p(A|tkn)* are the
+*posterior Bayesian* probabilities of a category or model. This *naive*
+Bayes formula does nor take into account dependencies between different
+categories.
+
+Priors are handled differently, depending on whether the R.A. Fisher
+inverse Chi² or the Chain Bayesian method is used. In Chain Bayesian
+mode, posteriors from one token calculation get the priors in the next
+calculation. In the default inverse Chi² method, priors are not passed
+on via chaining, but probabilities are compounded using the inverse Chi²
+method.
+
+In Chain Bayes mode, tokens with zero frequency in one category will
+effectively put the probability of that category to 0 (zero). This also
+causes all posterior priors to be set to 0 and the category to be
+completely suppressed in the result. Queries resulting in zero
+probabilities for all categories yield *NaN* values.
+
+The default inverse Chi² method is less sensitive about zero frequencies
+and still maintains a low probability for that token. This may be an
+important feature in natural language processing when using *Bayesian
+statistics*. Imagine that five different language *corpus* categories
+have been trained, but some words occurring in one category are not
+present in another. When the pure Chain Bayesian method is used, a
+sentence could never be classified into its correct category because the
+zero-count of just one word token could effectively exclude it from the
+category to which it belongs.
+
+On the other hand, the Chain Bayesian method offers exact results for
+specific proportions in the data. When using Chain Bayesian mode for
+natural language data, all zero frequencies should be removed from the
+trained dictionary first.
+
+The return value of `bayes-query` is a list of probability values, one
+for each category. Following are two examples: the first for the default
+inverse Chi² mode, the second for a data set processed with the Chain
+Bayesian method.
+
+
+### R.A. Fisher inverse Chi² method
+
+In the following example, the two data sets are books from Project
+Gutenberg. We assume that different authors use certain words with
+different frequencies and want to determine if a sentence is more likely
+to occur in one or the other author's writing. A similar method is
+frequently used to differentiate between spam and legitimate email.
+
+    ;; from Project Gutenberg: http://www.gutenberg.org/catalog/
+    ;; The Adventures of Sherlock Holmes - Sir Arthur Conan Doyle
+
+    (bayes-train (parse (lower-case (read-file "Doyle.txt")) 
+                        "[^a-z]+" 0) '() 'DoyleDowson)
+
+    ;; A Comedy of Masks - Ernest Dowson and Arthur Moore
+
+    (bayes-train '() (parse (lower-case (read-file "Dowson.txt")) 
+                        "[^a-z]+" 0) 'DoyleDowson)
+
+    (save "DoyleDowson.lsp" 'DoyleDowson)
+
+The two training sets are loaded, split into tokens, and processed by
+the [bayes-train](#bayes-train) function. In the end, the `DoyleDowson`
+dictionary is saved to a file, which will be used later with the
+`bayes-query` function.
+
+The following code illustrates how `bayes-query` is used to classify a
+sentence as *Doyle* or *Dowson*:
+
+    (load "DoyleDowson.lsp")
+    (bayes-query (parse "he was putting the last touches to a picture") 
+        'DoyleDowson)
+    → (0.0359554723158327 0.964044527684167) 
+
+    (bayes-query (parse "immense faculties and extraordinary powers of observation") 
+        'DoyleDowson)
+    → (0.983569359827141 0.0164306401728594) 
+
+The queries correctly identify the first sentence as a *Dowson*
+sentence, and the second one as a *Doyle* sentence.
+
+
+### Chain Bayesian method
+
+The second example is frequently found in introductory literature on
+Bayesian statistics. It shows the Chain Bayesian method of using
+`bayes-query` on the data of a previously processed data set:
+
+    (set 'Data:test-positive '(8 18))
+    (set 'Data:test-negative '(2 72))
+    (set 'Data:total '(10 90))
+
+A disease occurs in 10 percent of the population. A blood test developed
+to detect this disease produces a false positive rate of 20 percent in
+the healthy population and a false negative rate of 20 percent in the
+sick. What is the probability of a person carrying the disease after
+testing positive?
+
+    (bayes-query '(test-positive) Data true)
+    → (0.3076923077 0.6923076923)
+
+    (bayes-query '(test-positive test-positive) Data true)
+    → (0.64 0.36)
+
+    (bayes-query '(test-positive test-positive test-positive) Data true)
+    → (0.8767123288 0.1232876712)
+
+Note that the Bayesian formulas used assume statistical independence of
+events for the `bayes-query` to work correctly.
+
+The example shows that a person must test positive several times before
+they can be confidently classified as sick.
+
+Calculating the same example using the R.A. Fisher Chi² method will give
+less-distinguished results.
+
+
+### Specifying probabilities instead of counts
+
+Often, data is already available as probability values and would require
+additional work to reverse them into frequencies. In the last example,
+the data were originally defined as percentages. The additional optional
+*bool-probs* flag allows probabilities to be entered directly and should
+be used together with the Chain Bayesian mode for maximum performance:
+
+    (set 'Data:test-positive '(0.8 0.2))
+    (set 'Data:test-negative '(0.2 0.8))
+    (set 'Data:total '(0.1 0.9))
+
+    (bayes-query '(test-positive) Data true true)
+    → (0.3076923077 0.6923076923)
+
+    (bayes-query '(test-positive test-positive) Data true true)
+    → (0.64 0.36)
+
+    (bayes-query '(test-positive test-positive test-positive) Data true true)
+    → (0.8767123288 0.1232876712)
+
+As expected, the results are the same for probabilities as they are for
+frequencies.
+
+

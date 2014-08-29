@@ -1,0 +1,19 @@
+Function: peek
+----------------------------------
+
+#### syntax: (peek *int-handle*)
+
+Returns the number of bytes ready to be read on a file descriptor;
+otherwise, it returns `nil` if the file descriptor is invalid. `peek`
+can also be used to check `stdin`. This function is only available on
+Unix-like operating systems.
+
+    (peek 0)  ; check # of bytes ready on stdin
+
+Use the [net-peek](#net-peek) function to check for network sockets, or
+for the number of available bytes on them. On Unix systems,
+[net-peek](#net-peek) can be used to check file descriptors. The
+difference is that [net-peek](#net-peek) also sets
+[net-error](#net-error).
+
+

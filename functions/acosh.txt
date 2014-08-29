@@ -1,0 +1,14 @@
+Function: acosh
+-----------------------------------
+
+#### syntax: (acosh *num-radians*)
+
+Calculates the inverse hyperbolic cosine of *num-radians*, the value
+whose hyperbolic cosine is *num-radians*. If *num-radians* is less than
+1, `acosh` returns `NaN`.
+
+    (acosh 2)  → 1.316957897
+    (cosh (acosh 2)) → 2
+    (acosh 0.5) → NaN
+
+

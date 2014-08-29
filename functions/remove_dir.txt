@@ -1,0 +1,14 @@
+Function: remove-dir
+----------------------------------------
+
+#### syntax: (remove-dir *str-path*)
+
+Removes the directory whose path name is specified in *str-path*. The
+directory must be empty for `remove-dir` to succeed. Returns `nil` on
+failure.
+
+    (remove-dir "temp")
+
+Removes the directory `temp` in the current directory.
+
+

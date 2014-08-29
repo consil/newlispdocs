@@ -1,0 +1,124 @@
+Function: process
+-------------------------------------
+
+#### syntax: (process *str-command*)\
+ syntax: (process *str-command* *int-pipe-in* *int-pipe-out* [*int-win32-option*])\
+ syntax: (process *str-command* *int-pipe-in* *int-pipe-out* [*int-unix-pipe-error*])
+
+In the first syntax, `process` launches a process specified in
+*str-command* and immediately returns with a process ID or `nil` if a
+process could not be created. This process will execute the program
+specified or immediately die if *str-command* could not be executed.
+
+On Mac OS X and other Unixes, the application or script must be
+specified with its full path-name. The new process inherits the OS
+environment from the parent process.
+
+Command line arguments are parsed out at spaces. Arguments containing
+spaces must be delimited using single quotes on Mac OS X and other
+Unixes. On Win32, double quotes are used. The process id returned can be
+used to destroy the running process using [destroy](#destroy), if the
+process does not exit by itself.
+
+    (process "c:/WINDOWS/system32/notepad.exe")  → 1894 ; on Win32
+
+    ; find out the path of the program to start using exec, 
+    ; if the path is not known
+
+    (process (first (exec "which xclock")))  → 22607 ; on Unix
+
+If the path of the executable is unknown, `exec` together with the Unix
+`which` command can be used to start a program. The pid returned can be
+used to [destroy](#destroy) the process.
+
+In the second syntax, standard input and output of the created process
+can be redirected to pipe handles. When remapping standard I/O of the
+launched application to a pipe, it is possible to communicate with the
+other application via [write-line](#write-line) and
+[read-line](#read-line) or [write](#write) and [read](#read) statements:
+
+    ;; Linux/Unix
+    ;; create pipes
+    (map set '(myin bcout) (pipe))
+    (map set '(bcin myout) (pipe))   
+
+    ;; launch Unix 'bc' calculator application
+    (process "/usr/bin/bc" bcin bcout) → 7916
+
+    (write-line myout "3 + 4")  ; bc expects a line-feed
+
+    (read-line myin)  → "7"
+
+
+    ;; bc can use bignums with arbitrary precision
+
+    (write-line myout "123456789012345 * 123456789012345")
+
+    (read-line myin)  → "15241578753238669120562399025"
+
+    ;; destroy the process
+    (destroy 7916)
+
+    ;; Win32
+    (map set '(myin cmdout) (pipe))
+    (map set '(cmdin myout) (pipe))
+
+    (process "c:/Program Files/newlisp/newlisp.exe -c" cmdin cmdout)
+    → 1284
+
+    (write-line myout "(+ 3 4)")
+
+    (read-line myin) → "7"
+
+    ;; destroy the process
+    (destroy 1284)
+
+On Win32 versions of newLISP, a fourth optional parameter of
+*int-win32-option* can be specified to control the display status of the
+application. This option defaults to `1` for showing the application's
+window, `0` for hiding it, and `2` for showing it minimized on the
+Windows launch bar.
+
+On both Win32 and Linux/Unix systems, standard error will be redirected
+to standard out by default. On Linux/Unix, an optional pipe handle for
+standard error output can be defined in *int-unix-pipe-error*.
+
+The function [peek](#peek) can be used to check for information on the
+pipe handles:
+
+    ;; create pipes
+    (map set '(myin bcout) (pipe))
+    (map set '(bcin myout) (pipe))   
+    (map set '(errin errout) (pipe))   
+
+    ;; launch Unix 'bc' calculator application
+    (process "bc" bcin bcout errout)
+
+    (write myout command)
+
+    ;; wait for bc sending result or error info
+    (while (and (= (peek myin) 0)
+                (= (peek errin) 0)) (sleep 10))
+
+    (if (> (peek errin) 0)
+        (println (read-line errin)))
+        
+    (if (> (peek myin) 0)
+        (println (read-line myin)))
+
+Not all interactive console applications can have their standard I/O
+channels remapped. Sometimes only one channel, *in* or *out*, can be
+remapped. In this case, specify `0` (zero) for the unused channel. The
+following statement uses only the launched application's output:
+
+    (process "app" 0 appout)
+
+Normally, two pipes are used: one for communications to the child
+process and the other one for communications from the child process.
+
+See also the [pipe](#pipe) and [share](#share) functions for
+inter-process communications and the [semaphore](#semaphore) function
+for synchronization of several processes. See the [fork](#fork) function
+for starting separate newLISP processes on Linux/Unix.
+
+

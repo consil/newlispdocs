@@ -1,0 +1,40 @@
+Function: regex-comp
+----------------------------------------
+
+#### syntax: (regex-comp *str-pattern* [*int-option*])
+
+newLISP automatically compiles regular expression patterns and caches
+the last compilation to speed up repetitive pattern searches. If
+patterns change from one to the next, but are repeated over and over
+again, then the caching of the last pattern is not sufficient.
+`regex-comp` can be used to pre-compile repetitive patterns to speed up
+regular expression searches:
+
+    ; slower without pre-compilation
+
+    (dolist (line page)
+        (replace pattern-str1 line repl1 0)
+        (replace pattern-str2 line repl2 512)
+    )
+
+    ; fast with pre-compilation and option 0x10000
+
+    (set 'p1 (regex-comp pattern-str1))
+    (set 'p2 (regex-comp pattern-str2 512))
+
+    (dolist (line page)
+        (replace p1 line repl1 0x10000)
+        (replace p2 line repl2 0x10000)
+    )
+
+When using pre-compiled patterns in any of the functions using regular
+expressions, the option number is set to `0x10000` to signal that
+pre-compiled patterns are used. Normal pattern options are specified
+during pre-compilation with `regex-comp` . The `0x10000` option can only
+be combined with `0x8000`, the option used to specify that only one
+replacement should be made when using [replace](#replace).
+
+The function [ends-with](#ends-with) should not be used with compiled
+patterns, as it tries to append to an un-compiled pattern internally.
+
+

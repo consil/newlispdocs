@@ -1,0 +1,20 @@
+Function: empty?
+------------------------------------
+
+#### syntax: (empty? *exp*)\
+ syntax: (empty? *str*)
+
+*exp* is tested for an empty list (or *str* for an empty string).
+Depending on whether the argument contains elements, `true` or `nil` is
+returned.
+
+    (set 'var '())
+    (empty? var)         → true
+    (empty? '(1 2 3 4))  → nil
+    (empty? "hello")     → nil
+    (empty? "")          → true
+
+The first example checks a list, while the second two examples check a
+string.
+
+

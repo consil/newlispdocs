@@ -1,0 +1,26 @@
+Function: encrypt
+-------------------------------------
+
+#### syntax: (encrypt *str-source* *str-pad*)
+
+Performs a [one-time pad](http://en.wikipedia.org/wiki/One-time_pad)
+(OTP) encryption of *str-source* using the encryption pad in *str-pad*.
+The longer *str-pad* is and the more random the bytes are, the safer the
+encryption. If the pad is as long as the source text, is fully random,
+and is used only once, then one-time–pad encryption is virtually
+impossible to break, since the encryption seems to contain only random
+data. To retrieve the original, the same function and pad are applied
+again to the encrypted text:
+
+    (set 'secret 
+      (encrypt "A secret message" "my secret key")) 
+    → ",YS\022\006\017\023\017TM\014\022\n\012\030E"
+
+    (encrypt secret "my secret key")  → "A secret message"
+
+The second example encrypts a whole file:
+
+    (write-file "myfile.enc" 
+      (encrypt (read-file "myfile") "29kH67*"))
+
+

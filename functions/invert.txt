@@ -1,0 +1,42 @@
+Function: invert
+------------------------------------
+
+#### syntax: (invert *matrix* [*float-pivot*])
+
+Returns the inversion of a two-dimensional matrix in *matrix*. The
+matrix must be square, with the same number of rows and columns, and
+*non-singular* (invertible). Matrix inversion can be used to solve
+systems of linear equations (e.g., multiple regression in statistics).
+newLISP uses LU-decomposition of the matrix to find the inverse.
+
+Optionally `0.0` or a very small value can be specified in
+*float-pivot*. This value substitutes pivot elements in the
+LU-decomposition algorithm, which result in zero when the algorithm
+deals with a singular matrix.
+
+The dimensions of a matrix are defined by the number of rows times the
+number of elements in the first row. For missing elements in
+non-rectangular matrices, `0.0` (zero) is assumed. A matrix can either
+be a nested list or an [array](#array).
+
+    (set 'A '((-1 1 1) (1 4 -5) (1 -2 0)))
+    (invert A)  → ((10 2 9) (5 1 4) (6 1 5))
+    (invert (invert A)) → ((-1 1 1) (1 4 -5) (1 -2 0))
+
+    ; solve Ax = b for x
+    (multiply (invert A) '((1) (2) (3))) → ((41) (19) (23))
+
+    ; treatment of singular matrices
+    (invert '((2 -1) (4 -2)))        → nil
+    (invert '((2 -1) (4 -2)) 0.0)    → ((inf -inf) (inf -inf))
+    (invert '((2 -1) (4 -2)) 1e-20)  → ((5e+19 -2.5e+19) (1e+20 -5e+19)) 
+
+`invert` will return `nil` if the matrix is *singular* and cannot be
+inverted, and *float-pivot* is not specified.
+
+All operations shown here on lists can be performed on arrays, as well.
+
+See also the matrix functions [det](#det), [mat](#mat),
+[multiply](#multiply) and [transpose](#transpose).
+
+

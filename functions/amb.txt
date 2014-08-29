@@ -1,0 +1,19 @@
+Function: amb
+---------------------------------
+
+#### syntax: (amb *exp-1* [*exp-2* ... ])
+
+One of the expressions *exp-1* ... *n* is selected at random, and the
+evaluation result is returned.
+
+    (amb 'a 'b 'c 'd 'e)  → one of: a, b, c, d, or e at random
+
+    (dotimes (x 10) (print (amb 3 5 7)))  → 35777535755
+
+Internally, newLISP uses the same function as [rand](#rand) to pick a
+random number. To generate random floating point numbers, use
+[random](#random), [randomize](#randomize), or [normal](#normal). To
+initialize the pseudo random number generating process at a specific
+starting point, use the [seed](#seed) function.
+
+

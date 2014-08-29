@@ -1,0 +1,45 @@
+Function: search
+------------------------------------
+
+#### syntax: (search *int-file* *str-search* [*bool-flag* [*int-options*]])
+
+Searches a file specified by its handle in *int-file* for a string in
+*str-search*. *int-file* can be obtained from a previous [open](#open)
+file. After the search, the file pointer is positioned at the beginning
+or the end of the searched string or at the end of the file if nothing
+is found.
+
+By default, the file pointer is positioned at the beginning of the
+searched string. If *bool-flag* evaluates to `true`, then the file
+pointer is positioned at the end of the searched string.
+
+In *int-options*, the options flags can be specified to perform a PCRE
+regular expression search. See the function [regex](#regex) for details.
+If *int-options* is not specified a faster, plain string search is
+performed. `search` returns the new file position or `nil` if nothing is
+found.
+
+When using the regular expression options flag, patterns found are
+stored in the system variables `$0` to `$15`.
+
+    (set 'file (open "init.lsp" "read"))
+    (search file "define")
+    (print (read-line file) "\n")
+    (close file)
+
+    (set 'file (open "program.c" "r"))
+    (while (search file "#define (.*)" true 0) (println $1))
+    (close file)
+
+The file `init.lsp` is opened and searched for the string `define` and
+the line in which the string occurs is printed.
+
+The second example looks for all lines in the file `program.c` which
+start with the string `#define` and prints the rest of the line after
+the string "\#define ".
+
+For other functions using regular expressions, see
+[directory](#directory), [find](#find), [find-all](#find-all),
+[parse](#parse), [regex](#regex), and [replace](#replace).
+
+

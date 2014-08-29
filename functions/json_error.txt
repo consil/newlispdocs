@@ -1,0 +1,18 @@
+Function: json-error
+----------------------------------------
+
+#### syntax: (json-error)
+
+When [json-parse](#json-parse) returns `nil` due to a failed JSON data
+translation, this function retrieves an error description and the last
+scan position of the parser.
+
+    ; failed parse returns nil
+
+    (json-parse [text]{"address" "http://example.com"}[/text]) → nil
+
+    ; inspect the error information
+
+    (json-error) → ("missing : colon" 11)
+
+

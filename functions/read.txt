@@ -1,0 +1,40 @@
+Function: read
+----------------------------------------------------
+
+#### syntax: (read *int-file* *sym-buffer* *int-size* [*str-wait*])
+
+Reads a maximum of *int-size* bytes from a file specified in *int-file*
+into a buffer in *sym-buffer*. Any data referenced by the symbol
+*sym-buffer* prior to the reading is deleted. The handle in *int-file*
+is obtained from a previous [open](#open) statement. The symbol
+*sym-buffer* contains data of type string after the read operation.
+*sym-buffer* can also be a default functor specified by a context symbol
+for reference passing in and out of user-defined functions.
+
+`read` is a shorter writing of `read-buffer`. The longer form still
+works but is deprecated and should be avoided in new code.
+
+Optionally, a string to be waited for can be specified in *str-wait*.
+`read` will read a maximum amount of bytes specified in *int-size* or
+return earlier if *str-wait* was found in the data. The wait-string is
+part of the returned data and must not contain binary `0` (zero)
+characters.
+
+Returns the number of bytes read or `nil` when the wait-string was not
+found. In any case, the bytes read are put into the buffer pointed to by
+*sym-buffer*, and the file pointer of the file read is moved forward. If
+no new bytes have been read, *sym-buffer* will contain `nil`.
+
+    (set 'handle (open "aFile.ext" "read"))
+    (read handle buff 200)
+
+Reads 200 bytes into the symbol `buff` from the file `aFile.ext`.
+
+    (read handle buff 1000 "password:")
+
+Reads 1000 bytes or until the string `password:` is encountered. The
+string `password:` will be part of the data returned.
+
+See also the [write](#write) function.
+
+

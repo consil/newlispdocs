@@ -1,0 +1,14 @@
+Function: crit-z
+------------------------------------
+
+#### syntax: (crit-z *num-probability*)
+
+Calculates the critical normal distributed Z value of a given cumulated
+probability *num-probability* for testing of statistical significance
+and confidence intervals.
+
+    (crit-z 0.999)  → 3.090232372
+
+See also the inverse function [prob-z](#prob-z).
+
+

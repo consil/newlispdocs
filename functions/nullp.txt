@@ -1,0 +1,27 @@
+Function: null?
+-----------------------------------
+
+#### syntax: (null? *exp*)
+
+Checks if an expression evaluates to `nil`, the empty list `()`, the
+empty string `""`, `NaN` (not a number), or `0` (zero), in which case it
+returns `true`. In all other cases, `null?` returns `nil`. The predicate
+`null?` is useful in conjunction with the functions [filter](#filter) or
+[clean](#clean) to check the outcome of other newLISP operations.
+
+    (set 'x (sqrt -1)) → NaN ; or nan on UNIX
+    (null? x) → true
+
+    (map null? '(1 0 0.0 2 "hello" "" (a b c) () true))
+    → (nil true true nil nil true nil true nil) 
+
+    (filter null? '(1 0 2 0.0 "hello" "" (a b c) () nil true)) 
+    → (0 0 "" () nil)
+
+    (clean null? '(1 0 2 0.0 "hello" "" (a b c) () nil true))
+    → (1 2 "hello" (a b c) true)
+
+See also the predicates [empty?](#emptyp), [nil?](#nilp) and
+[zero?](#zerop).
+
+

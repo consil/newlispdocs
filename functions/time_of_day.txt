@@ -1,0 +1,11 @@
+Function: time-of-day
+-----------------------------------------
+
+#### syntax: (time-of-day)
+
+Returns the time in milliseconds since the start of the current day.
+
+See also the [date](#date), [date-value](#date-value), [time](#time),
+and [now](#now) functions.
+
+

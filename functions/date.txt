@@ -1,0 +1,101 @@
+Function: date
+--------------------------------------------------------
+
+#### syntax: (date)\
+ syntax: (date *int-secs* [*int-offset*])\
+ syntax: (date *int-secs* *int-offset* *str-format*)
+
+The first syntax returns the local time zone's current date and time as
+a string representation. If *int-secs* is out of range, `nil` is
+returned.
+
+In the second syntax, `date` translates the number of seconds in
+*int-secs* into its date/time string representation for the local time
+zone. The number in *int-secs* is usually retrieved from the system
+using [date-value](#date-value). Optionally, a time-zone offset (in
+minutes) can be specified in *int-offset*, which is added or subtracted
+before conversion of *int-sec* to a string. If *int-secs* is out of
+range or an invalid *str-format* is specified, an empty string `""` is
+returned.
+
+    (date)                   → "Fri Oct 29 09:56:58 2004"
+
+    (date (date-value))      → "Sat May 20 11:37:15 2006" 
+    (date (date-value) 300)  → "Sat May 20 16:37:19 2006"  ; 5 hours offset
+    (date 0)                 → "Wed Dec 31 16:00:00 1969"
+    (date 0 (now 0 -2))      → "Thu Jan  1 00:00:00 1970"  ; Unix epoch
+
+The way the date and time are presented in a string depends on the
+underlying operating system.
+
+The second example would show 1-1-1970 0:0 when in the Greenwich time
+zone, but it displays a time lag of 8 hours when in Pacific Standard
+Time (PST). `date` assumes the *int-secs* given are in Coordinated
+Universal Time (UTC; formerly Greenwich Mean Time (GMT)) and converts it
+according to the local time-zone.
+
+The third syntax makes the date string fully customizable by using a
+format specified in *str-format*. This allows the day and month names to
+be translated into results appropriate for the current locale:
+
+    (set-locale "german") → "de_DE"      
+
+    ; on Linux - no leading 0 on day with %-d
+    (date (date-value) 0 "%A %-d. %B %Y")  → "Montag  7. März 2005" 
+
+    (set-locale "C")  ; default POSIX
+
+    (date (date-value) 0 "%A %B %d %Y")    → "Monday March 07 2005"
+
+    ; suppressing leading 0 on Win32 using #
+    (date (date-value) 0 "%a %#d %b %Y")   → "Mon 7 Mar 2005" 
+
+    (set-locale "german")
+
+    (date (date-value) 0 "%x") → "07.03.2005"   ; day month year
+
+    (set-locale "C")
+
+    (date (date-value) 0 "%x") → "03/07/05"     ; month day year
+
+The following table summarizes all format specifiers available on both
+Win32 and Linux/Unix platforms. More format options are available on
+Linux/Unix. For details, consult the manual page for the C function
+`strftime()` of the individual platform's C library.
+
+  format   description
+  -------- ------------------------------------------------------------------------------------------------------------------------
+  %a       abbreviated weekday name according to the current locale
+  %A       full weekday name according to the current locale
+  %b       abbreviated month name according to the current locale
+  %B       full month name according to the current locale
+  %c       preferred date and time representation for the current locale
+  %d       day of the month as a decimal number (range 01–31)
+  %H       hour as a decimal number using a 24-hour clock (range 00–23)
+  %I       hour as a decimal number using a 12-hour clock (range 01–12)
+  %j       day of the year as a decimal number (range 001–366)
+  %m       month as a decimal number (range 01–12)
+  %M       minute as a decimal number
+  %p       either 'am' or 'pm' according to the given time value or the corresponding strings for the current locale
+  %S       second as a decimal number 0–61 (60 and 61 to account for occasional leap seconds)
+  %U       week number of the current year as a decimal number, starting with the first Sunday as the first day of the first week
+  %w       day of the week as a decimal, Sunday being 0
+  %W       week number of the current year as a decimal number, starting with the first Monday as the first day of the first week
+  %x       preferred date representation for the current locale without the time
+  %X       preferred time representation for the current locale without the date
+  %y       year as a decimal number without a century (range 00–99)
+  %Y       year as a decimal number including the century
+  %z       time zone or name or abbreviation (same as %Z on Win32, different on Unix)
+  %Z       time zone or name or abbreviation (same as %z on Win32, different on Unix)
+  %%       a literal '%' character
+
+
+Leading zeroes in the display of decimal day numbers can be suppressed
+using `"%-d"` on Linux and FreeBSD and using `"%e"` on OpenBSD,
+SunOS/Solaris and Mac OS X. On Win32 use `"%#d"`.
+
+See also [date-value](#date-value), [date-list](#date-list),
+[date-parse](#date-parse), [time-of-day](#time-of-day), [time](#time),
+and [now](#now).
+
+

@@ -1,0 +1,18 @@
+Function: utf8len
+-------------------------------------
+
+#### syntax: (utf8len *str*)
+
+Returns the number of characters in a UTF-8–encoded string. UTF-8
+characters can be encoded in more than one 8-bit byte. `utf8len` returns
+the number of UTF-8 characters in a string. This function is only
+available on UTF-8–enabled versions of newLISP.
+
+    (utf8len "我能吞下玻璃而不伤身体。")    → 12
+    (length "我能吞下玻璃而不伤身体。")      → 36
+
+See also the [unicode](#unicode) and [utf8](#utf8) functions. Above
+Chinese text from [UTF-8
+Sampler](http://www.columbia.edu/kermit/utf8.html).
+
+

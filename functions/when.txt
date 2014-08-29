@@ -1,0 +1,23 @@
+Function: when
+----------------------------------
+
+#### syntax: (when *exp-condition* *body*)
+
+The statements in *body* are only evaluated if *exp-condition* evaluates
+to anything not `nil` and not the empty list `()`. The result of the
+last expression in *body* is returned or `nil` or the empty list `()` if
+*body* was not executed.
+
+Because `when` does not have an *else* condition as in [if](#if), the
+statements in *body* need not to be grouped with [begin](#begin):
+
+    (when (read-line)
+        (set 'result (analyze (current-line)))
+        (report result)
+        (finish)
+    )   
+
+See also the function [unless](#unless) working like
+`(when (not ...) ...)`.
+
+

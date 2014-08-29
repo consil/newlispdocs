@@ -1,0 +1,155 @@
+Function: format
+------------------------------------
+
+#### syntax: (format *str-format exp-data-1* [*exp-data-2* ... ])\
+ syntax: (format *str-format* *list-data*)
+
+Constructs a formatted string from *exp-data-1* using the format
+specified in the evaluation of *str-format*. The format specified is
+identical to the format used for the `printf()` function in the ANSI C
+language. Two or more *exp-data* arguments can be specified for more
+than one format specifier in *str-format*.
+
+In an alternative syntax, the data to be formatted can be passed inside
+a list in *list-data*.
+
+`format` checks for a valid format string, matching data type, and the
+correct number of arguments. Wrong formats or data types result in error
+messages. [int](#int), [float](#float), or [string](#string) can be used
+to ensure correct data types and to avoid error messages.
+
+The format string has the following general format:
+
+**"%w.pf"**
+
+The `%` (percent sign) starts a format specification. To display a `%`
+inside a format string, double it: `%%`
+
+On Linux the percent sign can be followed by a single quote `%'` to
+insert thousand's separators in number formats.
+
+The `w` represents the width field. Data is right-aligned, except when
+preceded by a minus sign, in which case it is left-aligned. If preceded
+by a `+` (plus sign), positive numbers are displayed with a `+`. When
+preceded by a `0` (zero), the unused space is filled with leading
+zeroes. The width field is optional and serves all data types.
+
+The `p` represents the precision number of decimals (floating point
+only) or strings and is separated from the width field by a period.
+Precision is optional. When using the precision field on strings, the
+number of characters displayed is limited to the number in `p`.
+
+The `f` represents a type flag and is essential; it cannot be omitted.
+
+Below are the types in `f`:
+
+  format   description
+  -------- -----------------------------------------------------------
+  s        text string
+  c        character (value 1 - 255)
+  d        decimal (32-bit)
+  u        unsigned decimal (32-bit)
+  x        hexadecimal lowercase
+  X        hexadecimal uppercase
+  o        octal (32-bits) (not supported on all of newLISP flavors)
+  f        floating point
+  e        scientific floating point
+  E        scientific floating point
+  g        general floating point
+
+
+Formatting 64-bit numbers using the 32-bit format specifiers from above
+table will truncate and format the lower 32 bits of the number on 64-bit
+systerms and overflow to `0xFFFFFFFF` on 32-bit systems.
+
+For 32-bit and 64-bit numbers use the following format strings. 64-bit
+numbers will be truncated to 32-bit on 32-bit platforms:
+
+  format   description
+  -------- -----------------------------------
+  ld       decimal (32/64-bit)
+  lu       unsigned decimal (32/64-bit)
+  lx       hexadecimal (32/64-bit)
+  lX       hexadecimal uppercase (32/64-bit)
+
+
+For 64-bit numbers use the following format strings on Unix-like
+operating systems and on MS Windows (not supported on TRU64):
+
+  format   description
+  -------- -------------------------------
+  lld      decimal (64-bit)
+  llu      unsigned decimal (64-bit)
+  llx      hexadecimal (64-bit)
+  llX      hexadecimal uppercase(64-bit)
+
+
+On Windows platforms only the following characters apply for 64 bit
+numbers:
+
+  format   description
+  -------- -------------------------------
+  I64d     decimal (64-bit)
+  I64u     unsigned decimal (64-bit)
+  I64x     hexadecimal (64-bit)
+  I64X     hexadecimal uppercase(64-bit)
+
+
+Other text may occur between, before, or after the format specs.
+
+Note that on Tru64 Unix the format character `i` can be used instead of
+`d`.
+
+
+    (format ">>>%6.2f<<<" 1.2345)     → ">>>  1.23<<<"
+    (format ">>>%-6.2f<<<" 1.2345)    → ">>>1.23  <<<"
+    (format ">>>%+6.2f<<<" 1.2345)    → ">>> +1.23<<<"
+    (format ">>>%+6.2f<<<" -1.2345)   → ">>> -1.23<<<"
+    (format ">>>%-+6.2f<<<" -1.2345)  → ">>>-1.23 <<<"
+
+    (format "%e" 123456789)        → "1.234568e+08"
+    (format "%12.10E" 123456789)   → "1.2345678900E+08"
+
+    (format "%10g" 1.23)   → "      1.23"
+    (format "%10g" 1.234)  → "     1.234"
+
+    (format "Result = %05d" 2)  → "Result = 00002"
+
+    (format "%14.2f" 12345678.12)   → "   12345678.12"
+    ; on UNIX glibc compatible platforms only (Linux, MAC OS X 10.9) on some locales
+    (format "%'14.2f" 12345678.12) → " 12,345,678.12"
+
+    (format "%8d" 12345)   → "   12345"
+    ; on UNIX glibc compatible platforms only (Linux, MAC OS X 10.9) on some locales
+    (format "%'8d" 12345)  → "  12,345"
+
+    (format "%-15s" "hello")        → "hello          "
+    (format "%15s %d" "hello" 123)  → "          hello 123"
+    (format "%5.2s" "hello")        → "   he"
+    (format "%-5.2s" "hello")       → "he   "
+
+    (format "%o" 80)    → "120"
+                                    
+    (format "%x %X" -1 -1)  → "ffffffff FFFFFFFF"
+
+    ; 64 bit numbers on Windows
+    (format "%I64X" 123456789012345678)  → "1B69B4BA630F34E"
+
+    ; 64 bit numbers on Unix (except TRU64)
+    (format "%llX" 123456789012345678)   → "1B69B4BA630F34E"
+                                    
+    (format "%c" 65)  → "A"
+
+The data to be formatted can be passed inside a list:
+
+    (set 'L '("hello" 123))
+    (format "%15s %d" L)  → "          hello 123"
+
+If the format string requires it, newLISP's `format` will automatically
+convert integers into floating points or floating points into integers:
+
+    (format "%f" 123)      → 123.000000
+                           
+    (format "%d" 123.456)  → 123
+
+

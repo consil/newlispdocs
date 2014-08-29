@@ -1,0 +1,27 @@
+Function: source
+------------------------------------
+
+#### syntax: (source)\
+ syntax: (source *sym-1* [*sym-2* ... ])
+
+Works almost identically to [save](#save), except symbols and contexts
+get serialized to a string instead of being written to a file. Multiple
+variable symbols, definitions, and contexts can be specified. If no
+argument is given, `source` serializes the entire newLISP workspace.
+When context symbols are serialized, any symbols contained within that
+context will be serialized, as well. Symbols containing `nil` are not
+serialized. System symbols beginning with the `$` (dollar sign)
+character are only serialized when mentioned explicitly.
+
+Symbols not belonging to the current context are written out with their
+context prefix.
+
+    (define (double x) (+ x x))
+
+    (source 'double)  → "(define (double x)\n  (+ x x))\n\n"
+
+As with [save](#save), the formatting of line breaks and leading spaces
+or tabs can be controlled using the [pretty-print](#pretty-print)
+function.
+
+

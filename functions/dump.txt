@@ -1,0 +1,42 @@
+Function: dump
+----------------------------------
+
+#### syntax: (dump [*exp*])
+
+Shows the binary contents of a newLISP cell. Without an argument, this
+function outputs a listing of all Lisp cells to the console. When *exp*
+is given, it is evaluated and the contents of a Lisp cell are returned
+in a list.
+
+    (dump 'a)   → (9586996 5 9578692 9578692 9759280)
+
+    (dump 999)  → (9586996 130 9578692 9578692 999)
+
+The list contains the following memory addresses and information:
+
+  -----------------------------------------------------------------------------------
+  offset   description
+  -------- --------------------------------------------------------------------------
+  0        memory address of the newLISP cell
+
+  1        cell-\>type: major/minor type, see newlisp.h for details
+
+  2        cell-\>next: linked list ptr
+
+  3        cell-\>aux:\
+                string length+1 or\
+                low (little endian) or high (big endian) word of 64-bit integer or\
+                low word of IEEE 754 double float
+
+  4        cell-\>contents:\
+                string/symbol address or\
+                high (little endian) or low (big endian) word of 64-bit integer or\
+                high word of IEEE 754 double float
+  -----------------------------------------------------------------------------------
+
+
+This function is valuable for changing type bits in cells or hacking
+other parts of newLISP internals. See the function [cpymem](#cpymem) for
+a comprehensive example.
+
+

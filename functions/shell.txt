@@ -1,0 +1,45 @@
+Function: !
+-------------------------------
+
+#### syntax: (! *str-shell-command* [*int-flags*])
+
+Executes the command in *str-command* by shelling out to the operating
+system and executing. This function returns a different value depending
+on the host operating system.
+
+    (! "vi")  
+    (! "ls -ltr")
+
+Use the [exec](#exec) function to execute a shell command and capture
+the standard output or to feed standard input. The [process](#process)
+function may be used to launch a non-blocking child process and redirect
+std I/O and std error to pipes.
+
+On Ms Windows the optional *int-flags* parameter takes process creation
+flags as defined for the Windows `CreateProcessA` function to control
+various parameters of process creation. The inclusion of this parameter
+– which also can be `0` – forces a different creation of the process
+without a command shell window. This parameter is ignored on Unix.
+
+    ; on MS Windows
+    ; close the console of the currently running newLISP process
+    (apply (import "kernel32" "FreeConsole")) 
+
+    ; start another process and wait for it to finish
+    (! "notepad.exe" 0)
+
+    (exit)
+
+Without the additional parameter, the `!` call would create a new
+command window replacing the closed one.
+
+Note that `!` (exclamation mark) can be also be used as a command-line
+shell operator by omitting the parenthesis and space after the `!`:
+
+    > !ls -ltr    ; executed in the newLISP shell window
+
+Used in this way, the `!` operator is not a newLISP function at all, but
+rather a special feature of the newLISP command shell. The `!` must be
+entered as the first character on the command-line.
+
+

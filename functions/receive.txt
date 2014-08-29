@@ -1,0 +1,49 @@
+Function: receive
+-------------------------------------------------------
+
+#### syntax: (receive *int-pid* *sym-message*)\
+ syntax: (receive)
+
+In the first syntax, the function is used for message exchange between
+child processes launched with [spawn](#spawn) and their parent process.
+The message received replaces the contents in *sym-message.*
+
+The function reads one message from the receiver queue of *int-pid* for
+each invocation. When the queue is empty, `nil` is returned.
+
+    ; sending process
+    (send spid "hello")  → true
+
+    ; receiving process
+    (receive pid msg)    → true
+    msg                  → "hello"
+
+To make `receive` blocking and wait for arriving messages, use the
+following form:
+
+    ; wait until a message can be read
+    (until (receive pid msg))
+
+The function will loop until a message can be read from the queue.
+
+In the second syntax, the function returns a list of all child processes
+with pending messages for the parent process:
+
+    ; read pending messages from child processes
+    (dolist (pid (receive))
+        (receive pid msg)
+        (println "received message: " msg " from:" pid)
+    )
+
+The list of child process IDs returned by `(receive)` only contains PIDs
+of processes which have unread messages in their send queues. The
+`(receive pid msg)` statement now can be issued non-blocking, because it
+always is guaranteed to find a pending message in a child's message
+queue.
+
+The `receive` function is not available on Win32.
+
+For a more detailed discussion of this function and examples, see the
+[send](#send) function.
+
+

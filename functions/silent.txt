@@ -1,0 +1,22 @@
+Function: silent
+------------------------------------
+
+#### syntax: (silent [*exp-1* [*exp-2* ... ]])
+
+Evaluates one or more expressions in *exp-1*—. `silent` is similar to
+[begin](#begin), but it suppresses console output of the return value
+and the following prompt. It is often used when communicating from a
+remote application with newLISP (e.g., GUI front-ends or other
+applications controlling newLISP), and the return value is of no
+interest.
+
+Silent mode is reset when returning to a prompt. This way, it can also
+be used without arguments in a batch of expressions. When in interactive
+mode, hit [enter] twice after a statement using `silent` to get the
+prompt back.
+
+    (silent (my-func))  ; same as next
+
+    (silent) (my-func)  ; same effect as previous
+
+

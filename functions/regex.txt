@@ -1,0 +1,145 @@
+Function: regex
+-----------------------------------
+
+#### syntax: (regex *str-pattern* *str-text* [*int-option* [*int-offset*]])
+
+Performs a Perl Compatible Regular Expression (PCRE) search on
+*str-text* with the pattern specified in *str-pattern*. The same regular
+expression pattern matching is also supported in the functions
+[directory](#directory), [find](#find), [find-all](#find-all),
+[parse](#parse), [replace](#replace), and [search](#search) when using
+these functions on strings.
+
+`regex` returns a list with the matched strings and substrings and the
+beginning and length of each string inside the text. If no match is
+found, it returns `nil`. The offset numbers can be used for subsequent
+processing.
+
+Additionally an *int-option* can be specified to control certain regular
+expression options explained later. The additional *int-offset*
+parameter tells `regex` to start searching for a match not at the
+beginning of the string but at an offset.
+
+The offset and length numbers in the `regex` results are given based on
+single bytes even when running the UTF-8 enabled version of newLISP.
+
+`regex` also sets the variables `$0, $1,` and `$2—` to the expression
+and subexpressions found. Just like any other symbol in newLISP, these
+variables or their equivalent expressions `($ 0), ($ 1),` and `($ 2)—`
+can be used in other newLISP expressions for further processing.
+
+Functions using regular expressions will not reset the `$0, $1 ... $15`
+variables to `nil` when no match is found.
+
+    (regex "b+" "aaaabbbaaaa")  → ("bbb" 4 3)
+
+    ; case-insensitive search option 1
+    (regex "b+" "AAAABBBAAAA" 1)  → ("BBB" 4 3) 
+
+    (regex "[bB]+" "AAAABbBAAAA" )  → ("BbB" 4 3)
+
+    (regex "http://(.*):(.*)" "http://nuevatec.com:80") 
+    → ("http://nuevatec.com:80" 0 22 "nuevatec.com" 7 12 "80" 20 2)
+
+    $0  → "http://nuevatec.com:80"
+    $1  → "nuevatec.com"
+    $2  → "80"
+
+    (dotimes (i 3) (println ($ i)))
+    http://nuevatec.com:80
+    nuevatec.com
+    80
+    → "80"
+
+The second example shows the usage of extra options, while the third
+example demonstrates more complex parsing of two subexpressions that
+were marked by parentheses in the search pattern. In the last example,
+the expression and subexpressions are retrieved using the system
+variables `$0` to `$2` or their equivalent expression `($ 0)` to
+`($ 2)`.
+
+When `""` (quotes) are used to delimit strings that include literal
+backslashes, the backslash must be doubled in the regular expression
+pattern. As an alternative, `{ }` (curly brackets) or `[text]` and
+`[/text]` (text tags) can be used to delimit text strings. In these
+cases, no extra backslashes are required.
+
+Characters escaped by a backslash in newLISP (e.g., the quote `\"` or
+`\n`) need not to be doubled in a regular expression pattern, which
+itself is delimited by quotes.
+
+    ;; double backslash for parentheses and other special char in regex
+    (regex "\\(abc\\)" "xyz(abc)xyz")  → ("(abc)" 3 5)  
+    ;; double backslash for backslash (special char in regex)
+    (regex "\\d{1,3}" "qwerty567asdfg")  → ("567" 6 3)
+
+    ;; one backslash for quotes (special char in newLISP)
+    (regex "\"" "abc\"def")  → ("\"" 3 1)     
+
+    ;; brackets as delimiters
+    (regex {\(abc\)} "xyz(abc)xyz")  → ("(abc)" 3 5)  
+
+    ;; brackets as delimiters and quote in pattern
+    (regex {"} "abc\"def")  → ("\"" 3 1)     
+
+    ;; text tags as delimiters, good for multiline text in CGI
+    (regex [text]\(abc\)[/text] "xyz(abc)xyz")  → ("(abc)" 3 5)  
+    (regex [text]"[/text] "abc\"def")           → ("\"" 3 1) 
+
+When curly brackets or text tags are used to delimit the pattern string
+instead of quotes, a simple backslash is sufficient. The pattern and
+string are then passed in raw form to the regular expression routines.
+When curly brackets are used inside a pattern itself delimited by curly
+brackets, the inner brackets must be balanced, as follows:
+
+    ;; brackets inside brackets are balanced
+    (regex {\d{1,3}} "qwerty567asdfg")  → ("567" 6 3) 
+
+The following constants can be used for *int-option*. Several options
+can be combined using a binary or `|` (pipe) operator. E.g. `(| 1 4)`
+would combine options `1` and `4`. The uppercase names are used in the
+PCRE regex documentation and could be predefined in `init.lsp`. The last
+option is a newLISP custom option only to be used in
+[replace](#replace); it can be combined with PCRE options.
+
+  PCRE name               no        description
+  ----------------------- --------- --------------------------------------------------------------------------
+  PCRE\_CASELESS          1         treat uppercase like lowercase
+  PCRE\_MULTILINE         2         limit search at a newline like Perl's /m
+  PCRE\_DOTALL            4         . (dot) also matches newline
+  PCRE\_EXTENDED          8         ignore whitespace except inside char class
+  PCRE\_ANCHORED          16        anchor at the start
+  PCRE\_DOLLAR\_ENDONLY   32        \$ matches at end of string, not before newline
+  PCRE\_EXTRA             64        additional functionality currently not used
+  PCRE\_NOTBOL            128       first ch, not start of line; \^ shouldn't match
+  PCRE\_NOTEOL            256       last char, not end of line; \$ shouldn't match
+  PCRE\_UNGREEDY          512       invert greediness of quantifiers
+  PCRE\_NOTEMPTY          1024      empty string considered invalid
+  PCRE\_UTF8              2048      pattern and strings as UTF-8 characters
+  REPLACE\_ONCE           0x8000    replace only one occurrence only for use in [replace](#replace)
+  PRECOMPILED             0x10000   pattern is pre-compiled, can only be combined with RREPLACE\_ONCE 0x8000
+
+
+The settings of the PCRE\_CASELESS, PCRE\_MULTILINE, PCRE\_DOTALL, and
+PCRE\_EXTENDED options can be changed from within the pattern by a
+sequence of option letters enclosed between "(?" and ")". The option
+letters are:
+
+  --- ---------------------
+  i   for PCRE\_CASELESS
+  m   for PCRE\_MULTILINE
+  s   for PCRE\_DOTALL
+  x   for PCRE\_EXTENDED
+  --- ---------------------
+
+
+Note that regular expression syntax is very complex and feature-rich
+with many special characters and forms. Please consult a book or the
+PCRE manual pages for more detail. Most PERL books or introductions to
+Linux or Unix also contain chapters about regular expressions. See also
+<http://www.pcre.org> for further references and manual pages.
+
+Regular expression patterns can be precompiled for higher speed when
+using changing repetitive patterns with [regex-comp](#regex-comp).
+
+

@@ -1,0 +1,116 @@
+Function: signal
+------------------------------------
+
+#### syntax: (signal *int-signal* *sym-event-handler* | *func-event-handler*)\
+ syntax: (signal *int-signal* "ignore" | "default" | "reset")\
+ syntax: (signal *int-signal*)
+
+Sets a user-defined handler in *sym-event-handler* for a signal
+specified in *int-signal* or sets to a function expression in
+*func-event-handler*.
+
+A parameter following *int-signal* is not evaluated.
+
+If no signal handler is specified any of the string constants
+`"ignore"`, `"default"` or `"reset"` can be specified in either lower or
+upper case or simply using the first letter of the option string. When
+signal setup with any of these three options has been successful, `true`
+is returned.
+
+Using `"ignore"` will make newLISP ignore the signal. Using `"default"`
+will set the handler to the default handler of the underlying platform
+OS. The `"reset"` option will restore the handler to newLISP startup
+state.
+
+On startup, newLISP either specifies an empty newLISP handler or a
+Ctrl-C handler for `SIGINT` and a `waitpipd(-1, 0, WNOHANG)` C-call for
+`SIGCHLD`.
+
+Different signals are available on different OS platforms and Linux/Unix
+flavors. The numbers to specify in *int-signal* also differ from
+platform-to-platform. Valid values can normally be extracted from a file
+found in `/usr/include/sys/signal.h` or `/usr/include/signal.h`.
+
+Some signals make newLISP exit even after a user-defined handler has
+been specified and executed (e.g., signal SIGKILL). This behavior may
+also be different on different platforms.
+
+    (constant 'SIGINT 2)
+    (define (ctrlC-handler) (println "ctrl-C has been pressed"))
+
+    (signal SIGINT 'ctrlC-handler)
+
+    ; now press ctrl-C
+    ; the following line will appear
+    ; this will only work in an interactive terminal window
+    ; and will not work in the newLISP-GS editor
+
+    ctrl-C has been pressed
+
+    ; reset treatment of signal 2 to startup conditions
+
+    (signal SIGINT "reset")
+
+On Win32, the above example would execute the handler before exiting
+newLISP. On most Linux/Unix systems, newLISP would stay loaded and the
+prompt would appear after hitting the [enter] key.
+
+Instead of specifying a symbol containing the signal handler, a function
+can be specified directly. The signal number is passed as a parameter:
+
+    (signal SIGINT exit)  → $signal-2
+
+    (signal SIGINT (fn (s) (println "signal " s " occurred")))
+
+Note that the signal SIGKILL (9 on most platforms) will always terminate
+the application regardless of an existing signal handler.
+
+The signal could have been sent from another shell on the same computer:
+
+    kill -s SIGINT 2035
+
+In this example, `2035` is the process ID of the running newLISP.
+
+The signal could also have been sent from another newLISP application
+using the function [destroy](#destroy):
+
+    (destroy 2035) → true
+
+If newLISP receives a signal while evaluating another function, it will
+still accept the signal and the handler function will be executed:
+
+    (constant 'SIGINT 2)
+    (define (ctrlC-handler) (println "ctrl-C has been pressed"))
+
+    (signal SIGINT 'ctrlC-handler)
+    ;; or
+    (signal SIGINT ctrlC-handler)
+
+
+    (while true (sleep 300) (println "busy"))
+
+    ;; generates following output
+    busy
+    busy
+    busy
+    ctrl-C has been pressed
+    busy
+    busy
+    …
+
+Specifying only a signal number will return either the name of the
+currently defined handler function or `nil`.
+
+The user-defined signal handler can pass the signal number as a
+parameter.
+
+    (define (signal-handler sig)
+        (println "received signal: " sig))
+
+    ;; set all signals from 1 to 8 to the same handler  
+    (for (s 1 8) 
+        (signal s 'signal-handler))
+
+In this example, all signals from 1 to 8 are set to the same handler.
+
+

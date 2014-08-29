@@ -1,0 +1,62 @@
+Function: int
+---------------------------------
+
+#### syntax: (int *exp* [*exp-default* [*int-base*]])
+
+If the expression in *exp* evaluates to a number or a string, the result
+is converted to an integer and returned. If *exp* cannot be converted to
+an integer, then `nil` or the evaluation of *exp-default* will be
+returned. This function is mostly used when translating strings from
+user input or from parsing text. If *exp* evaluates to a string, the
+string must start with a digit; one or more spaces; or the `+` or `-`
+sign. The string must begin with '`0x`' for hexadecimal strings or '`0`'
+(zero) for octal strings. If *exp* is invalid, `int` returns `nil` as a
+default value if not otherwise specified.
+
+A second optional parameter can be used to force the number base of
+conversion to a specific value.
+
+Integers larger than 9,223,372,036,854,775,807 are truncated to
+9,223,372,036,854,775,807. Integers smaller
+than -9,223,372,036,854,775,808 are truncated
+to -9,223,372,036,854,775,808.
+
+When converting from a float (as in the second form of `int`), floating
+point values larger or smaller than the integer maximum or minimum are
+also truncated. A floating point expression evaluating to `NaN` is
+converted to `0` (zero).
+
+    (int "123")          → 123
+    (int " 123")         → 123
+    (int "a123" 0)       → 0
+    (int (trim " 123"))  → 123
+    (int "0xFF")         → 255
+    (int "0b11111")      → 31
+    (int "055")          → 45
+    (int "1.567")        → 1
+    (int 1.567)          → 1
+
+    (integer? 1.00)        → nil
+    (integer? (int 1.00))  → true
+
+    (int "1111" 0 2)  → 15   ; base 2 conversion
+    (int "0FF" 0 16)  → 255  ; base 16 conversion
+
+    (int 'xyz)     → nil
+    (int 'xyz 0)   → 0
+    (int nil 123)  → 123
+
+    (int "abc" (throw-error "not a number"))  
+    → ERR: user error : not a number
+
+    (print "Enter a num:")
+    (set 'num (int (read-line)))
+
+    (int (bits 12345) 0 2) → 12345
+
+The inverse function to `int` with base `2` is [bits](#bits).
+
+Use the [float](#float) function to convert arguments to floating point
+numbers.
+
+

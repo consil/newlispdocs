@@ -1,0 +1,46 @@
+Function: lookup
+------------------------------------
+
+#### syntax: (lookup *exp-key* *list-assoc* [*int-index* [*exp-default*]])
+
+Finds in *list-assoc* an association, the key element of which has the
+same value as *exp-key*, and returns the *int-index* element of
+association (or the last element if *int-index* is absent).
+
+Optionally, *exp-default* can be specified, which is returned if an
+association matching *exp-key* cannot be found. If the *exp-default* is
+absent and no association has been found, `nil` is returned.
+
+See also [Indexing elements of strings and lists](#indexing).
+
+`lookup` is similar to [assoc](#assoc) but goes one step further by
+extracting a specific element found in the list.
+
+    (set 'params '(
+        (name "John Doe") 
+        (age 35) 
+        (gender "M") 
+        (balance 12.34)
+    ))
+
+    (lookup 'age params)             → 35
+
+    ; use together with setf to modify and association list
+    (setf (lookup 'age params) 42)   → 42
+    (lookup 'age params)             → 42
+
+    (set 'persons '(
+        ("John Doe" 35 "M" 12.34) 
+        ("Mickey Mouse" 65 "N" 12345678)
+    ))
+
+    (lookup "Mickey Mouse" persons 2)    → "N"
+    (lookup "Mickey Mouse" persons -3)   → 65
+    (lookup "John Doe" persons 1)        → 35 
+    (lookup "John Doe" persons -2)       → "M"
+
+    (lookup "Jane Doe" persons 1 "N/A")  → "N/A"
+
+See also [assoc](#assoc)
+
+

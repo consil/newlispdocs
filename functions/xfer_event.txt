@@ -1,0 +1,54 @@
+Function: xfer-event
+----------------------------------------
+
+#### syntax: (xfer-event *sym-event-handler* | *func-event-handler*)
+
+Registers a function in symbol *sym-event-handler* or in lambda function
+*func-event-handler* to monitor HTTP byte transfers initiated by
+[get-url](#get-url), [post-url](#post-url) or [put-url](#put-url) or
+initiated by file functions which can take URLs like [load](#load),
+[save](#save), [read-file](#read-file), [write-file](#write-file) and
+[append-file](#append-file).
+
+E.g. whenever a block of data requested with [get-url](#get-url)
+arrives, the function in *sym* or *func* will be called with the number
+of bytes transferred. Likewise when sending data with
+[post-url](#post-url) or any of the other data sending functions, *sym*
+or *func* will be called with the number of bytes transferred for each
+block of data transferred.
+
+    (xfer-event (fn (n) (println "->" n)))
+    (length (get-url "http://newlisp.org"))
+
+    ->73
+    ->799
+    ->1452
+    ->351
+    ->1093
+    ->352
+    ->211
+    ->885
+    ->564
+    ->884
+    ->561
+    ->75
+    ->812
+    ->638
+    ->1452
+    ->801
+    ->5
+    ->927
+    11935
+
+The computer output is shown in bold. Whenever a block of data is
+received its byte size is printed. Instead of defining the handler
+function directory with a lambda function in *func*, a symbol containing
+a function definition could have been used:
+
+    (define (report n) (println "->" n))
+    (xfer-event 'report)
+
+This can be used to monitor the progress of longer lasting byte
+transfers in HTTP uploads or downloads.
+
+

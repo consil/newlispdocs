@@ -1,0 +1,23 @@
+Function: bigint?
+-------------------------------------
+
+#### syntax: (bigint? *number*)
+
+Check if a number is formatted as a big integer.
+
+    (set 'x 12345)
+    (set 'y 12345L)
+    (set 'z 123456789012345678901234567890)
+    (set 'p 1.2345e20)
+    (set 'q (bigint p))
+
+    (bigint? x)  → nil
+    (bigint? y)  → true
+    (bigint? z)  → true
+    (bigint? p)  → nil
+    (bigint? q)  → true
+
+See also the manual chapter [Big integer, unlimited precision
+arithmetic](#big_int)
+
+

@@ -1,0 +1,42 @@
+Function: get-int
+-------------------------------------
+
+#### syntax: (get-int *int-address*)
+
+Gets a 32-bit integer from the address specified in *int-address*. This
+function is handy when using imported shared library functions with
+`import`, a function returning an address pointer to an integer, or a
+pointer to a structure containing integers.
+
+    int * foo(void)
+    {
+    int * result;
+    …
+    *result = 123;
+    return(result);
+    }
+
+    int foo-b(void)
+    {
+    int result;
+    …
+    result = 456;
+    return(result);
+    }
+
+Consider the C function `foo` (from a shared library), which returns an
+integer pointer (address of an integer).
+
+    (import "mylib.so" "foo")
+    (get-int (foo))  → 123
+    (foo-b)          → 456
+
+Note that using `get-int` with an incorrect address in *int-address* is
+unsafe and could result in the system crashing or becoming unstable.
+
+See also the [address](#address), [get-char](#get-char),
+[get-float](#get-float), [get-long](#get-long),
+[get-string](#get-string), [pack](#pack), and [unpack](#unpack)
+functions.
+
+

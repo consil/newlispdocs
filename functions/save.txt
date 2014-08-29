@@ -1,0 +1,63 @@
+Function: save
+----------------------------------
+
+#### syntax: (save *str-file*)\
+ syntax: (save *str-file* *sym-1* [*sym-2* ... ])
+
+In the first syntax, the `save` function writes the contents of the
+newLISP workspace (in textual form) to the file *str-file*. `save` is
+the inverse function of `load`. Using `load` on files created with
+`save` causes newLISP to return to the same state as when `save` was
+originally invoked. System symbols starting with the `$` character
+(e.g., `$0` from regular expressions or `$main-args` from the
+command-line), symbols of built-in functions and symbols containing
+`nil` are not saved.
+
+In the second syntax, symbols can be supplied as arguments. If *sym-n*
+is supplied, only the definition of that symbol is saved. If *sym-n*
+evaluates to a context, all symbols in that context are saved. More than
+one symbol can be specified, and symbols and context symbols can be
+mixed. When contexts are saved, system variables and symbols starting
+with the `$` character are not saved. Specifying system symbols
+explicitly causes them to be saved.
+
+Each symbol is saved by means of a [set](#set) statement or—if the
+symbol contains a lambda or lambda-macro function—by means of
+[define](#define) or [define-macro](#define-macro) statements.
+
+`save` returns `true` on completion.
+
+    (save "save.lsp")
+
+    (save "/home/myself/myfunc.LSP" 'my-func) 
+    (save "file:///home/myself/myfunc.LSP" 'my-func) 
+
+    (save "http://asite.com:8080//home/myself/myfunc.LSP" 'my-func)
+
+    (save "mycontext.lsp" 'mycontext) 
+
+    ;; multiple args
+    (save "stuff.lsp" 'aContext 'myFunc '$main-args 'Acontext)
+
+Because all context symbols are part of the context `MAIN`, saving
+`MAIN` saves all contexts.
+
+Saving to a URL will cause an HTTP PUT request to be sent to the URL. In
+this mode, `save` can also be used to push program source to remote
+newLISP server nodes. Note that a double backslash is required when path
+names are specified relative to the root directory. `save` in `HTTP`
+mode will observe a 60-second timeout.
+
+Symbols made using [sym](#sym) that are incompatible with the normal
+syntax rules for symbols are serialized using a [sym](#sym) statement
+instead of a [set](#set) statement.
+
+`save` serializes contexts and symbols as if the current context is
+`MAIN`. Regardless of the current context, `save` will always generate
+the same output.
+
+See also the functions [load](#load) (the inverse operation of `save`)
+and [source](#source), which saves symbols and contexts to a string
+instead of a file.
+
+

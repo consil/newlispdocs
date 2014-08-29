@@ -1,0 +1,24 @@
+Function: npv
+---------------------------------
+
+#### syntax: (npv *num-interest* *list-values*)
+
+Calculates the net present value of an investment with a fixed interest
+rate *num-interest* and a series of future payments and income in
+*list-values*. Payments are represented by negative values in
+*list-values*, while income is represented by positive values in
+*list-values*.
+
+    (npv 0.1 '(1000 1000 1000)) 
+    → 2486.851991
+
+    (npv 0.1 '(-2486.851991 1000 1000 1000)) 
+    → -1.434386832e-08  ; ~ 0.0 (zero)
+
+In the example, an initial investment of \$2,481.85 would allow for an
+income of \$1,000 after the end of the first, second, and third years.
+
+See also the [fv](#fv), [irr](#irr), [nper](#nper), [pmt](#pmt), and
+[pv](#pv) functions.
+
+

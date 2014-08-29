@@ -1,0 +1,96 @@
+Function: expand
+------------------------------------
+
+#### syntax: (expand *exp* *sym-1* [*sym-2* ... ])\
+ syntax: (expand *exp* *list-assoc* [*bool*])\
+ syntax: (expand *exp*)
+
+In the first syntax, one symbol in *sym* (or more in *sym-2* through
+*sym-n*) is looked up in a simple or nested expression *exp*. They are
+then expanded to the current binding of the symbol and the expanded
+expression is returned. The original list remains unchanged.
+
+    (set 'x 2 'a '(d e))
+    (set 'foo 'a)
+    (expand foo 'a)               → (d e)
+    (expand '(a x b) 'x)           → (a 2 b)
+    (expand '(a x (b c x)) 'x)     → (a 2 (b c 2))
+    (expand '(a x (b c x)) 'x 'a)  → ((d e) 2 (b c 2))
+
+`expand` is useful when composing lambda expressions and doing variable
+expansion as in rewrite macros.
+
+    (define (raise-to power)
+      (expand (fn (base) (pow base power)) 'power))
+
+    (define square (raise-to 2))
+    (define cube (raise-to 3))
+
+    (square 5)  → 25
+    (cube 5)    → 125
+
+If more than one symbol is present, `expand` will work in an incremental
+fashion:
+
+    (set 'a '(b c))
+    (set 'b 1)
+
+    (expand '(a b c) 'a 'b)  → ((1 c) 1 c) 
+
+Like the [apply](#apply) function, `expand` *reduces* its argument list.
+
+#### syntax: (expand *list* *list-assoc* [*bool*])
+
+The second syntax of `expand` allows expansion bindings to be specified
+on the fly, without performing a [set](#set) on the participating
+variables:
+
+If the *bool* evaluates to `true`, the value parts in the association
+list are evaluated.
+
+    (expand '(a b c) '((a 1) (b 2)))                → (1 2 c)
+    (expand '(a b c) '((a 1) (b 2) (c (x y z))))    → (1 2 (x y z))
+    (expand '(a b) '((a (+ 1 2)) (b (+ 3 4))))      → ((+ 1 2) (+ 3 4))
+    (expand '(a b) '((a (+ 1 2)) (b (+ 3 4))) true) → (3 7)
+
+Note that the contents of the variables in the association list will not
+change. This is different from the [letex](#letex) function, where
+variables are set by evaluating and assigning their association parts.
+
+This form of `expand` is frequently used in logic programming, together
+with the [unify](#unify) function.
+
+#### syntax: (expand *list*)
+
+A third syntax is used to expand only the contents of variables starting
+with an uppercase character. This PROLOG mode may also be used in the
+context of logic programming. As in the first syntax of `expand`,
+symbols must be preset. Only uppercase variables and those bound to
+anything other than `nil` will be expanded:
+
+    (set 'A 1 'Bvar 2 'C nil 'd 5 'e 6)
+    (expand '(A (Bvar) C d e f))  → (1 (2) C d e f)
+
+Only the symbols `A` and `Bvar` are expanded because they have
+capitalized names and non-`nil` contents.
+
+The *currying* function in the example demonstrating the first syntax of
+`expand` can now be written even more simply using an uppercase
+variable:
+
+    (define (raise-to Power) 
+      (expand (fn (base) (pow base Power))))
+
+    > (define cube (raise-to 3))
+    (lambda (base) (pow base 3))
+
+    > (cube 4)
+    64
+
+    > _
+
+See the [letex](#letex) function, which also provides an expansion
+mechanism, and the function [unify](#unify), which is frequently used
+together with `expand`.
+
+

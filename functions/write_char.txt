@@ -1,0 +1,28 @@
+Function: write-char
+----------------------------------------
+
+#### syntax: (write-char *int-file* *int-byte1* [*int-byte2* ... ])
+
+Writes a byte specified in *int-byte* to a file specified by the file
+handle in *int-file*. The file handle is obtained from a previous `open`
+operation. Each `write-char` advances the file pointer by one 8-bit
+byte.
+
+`write-char` returns the number of bytes written.
+
+    (define (slow-file-copy from-file to-file)
+        (set 'in-file (open from-file "read"))
+        (set 'out-file (open to-file "write"))
+        (while (set 'chr (read-char in-file))
+            (write-char out-file chr))
+         (close in-file)
+        (close out-file)
+        "finished")
+
+Use the [print](#print) and [device](#device) functions to write larger
+portions of data at a time. Note that newLISP already supplies a faster
+built-in function called [copy-file](#copy-file).
+
+See also the [read-char](#read-char) function.
+
+

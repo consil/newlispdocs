@@ -1,0 +1,18 @@
+Function: gammaln
+-------------------------------------
+
+#### syntax: (gammaln *num-x*)
+
+Calculates the log Gamma function of the value *x* in *num-x*.
+
+    (exp (gammaln 6))  → 120
+
+The example uses the equality of *n! = gamma(n + 1)* to calculate the
+factorial value of 5.
+
+The log Gamma function is also related to the Beta function, which can
+be derived from it:
+
+> ***Beta(z,w) = Exp(Gammaln(z) + Gammaln(w) - Gammaln(z+w))***
+
+

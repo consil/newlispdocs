@@ -1,0 +1,27 @@
+Function: copy
+----------------------------------
+
+#### syntax: (copy *exp*)
+
+Make a copy from evaluating expression in *exp*. Some built-in functions
+are [destructive](#destructice), changing the original contents of a
+list, array or string they are working on. With `copy` their behavior
+can be made non-destructive.
+
+    (set 'aList '(a b c d e f))
+
+    (replace 'c (copy aList)) → (a b d e f)
+
+    aList → (a b c d e f)
+
+    (set 'str "newLISP") → "newLISP"
+
+    (rotate (copy str)) → "PnewLIS"
+
+    str → "newLISP" 
+
+Using `copy` the functions [replace](#replace) and [rotate](#rotate) are
+prevented from changing the data. A modified version of the data is
+returned.
+
+

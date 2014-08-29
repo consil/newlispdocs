@@ -1,0 +1,16 @@
+Function: unique
+------------------------------------
+
+#### syntax: (unique *list*)
+
+Returns a unique version of *list* with all duplicates removed.
+
+    (unique '(2 3 4 4 6 7 8 7))  → (2 3 4 6 7 8)
+
+Note that the list does not need to be sorted, but a sorted list makes
+`unique` perform faster.
+
+Other *set* functions are [difference](#difference),
+[intersect](#intersect) and [union](#union).
+
+

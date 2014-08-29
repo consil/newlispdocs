@@ -1,0 +1,42 @@
+Function: float
+-----------------------------------
+
+#### syntax: (float *exp* [*exp-default*])
+
+If the expression in *exp* evaluates to a number or a string, the
+argument is converted to a float and returned. If *exp* cannot be
+converted to a float then `nil` or, if specified, the evaluation of
+*exp-default* will be returned. This function is mostly used to convert
+strings from user input or when reading and parsing text. The string
+must start with a digit or the `+` (plus sign), `-` (minus sign), or `.`
+(period). If *exp* is invalid, `float` returns `nil` as a default value.
+
+Floats with exponents larger than 1e308 or smaller than -1e308 are
+converted to +INF or -INF, respectively. The display of +INF and -INF
+differs on different platforms and compilers.
+
+    (float "1.23")       → 1.23
+    (float " 1.23")      → 1.23
+    (float ".5")         → 0.50
+    (float "-1.23")      → -1.23
+    (float "-.5")        → nil
+    (float "#1.23")      → nil
+    (float "#1.23" 0.0)  → 0
+
+    (float? 123)          → nil
+    (float? (float 123))  → true
+
+    (float '(a b c))    → nil
+    (float '(a b c) 0)  → 0
+    (float nil 0)       → 0
+
+    (float "abc" "not a number")  → "not a number"
+    (float "1e500")               → inf
+    (float "-1e500")              → -inf
+
+    (print "Enter a float num:")
+    (set 'f-num (float (read-line)))
+
+Use the [int](#int) function to parse integer numbers.
+
+

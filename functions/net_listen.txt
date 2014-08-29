@@ -1,0 +1,182 @@
+Function: net-listen
+----------------------------------------
+
+#### syntax: (net-listen *int-port* [*str-ip-addr* [*str-mode*]])\
+ syntax: (net-listen *str-file-path*)
+
+Listens on a port specified in *int-port*. A call to `net-listen`
+returns immediately with a socket number, which is then used by the
+blocking [net-accept](#net-accept) function to wait for a connection. As
+soon as a connection is accepted, [net-accept](#net-accept) returns a
+socket number that can be used to communicate with the connecting
+client.
+
+    (set 'port 1234)
+    (set 'listen (net-listen port))
+    (unless listen (begin
+        (print "listening failed\n")
+        (exit)))
+
+    (print "Waiting for connection on: " port "\n")
+
+    (set 'connection (net-accept listen))
+    (if connection
+        (while (net-receive connection buff 1024 "\n")
+            (print buff)
+            (if (= buff "\r\n") (exit)))
+        (print "Could not connect\n"))
+
+The example waits for a connection on port 1234, then reads incoming
+lines until an empty line is received. Note that listening on ports
+lower than 1024 may require superuser access on Unix systems.
+
+On computers with more than one interface card, specifying an optional
+interface IP address or name in *str-ip-addr* directs `net-listen` to
+listen on the specified address.
+
+    ;; listen on a specific address
+    (net-listen port "192.168.1.54") 
+
+### Local domain Unix sockets
+
+In the second syntax, `net-listen` listens for a client on the local
+file system via a *local domain Unix socket* named using
+*str-file-path*. If successful, returns a socket handle that can be used
+with [net-accept](#net-accept) to accept a client connection; otherwise,
+returns `nil`.
+
+    (net-listen "/tmp/mysocket")  → 5
+
+    ; on OS/2 use "\\socket\\" prefix
+
+    (net-listen "\\socket\\mysocket")
+
+    (net-accept 5)
+
+A *local domain* file system socket is created and listened on. A client
+will try to connect using the same *str-file-path*. After a connection
+has been accepted the functions [net-select](#net-select),
+[net-send](#net-send) and [net-receive](#net-receive) can be used as
+usual for TCP/IP stream communications. This type of connection can be
+used as a fast bi-directional communications channel between processes
+on the same file system. This type of connection is not available on
+Win32 platforms.
+
+### UDP communications
+
+As a third parameter, the optional string `"udp"` or `"u"` can be
+specified in *str-mode* to create a socket suited for UDP (User Datagram
+Protocol) communications. A socket created in this way can be used
+directly with [net-receive-from](#net-receive-from) to await incoming
+UDP data *without* using `net-accept`, which is only used in TCP
+communications. The [net-receive-from](#net-receive-from) call will
+block until a UDP data packet is received. Alternatively,
+[net-select](#net-select) or [net-peek](#net-peek) can be used to check
+for ready data in a non-blocking fashion. To send data back to the
+address and port received with [net-receive-from](#net-receive-from),
+use [net-send-to](#net-send-to).
+
+Note that [net-peer](#net-peer) will not work, as UDP communications do
+not maintain a connected socket with address information.
+
+    (net-listen 10002 "192.168.1.120" "udp") 
+
+    (net-listen 10002 "" "udp") 
+
+The first example listens on a specific network adapter, while the
+second example listens on the default adapter. Both calls return a
+socket number that can be used in subsequent
+[net-receive](#net-receive), [net-receive-from](#net-receive-from),
+[net-send-to](#net-send-to), [net-select](#net-select), or
+[net-peek](#net-peek) function calls.
+
+Both a UDP server *and* UDP client can be set up using `net-listen` with
+the `"udp"` option. In this mode, `net-listen` does not really *listen*
+as in TCP/IP communications; it just binds the socket to the local
+interface address and port.
+
+For a working example, see the files `examples/client` and
+`examples/server` in the newLISP source distribution.
+
+Instead of `net-listen` and the `"udp"` option, the functions
+[net-receive-udp](#net-receive-udp) and [net-send-udp](#net-send-udp)
+can be used for short transactions consisting only of one data packet.
+
+`net-listen`, [net-select](#net-select), and [net-peek](#net-peek) can
+be used to facilitate non-blocking reading. The listening/reading socket
+is not closed but is used again for subsequent reads. In contrast, when
+the [net-receive-udp](#net-receive-udp) and
+[net-send-udp](#net-send-udp) pair is used, both sides close the sockets
+after sending and receiving.
+
+### UDP multicast communications
+
+If the optional string *str-mode* is specified as `"multi"` or `"m"`,
+`net-listen` returns a socket suitable for multicasting. In this case,
+*str-ip-addr* contains one of the multicast addresses in the range
+`224.0.0.0` to `239.255.255.255`. `net-listen` will register
+*str-ip-addr* as an address on which to receive multicast transmissions.
+This address should not be confused with the IP address of the server
+host.
+
+    ;; example client
+
+    (net-connect "226.0.0.1" 4096 "multi")  → 3
+
+    (net-send-to "226.0.0.1" 4096 "hello" 3)
+
+
+    ;; example server
+
+    (net-listen 4096 "226.0.0.1" "multi")  → 5
+
+    (net-receive-from 5 20)               
+    → ("hello" "192.168.1.94" 32769)
+
+On the server side, [net-peek](#net-peek) or [net-select](#net-select)
+can be used for non-blocking communications. In the example above, the
+server would block until a datagram is received.
+
+The [net-send](#net-send) and [net-receive](#net-receive) functions can
+be used instead of [net-send-to](#net-send-to) and
+[net-receive-from](#net-receive-from).
+
+### Packet divert sockets and ports
+
+If *str-mode* is specified as `"divert"`, a divert socket can be created
+for a divert port in *int-port* on BSD like platforms. The content of IP
+address in *str-ip-addr* is ignored and can be specified as an empty
+string. Only the *int-port* is relevant and will be bound to the raw
+socket returned.
+
+To use the divert option in `net-listen`, newLISP must run in super-user
+mode. This option is only available on Unix like platforms.
+
+The divert socket will receive all raw packets diverted to the divert
+port. Packets may also be written back to a divert socket, in which case
+they re-enter OS kernel IP packet processing.
+
+Rules for packet diversion to the divert port must be defined using
+either the *ipfw* BSD or *ipchains* Linux configuration utilities.
+
+The [net-receive-from](#net-receive-from) and
+[net-send-to](#net-send-to) functions are used to read and write raw
+packets on the divert socket created and returned by the `net-listen`
+statement. The same address received by
+[net-receive-from](#net-receive-from) is used in the
+[net-send-to](#net-send-to) call when re-injecting the packet:
+
+    ; rules have been previously configured for a divert port
+    (set 'divertSocket (net-listen divertPort "" "divert"))
+
+    (until (net-error)
+        (set 'rlist (net-receive-from divertSocket maxBytes))
+        (set 'buffer (rlist 1))
+        ; buffer can be processed here before reinjecting
+        (net-send-to (rlist 0) divertPort buffer divertSocket)
+    )
+
+For more information see the Unix man pages for *divert* and the *ipfw*
+(BSDs) or *ipchains* (Linux) configuration utilities.
+
+

@@ -1,0 +1,48 @@
+Function: irr
+---------------------------------
+
+#### syntax: (irr *list-amounts* [*list-times* [*num-guess*]])
+
+Calculates the internal rate of return of a cash flow per time period.
+The internal rate of return is the interest rate that makes the present
+value of a cash flow equal to `0.0` (zero). In-flowing (negative values)
+and out-flowing (positive values) amounts are specified in
+*list-amounts*. If no time periods are specified in *list-times*,
+amounts in *list-amounts* correspond to consecutive time periods
+increasing by 1 (1, 2, 3—). The algorithm used is iterative, with an
+initial guess of 0.5 (50 percent). Optionally, a different initial guess
+can be specified. The algorithm returns when a precision of 0.000001
+(0.0001 percent) is reached. `nil` is returned if the algorithm cannot
+converge after 50 iterations.
+
+*irr* is often used to decide between different types of investments.
+
+    (irr '(-1000 500 400 300 200 100))  
+    → 0.2027
+
+    (npv 0.2027 '(500 400 300 200 100)) 
+    → 1000.033848 ; ~ 1000
+
+    (irr '(-1000 500 400 300 200 100) '(0 3 4 5 6 7)) 
+    → 0.0998
+
+    (irr '(-5000 -2000 5000 6000) '(0 3 12 18)) 
+    → 0.0321
+
+If an initial investment of 1,000 yields 500 after the first year, 400
+after two years, and so on, finally reaching `0.0` (zero) after five
+years, then that corresponds to a yearly return of about 20.2 percent.
+The next line demonstrates the relation between `irr` and [npv](#npv).
+Only 9.9 percent returns are necessary when making the first withdrawal
+after three years.
+
+In the last example, securities were initially purchased for 5,000, then
+for another 2,000 three months later. After a year, securities for 5,000
+are sold. Selling the remaining securities after 18 months renders
+6,000. The internal rate of return is 3.2 percent per month, or about 57
+percent in 18 months.
+
+See also the [fv](#fv), [nper](#nper), [npv](#npv), [pmt](#pmt), and
+[pv](#pv) functions.
+
+

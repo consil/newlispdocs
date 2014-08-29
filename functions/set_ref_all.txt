@@ -1,0 +1,52 @@
+Function: set-ref-all
+-----------------------------------------------------------
+
+#### syntax: (set-ref-all *exp-key* *list* *exp-replacement* [*func-compare*])
+
+Searches for *exp-key* in *list* and replaces each instance of the found
+element with *exp-replacement*. The *list* can be nested. The system
+variable `$it` contains the expression found and can be used in
+*exp-replacement*. The system variable `$count` contains the number of
+replacements made. The function returns the new modified *list*.
+
+    (set 'data '((monday (apples 20 30) (oranges 2 4 9)) (tuesday (apples 5) (oranges 32 1))))
+
+    (set-ref-all 'apples data "Apples")
+     → ((monday ("Apples" 20 30) (oranges 2 4 9)) (tuesday ("Apples" 5) (oranges 32 1)))
+
+    $count → 2
+
+Using the default functor in the `(list key)` pattern allows the list to
+be passed by reference to a user-defined function containing a
+`set-ref-all` statement. This would result in less memory usage and
+higher speeds in when doing replacements in large lists:
+
+    (set 'db:db '((monday (apples 20 30) (oranges 2 4 9)) (tuesday (apples 5) (oranges 32 1))))
+
+    (define (foo ctx)
+        (set-ref-all 'apples ctx "Apples")
+    )
+
+    (foo db) 
+     → ((monday ("Apples" 20 30) (oranges 2 4 9)) (tuesday ("Apples" 5) (oranges 32 1)))
+
+When evaluating `(foo db)`, the list in `db:db` will be passed by
+reference and `set-ref-all` will make the changes on the original, not
+on a copy of `db:db`.
+
+Like with [find](#find), [replace](#replace), [ref](#ref) and
+[ref-all](#ref-all), complex searches can be expressed using
+[match](#match) or [unify](#unify) in *func-compare*:
+
+    (set 'data '((monday (apples 20 30) (oranges 2 4 9)) (tuesday (apples 5) (oranges 32 1))))
+
+    (set-ref-all '(oranges *) data (list (first $it) (apply + (rest $it))) match)
+        → ( ... (oranges 15) ... (oranges 33) ... ) 
+
+The example sums all numbers found in records starting with the symbol
+`oranges`. The found items appear in `$it`
+
+See also [set-ref](#set-ref) which replaces only the first element
+found.
+
+

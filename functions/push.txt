@@ -1,0 +1,118 @@
+Function: push
+--------------------------------------------------------------------------
+
+#### syntax: (push *exp* *list* [*int-index-1* [*int-index-2* ... ]])\
+ syntax: (push *exp* *list* [*list-indexes*])\
+ syntax: (push *str-1* *str-2* [*int-index*])
+
+Inserts the value of *exp* into the list *list*. If *int-index* is
+present, the element is inserted at that index. If the index is absent,
+the element is inserted at index `0` (zero), the first element. `push`
+is a destructive operation that changes the contents of the target list.
+
+The list changed is returned as a reference on which other built-in
+functions can work. See also [Indexing elements of strings and
+lists](#indexing).
+
+If more than one *int-index* is present, the indices are used to access
+a nested list structure. Improper indices (those not matching list
+elements) are discarded.
+
+The second version takes a list of *list-indexes* but is otherwise
+identical to the first. In this way, `push` works easily together with
+[ref](#ref) and [ref-all](#ref-all), which return lists of indices.
+
+If *list* does not contain a list, *list* must contain a `nil` and will
+be initialized to the empty list.
+
+Repeatedly using `push` to the end of a list using `-1` as the
+*int-index* is optimized and as fast as pushing to the front of a list
+with no index at all. This can be used to efficiently grow a list.
+
+    ; inserting in front
+    (set 'pList '(b c))  → (b c)
+    (push 'a pList)      → (a b c)
+    pList                → (a b c)
+
+    ; insert at index
+    (push "hello" pList 2)  → (a b "hello" c)
+
+    ; optimized appending at the end
+    (push 'z pList -1)  → (a b "hello" c z)
+
+    ; inserting lists in lists
+    (push '(f g) pList)  → ((f g) a b "hello" c z)
+
+    ; inserting at negative index
+    (push 'x pList -3)  → ((f g) a b "hello" x c z)
+
+    ; using multiple indices
+    (push 'h pList 0 -1)  → ((f g h) a b "hello" x c z)
+
+    ; use indices in a list
+    (set 'pList '(a b (c d () e)))
+
+    (push 'x pList '(2 2 0))  → (a b (c d (x) e))
+
+    (ref 'x pList)   → (2 2 0)
+
+    (pop pList '(2 2 0))  → x
+
+    ; the target list is a place reference
+    (set 'lst '((a 1) (b 2) (c 3) (d)))
+
+    (push 4 (assoc 'd lst) -1) → (d 4)
+
+    lst → ((a 1) (b 2) (c 3) (d 4))
+
+
+    ; push on un-initialized symbol
+    aVar  → nil 
+
+    (push 999 aVar)  → (999)
+
+    aVar  → (999)
+
+`push` and pop can be combined to model a queue:
+
+    ; pop and push a as a queue
+    (set 'Q '(a b c d e))
+
+    (pop (push 'f Q -1)) → a
+    (pop (push 'g Q -1)) → b
+
+    Q →  (c d e f g)
+
+Because `push` returns a reference to the modified list, `pop` can work
+on it directly.
+
+In the third syntax `push` can be used to change strings. When
+*int-index* is used, it refers to character positions rather than byte
+positions. UTF-8 characters may be multi-byte characters.
+
+    ;; push on strings
+
+    (set 'str "abcdefg")
+
+    (push "hijk" str -1)  → "abcdefghijk"
+    str                   → "abcdefghijk"
+
+    (push "123" str)  → "123abcdefghijk"
+    (push "4" str 3)  → "1234abcdefghijk"
+
+    (set 'str "\u03b1\u03b2\u03b3")  →  "αβγ"
+
+    (push "*" str 1)  →  "α*βγ"
+
+    ;; push on a string reference
+
+    (set 'lst '("abc" "xyz"))
+
+    (push x (lst 0)) → "xabc"
+
+    lst → ("xabc" "xyz")
+
+See also the [pop](#pop) function, which is the inverse operation to
+`push`.
+
+

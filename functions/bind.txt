@@ -1,0 +1,47 @@
+Function: bind
+----------------------------------------------------
+
+#### syntax: (bind *list-variable-associations* [*bool-eval*])
+
+*list-variable-associations* contains an association list of symbols and
+their values. `bind` sets all symbols to their associated values.
+
+The associated values are evaluated if the *bool-eval* flag is `true`:
+
+    (set 'lst '((a (+ 3 4)) (b "hello")))
+
+    (bind lst)         → "hello"
+
+    a    → (+ 3 4)
+    b    → "hello"
+
+    (bind lst true)    → "hello"
+
+    a    → 7
+
+The return value of bind is the value of the last association.
+
+`bind` is often used to bind association lists returned by
+[unify](#unify).
+
+    (bind (unify '(p X Y a) '(p Y X X)))    → a
+
+    X    → a
+    Y    → a
+
+This can be used for de-structuring:
+
+    (set 'structure '((one "two") 3 (four (x y z))))
+    (set 'pattern '((A B) C (D E)))
+    (bind (unify pattern structure))
+
+    A → one
+    B → "two"
+    C → 3
+    D → four
+    E → (x y z)
+
+[unify](#unify) returns an association list and `bind` binds the
+associations.
+
+

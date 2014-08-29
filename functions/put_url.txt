@@ -1,0 +1,105 @@
+Function: put-url
+-------------------------------------
+
+#### syntax: (put-url *str-url* *str-content* [*str-option*] [*int-timeout* [*str-header*]])
+
+The HTTP PUT protocol is used to transfer information in *str-content*
+to a file specified in *str-url*. The lesser-known HTTP PUT mode is
+frequently used for transferring web pages from HTML editors to Web
+servers. In order to use PUT mode, the web server's software must be
+configured correctly. On the Apache web server, use the `'Script PUT'`
+directive in the section where directory access rights are configured.
+
+If *str-url* starts with `file://` then *str-content* is written to the
+local file system.
+
+Optionally, an *int-timeout* value can be specified in milliseconds as
+the last parameter. `put-url` will return `ERR:     timeout` when the
+host gives no response and the timeout expires. On other error
+conditions, `put-url` returns a string starting with `ERR:` and the
+description of the error.
+
+`put-url` requests are also understood by newLISP server nodes.
+
+    (put-url "http://asite.com/myFile.txt" "Hi there")
+    (put-url "http://asite.com/myFile.txt" "Hi there" 2000)
+
+    (put-url "http://asite.com/webpage.html" 
+        (read-file "webpage.html"))
+
+    ; write /home/joe/newfile.txt on the local file system
+    (puts-url "file:///home/joe/newfile.txt" "Hello World!")
+
+The first example creates a file called `myFile.txt` on the target
+server and stores the text string `'Hi there'` in it. In the second
+example, the local file `webpage.html` is transferred to `asite.com`.
+
+On an Apache web server, the following could be configured in
+`httpd.conf`.
+
+    <directory /www/htdocs>
+    Options All
+    Script PUT /cgi-bin/put.cgi
+    </directory>
+
+The script `put.cgi` would contain code to receive content from the web
+server via STDIN. The following is a working `put.cgi` written in
+newLISP for the Apache web server:
+
+    #!/usr/home/johndoe/bin/newlisp
+    #
+    #
+    # get PUT method data from CGI STDIN 
+    # and write data to a file specified
+    # int the PUT request
+    # 
+    #
+
+
+    (print "Content-Type: text/html\n\n")
+
+    (set 'cnt 0)
+    (set 'result "")
+
+    (if (= "PUT" (env "REQUEST_METHOD"))
+        (begin
+          (set 'len (int (env "CONTENT_LENGTH")))
+
+          (while (< cnt len)
+              (set 'n (read (device) buffer len))
+              (if (not n) 
+                (set 'cnt len) 
+                (begin 
+                  (inc cnt n)
+                  (write result buffer))))
+                  
+          (set 'path (append 
+                  "/usr/home/johndoe" 
+                  (env "PATH_TRANSLATED")))
+
+          (write-file path result)
+        )
+    )
+
+    (exit)
+
+Note that the script appends ".txt" to the path to avoid the CGI
+execution of uploaded malicious scripts. Note also that the two lines
+where the file path is composed may work differently in your web server
+environment. Check environment variables passed by your web server for
+composition of the right file path.
+
+`put-url` returns content returned by the `put.cgi` script.
+
+### Additional parameters
+
+In *str-option*, `"header"` or `"list"` can be specified for the
+returned page. If the *int-timeout* option is specified, the custom
+header option *str-header* can be specified, as well. See the function
+[get-url](#get-url) for details on both of these options.
+
+See also the functions [get-url](#get-url) and [post-url](#post-url),
+which can be used to upload files when formatting form data as
+`multipart/form-data`.
+
+

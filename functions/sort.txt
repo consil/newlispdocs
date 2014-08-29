@@ -1,0 +1,51 @@
+Function: sort
+----------------------------------------------------
+
+#### syntax: (sort *list* [*func-compare*])\
+ syntax: (sort *array* [*func-compare*])
+
+All members in *list* or *array* are sorted in ascending order. Anything
+may be sorted, regardless of the types. When members are themselves
+lists or arrays, each element is recursively compared. If two
+expressions of different types are compared, the lower type is sorted
+before the higher type in the following order:
+
+    Atoms: nil, true, integer or float, string, symbol, primitive
+    Lists: quoted expression, list, lambda, lambda-macro
+
+The `sort` is destructive, changing the order of the elements in the
+original list or array and returning the sorted list or array. It is a
+stable binary merge-sort with approximately *O(n log2 n)* performance
+preserving the order of adjacent elements which are equal. When
+*func-compare* is used it must work with either `<=` or `>=` operators
+to be stable.
+
+An optional comparison operator, user-defined function, or anonymous
+function can be supplied. The functor or operator can be given with or
+without a preceding quote.
+
+    (sort '(v f r t h n m j))     → (f h j m n r t v)
+    (sort '((3 4) (2 1) (1 10)))  → ((1 10) (2 1) (3 4))
+    (sort '((3 4) "hi" 2.8 8 b))  → (2.8 8 "hi" b (3 4))
+
+    (set 's '(k a l s))
+    (sort s)  → (a k l s)  
+
+    (sort '(v f r t h n m j) >) → (v t r n m j h f)
+
+    (sort s <)  → (a k l s)
+    (sort s >)  → (s l k a)  
+    s           → (s l k a)
+
+    ;; define a comparison function
+    (define (comp x y) 
+        (>= (last x) (last y)))
+        
+    (set 'db '((a 3) (g 2) (c 5)))
+
+    (sort db comp)  →  ((c 5) (a 3) (g 2))
+
+    ;; use an anonymous function
+    (sort db (fn (x y) (>= (last x) (last y))))
+
+

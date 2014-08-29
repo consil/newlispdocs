@@ -1,0 +1,28 @@
+Function: det
+---------------------------------
+
+#### syntax: (det *matrix* [*float-pivot*])
+
+Returns the determinant of a square matrix. A matrix can either be a
+nested list or an [array](#array).
+
+Optionally `0.0` or a very small value can be specified in
+*float-pivot*. This value substitutes pivot elements in the
+LU-decomposition algorithm, which result in zero when the algorithm
+deals with a singular matrix.
+
+    (set 'A '((-1 1 1) (1 4 -5) (1 -2 0)))
+    (det A)  → -1
+
+    ; treatment of singular matrices
+    (det '((2 -1) (4 -2)))        → nil
+    (det '((2 -1) (4 -2)) 0)      → -0
+    (det '((2 -1) (4 -2)) 1e-20)  → -4e-20
+
+If the matrix is singular and *float-pivot* is not specified, `nil` is
+returned.
+
+See also the other matrix operations [invert](#invert), [mat](#mat),
+[multiply](#multiply) and [transpose](#transpose).
+
+

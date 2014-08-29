@@ -1,0 +1,59 @@
+Function: set
+---------------------------------------------------
+
+#### syntax: (set *sym-1* *exp-1* [*sym-2* *exp-2* ... ])
+
+Evaluates both arguments and then assigns the result of *exp* to the
+symbol found in *sym*. The `set` expression returns the result of the
+assignment. The assignment is performed by copying the contents of the
+right side into the symbol. The old contents of the symbol are deleted.
+An error message results when trying to change the contents of the
+symbols `nil`, `true`, or a context symbol. `set` can take multiple
+argument pairs.
+
+    (set 'x 123)     → 123
+    (set 'x 'y)      → y
+    (set x "hello")  → "hello"
+
+    y  → "hello"
+
+    (set 'alist '(1 2 3))  → (1 2 3)
+
+
+    (set 'x 1 'y "hello")  → "hello"  ; multiple arguments
+
+    x  → 1
+    y  → "hello"
+
+The symbol for assignment could be the result from another newLISP
+expression:
+
+    (set 'lst '(x y z))  → (x y z)
+
+    (set (first lst) 123)  → 123
+
+    x  → 123
+
+Symbols can be set to lambda or lambda-macro expressions. This operation
+is equivalent to using [define](#define) or
+[define-macro](#define-macro).
+
+    (set 'double (lambda (x) (+ x x)))
+    → (lambda (x) (+ x x))
+
+is equivalent to:
+
+    (define (double x) (+ x x))
+    → (lambda (x) (+ x x))
+
+is equivalent to:
+
+    (define double (lambda (x) (+ x x)))
+    → (lambda (x) (+ x x))
+
+Use the [constant](#constant) function (which works like `set`) to
+protect the symbol from subsequent alteration. Using the [setq](#setq)
+or [setf](#setf) function eliminates the need to quote the variable
+symbol.
+
+

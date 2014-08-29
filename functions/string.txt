@@ -1,0 +1,32 @@
+Function: string
+------------------------------------
+
+#### syntax: (string *exp-1* [*exp-2* ... ])
+
+Translates into a string anything that results from evaluating *exp-1*—.
+If more than one expression is specified, the resulting strings are
+concatenated.
+
+    (string 'hello)          → "hello"
+    (string 1234)            → "1234"
+    (string '(+ 3 4))        → "(+ 3 4)"
+    (string (+ 3 4) 8)       → "78"
+    (string 'hello " " 123)  → "hello 123"
+
+If a buffer passed to `string` contains `\000`, only the string up to
+the first terminating zero will be copied:
+
+    (set 'buff "ABC\000\000\000")  → "ABC\000\000\000"
+
+    (length buff)  → 6
+
+    (string buff)  → "ABC"
+
+    (length (string buff))  → 3
+
+Use the [append](#append) and [join](#join) (allows the joining string
+to be specified) functions to concatenate strings containing zero bytes.
+Use the [source](#source) function to convert a lambda expression into
+its newLISP source string representation.
+
+

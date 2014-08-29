@@ -1,0 +1,23 @@
+Function: net-service
+-----------------------------------------
+
+#### syntax: (net-service *str-service* *str-protocol*)\
+ syntax: (net-service *int-port* *str-protocol*)
+
+In the first syntax `net-service` makes a lookup in the *services*
+database and returns the standard port number for this service.
+
+In the second syntax a service port is supplied in *int-port* to look up
+the service name.
+
+Returns `nil` on failure.
+
+    ; get the port number from the name
+    (net-service "ftp" "tcp")       → 21
+    (net-service "http" "tcp")      → 80
+    (net-service "net-eval" "tcp")  → 4711  ; if configured
+
+    ; get the service name from the port number
+    (net-service 22 "tcp")          → "ssh"
+
+

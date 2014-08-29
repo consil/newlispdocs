@@ -1,0 +1,38 @@
+Function: rotate
+------------------------------------------------------
+
+#### syntax: (rotate *list* [*int-count*])\
+ syntax: (rotate *str* [*int-count*])
+
+Rotates and returns the *list* or string in *str*. A count can be
+optionally specified in *int-count* to rotate more than one position. If
+*int-count* is positive, the rotation is to the right; if *int-count* is
+negative, the rotation is to the left. If no *int-count* is specified,
+`rotate` rotates 1 to the right. `rotate` is a destructive function that
+changes the contents of the original list or string.
+
+    (set 'l '(1 2 3 4 5 6 7 8 9))
+
+    (rotate l)    → (9 1 2 3 4 5 6 7 8)
+    (rotate l 2)  → (7 8 9 1 2 3 4 5 6)
+
+    l  → (7 8 9 1 2 3 4 5 6)
+
+    (rotate l -3)  → (1 2 3 4 5 6 7 8 9)
+
+    ; rotate a byte character string
+
+    (set 'str "newLISP")
+
+    (rotate str)     → "PnewLIS"
+    (rotate str 3)   → "LISPnew"
+    (rotate str -4)  → "newLISP"
+
+    ; rotate a multibyte character UTF-8 string on character boundaries
+
+    (join (rotate (explode "ΑΒΓΔΕΖΗΘ")))  → "ΘΑΒΓΔΕΖΗ"
+
+When working on a string, `rotate` works on byte boundaries rather than
+character boundaries.
+
+

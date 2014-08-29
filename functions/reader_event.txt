@@ -1,0 +1,38 @@
+Function: reader-event
+------------------------------------------
+
+#### syntax: (reader-event [*sym-event-handler | func-event-handler*])\
+ syntax: (reader-event 'nil)
+
+An event handler can be specified to hook between newLISP's reader,
+translation and evaluation process. The function specified in
+*sym-event-handler* or *func-event-handler* gets called after newLISP
+translates an expression and before evaluating it. The event handler can
+do transformation on the expression before it gets evaluated.
+
+Specifying a quoted `nil` for the event will disable it.
+
+The following one-liner `reader-event` could be used to enhance the
+interactive shell with a tracer:
+
+    >(reader-event (lambda (ex) (print " => " ex)))
+    $reader-event
+    > (+ 1 2 3)
+     => (+ 1 2 3)
+    6
+    >
+
+The expression intercepted passes through unchanged, but output is
+enhanced.
+
+The reader event function will be called after each reading of an
+s-expression by the [load](#load) or [eval-string](#eval-string)
+function.
+
+In versions previous to 10.5.8 `reader-event` was used to define a
+`macro` expansion function in the module file `macro.lsp`. Starting
+version 10.5.8, newLISP has [macro](#macro) as a built-in function
+behaving the same, but much faster when loading files and reading
+source.
+
+

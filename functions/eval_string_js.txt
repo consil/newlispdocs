@@ -1,0 +1,29 @@
+Function: eval-string-js_[JS](#JS)
+------------------------------------------------------
+
+#### syntax: (eval-string-js *str-JavaScript-source*)
+
+The function takes a program source in *str-JavaScript-source* and
+returns the result in a string.
+
+This function is only available on newLISP compiled to JavaScript.
+
+    (eval-string-js "window.prompt('Enter some text:', '')")
+
+    ; for single and double quotes inside a string passed to a
+    ; JavaScropt function, single and double quotes must be
+    ; preceded by a backslash \ and the whole string passed
+    ; to eval-string-js limited by [text], [/text] tags.
+
+    (eval-string-js [text]alert('A double quote: \" and a single quote: \' ')[/text])
+
+    (eval-string-js "6 * 7")
+
+The first expression will pop up a dialog box to enter text. The
+function will return the text string entered. The second expression will
+return the string `42`.
+
+See also the function [display-html](#display-html) for displaying an
+HTML page in the browser.
+
+

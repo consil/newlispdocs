@@ -1,0 +1,51 @@
+Function: eval
+----------------------------------
+
+#### syntax: (eval *exp*)
+
+*eval* evaluates the result of evaluating *exp* in the current variable
+environment.
+
+    (set 'expr '(+ 3 4))  → (+ 3 4)
+    (eval expr)           → 7
+    (eval (list + 3 4))   → 7
+    (eval ''x)            → x
+    (set 'y 123)          
+    (set 'x 'y)           
+    x            → y
+    (eval x)     → 123
+
+As usual, evaluation of variables happens in the current variable
+environment:
+
+    ; eval in global (top level) environment
+    (set 'x 3 'y 4)
+    (eval '(+ x y))          → 7
+
+    ; eval in local environment
+    (let ( (x 33) (y 44) ) 
+        (eval '(+ x y)))     → 77
+
+    ; old environment after leaving local let environment
+    (eval '(+ x y))          → 7
+
+newLISP passes all arguments by value. Using a quoted symbol,
+expressions can be passed by reference through the symbol. `eval` can be
+used to access the original contents of the symbol:
+
+    (define (change-list aList) (push 999 (eval aList)))
+
+    (set 'data '(1 2 3 4 5))
+
+    (change-list 'data)  → (999 1 2 3 4 5)
+
+In the example, the parameter `'data ` is quoted, so `push` can work on
+the original list.
+
+There is a safer method to pass arguments by reference in newLISP by
+enclosing the data inside context objects. See the chapter [Passing data
+by reference](#pass_big). Passing references into user defined function
+using namespace ids avoids *variable capture* of the passed symbol, in
+case the symbol passed is the same used as a parameter in the function.
+
+

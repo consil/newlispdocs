@@ -1,0 +1,71 @@
+Function: share
+-----------------------------------
+
+#### syntax: (share)\
+ syntax: (share *int-address-or-handle*)\
+ syntax: (share *int-address-or-handle* *exp-value*)\
+ syntax: (share *nil* *int-address*)
+
+Accesses shared memory for communicating between several newLISP
+processes. When called without arguments, `share` requests a page of
+shared memory from the operating system. This returns a memory address
+on Linux/Unix and a handle on Win32, which can then be assigned to a
+variable for later reference. This function is not available on OS/2.
+
+To set the contents of shared memory, use the third syntax of `share`.
+Supply a shared memory address on Linux/Unix or a handle on Win32 in
+*int-address-or-handle*, along with an integer, float, string expression
+or any other expression (since v.10.1.0) supplied in *exp-value*. Using
+this syntax, the value supplied in *exp-value* is also the return value.
+
+To access the contents of shared memory, use the second syntax of
+`share`, supplying only the shared memory address or handle. The return
+value will be any constant or expression (since v.10.1.0) written
+previously into the memory. If the memory has not been previously set to
+a value, `nil` will be returned.
+
+Only available on Unix-like operating systems, the last syntax unmaps a
+shared memory address. Note that using a shared address after unmapping
+it will crash the system.
+
+Memory can be shared between parent and child processes, but not between
+independent processes.
+
+Since v.10.1.0 size of share objects can exceed the shared memory
+pagesize of the operating system. For objects bigger than the pagesize,
+newLISP internally uses files for sharing. This requires a `/tmp`
+directory on Unix-like operating system and a `temp` directory in the
+root of the current disk drive on Win32 systems. On Unix-like systems
+this directory is present, on Win32 it may have to be created.
+
+    (set 'mem (share))
+
+    (share mem 123)  → 123
+    (share mem)      → 123
+
+    (share mem "hello world") → "hello world"
+    (share mem)               → "hello world"
+
+    (share mem true)  → true
+    (share mem)       → true
+
+    (share mem '(+ 1 2 3 4))  → (+ 1 2 3 4)
+    (share mem)               → (+ 1 2 3 4)
+
+    ; expressions received can be evaluated (since v.10.1.0)
+    (eval (share mem))        → 10 
+
+    (share nil mem)   → true  ; unmap only on Unix
+
+Expression read from shared memory and evaluated, will be evaluated in
+the recipient's process environment.
+
+Note that shared memory access between different processes should be
+synchronized using a [semaphore](#semaphore). Simultaneous access to
+shared memory can crash the running process.
+
+For a more comprehensive example of using shared memory in a multi
+process Linux/Unix application, see the file `example/prodcons.lsp` in
+the newLISP source distribution.
+
+

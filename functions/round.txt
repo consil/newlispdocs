@@ -1,0 +1,22 @@
+Function: round
+-----------------------------------
+
+#### syntax: (round *number* [*int-digits*])
+
+Rounds the number in *number* to the number of digits given in
+*int-digits*. When decimals are being rounded, *int-digits* is negative.
+It is positive when the integer part of a number is being rounded.
+
+If *int-digits* is omitted, the function rounds to `0` decimal digits.
+
+    (round 123.49 2)    → 100
+    (round 123.49 1)    → 120
+    (round 123.49 0)    → 123
+    (round 123.49)      → 123
+    (round 123.49 -1)   → 123.5
+    (round 123.49 -2)   → 123.49
+
+Note that rounding for display purposes is better accomplished using
+[format](#format).
+
+

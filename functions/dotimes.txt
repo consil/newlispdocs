@@ -1,0 +1,24 @@
+Function: dotimes
+-------------------------------------
+
+#### syntax: (dotimes (*sym-var* *int-count* [*exp-break*]) *body*)
+
+The expressions in *body* are evaluated *int* times. The variable in
+*sym* is set from 0 (zero) to (*int* - 1) each time before evaluating
+the body expression(s). The variable used as the loop index is local to
+the `dotimes` expression and behaves according the rules of dynamic
+scoping. The loop index is of integer type. `dotimes` returns the result
+of the last expression evaluated in *body*. After evaluation of the
+`dotimes` statement *sym* assumes its previous value.
+
+Optionally, a condition for early loop exit may be defined in
+*exp-break*. If the break expression evaluates to any non-`nil` value,
+the `dotimes` loop returns with the value of *exp-break*. The break
+condition is tested before evaluating *body*.
+
+    (dotimes (x 10)
+      (print x))  → 9  ; return value
+
+This prints `0123456789` to the console window.
+
+

@@ -1,0 +1,15 @@
+Function: sub
+---------------------------------
+
+#### syntax: (sub *num-1* [*num-2* ... ])
+
+Successively subtracts the expressions in *num-1*, *num-2*—. `sub`
+performs mixed-type arithmetic and handles integers or floating points,
+but it will always return a floating point number. If only one argument
+is supplied, its sign is reversed. Any floating point calculation with
+`NaN` also returns `NaN`.
+
+    (sub 10 8 0.25)  → 1.75
+    (sub 123)        → -123
+
+

@@ -1,0 +1,30 @@
+Function: ostype
+------------------------------------
+
+#### syntax: ostype
+
+`ostype` is a built-in system constant containing the name of the
+operating system newLISP is running on.
+
+    ostype  → "Win32"
+
+One of the following strings is returned:
+`"Linux", "BSD", "OSX", "Tru64Unix", "Solaris", "SunOS", "Win32", "Cygwin", or "OS/2"`.
+
+`ostype` can be used to write platform-independent code:
+
+    (if 
+        (= ostype "Linux") (import "libz.so")
+        (= ostype "BSD") (import "libz.so")
+        (= ostype "OSX") (import "libz.dylib")
+        ...
+        (println "cannot import libz on this platform")
+    )
+
+Use [sys-info](#sys-info) to learn more about the current flavor of
+newLISP running.
+
+For a table of other built-in system variables and symbols see the
+chapter [System Symbols and Constants](#system_symbols) in the appendix.
+
+

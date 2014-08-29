@@ -1,0 +1,37 @@
+Function: filter
+------------------------------------
+
+#### syntax: (filter *exp-predicate* *exp-list*)
+
+The predicate *exp-predicate* is applied to each element of the list
+*exp-list*. A list is returned containing the elements for which
+*exp-predicate* is true. `filter` works like [clean](#clean), but with a
+negated predicate.
+
+    (filter symbol? '(1 2 d 4 f g 5 h))  → (d f g h)
+
+    (define (big? x) (> x 5))  → (lambda (x) (> x 5))
+
+    (filter big? '(1 10 3 6 4 5 11))  → (10 6 11)
+
+    ; filter with comparison functor
+    (set 'L '((a 10 2 7) (b 5) (a 8 3) (c 8) (a 9)))
+
+    (filter (curry match '(a *)) L)   → ((a 10 2 7) (a 8 3) (a 9))
+
+    (filter (curry match '(? ?)) L)   → ((b 5) (c 8) (a 9))
+
+    (filter (curry match '(* 8 *)) L) → ((a 8 3) (c 8))
+
+The predicate may be a built-in predicate, a user-defined function, or a
+lambda expression.
+
+For filtering a list of elements with the elements from another list,
+use the [difference](#difference) function or [intersect](#intersect)
+(with the *list* option).
+
+See also the related function [index](#index), which returns the indices
+of the filtered elements and [clean](#clean), which returns all elements
+of a list for which a predicate is false.
+
+

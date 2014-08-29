@@ -1,0 +1,32 @@
+Function: net-interface
+-------------------------------------------
+
+#### syntax: (net-interface *str-ip-addr*)\
+ syntax: (net-interface)
+
+Sets the default local interface address to be used for network
+connections. If not set then network functions will default to an
+internal default address, except when overwritten by an optional
+interface address given in [net-listen](#net-listen).
+
+When no *str-ip-addr* is specified, the current default is returned. If
+the `net-interface` has not been used yet to specify an IP address, the
+address `0.0.0.0` is returned. This means that all network routines will
+use the default address preconfigured by the underlying operating
+system.
+
+This function has only usage on multihomed servers with either multiple
+network interface hardware or otherwise supplied multiple IP numbers. On
+all other machines network functions will automatically select the
+single network interface installed.
+
+On error the function returns `nil` and [net-error](#net-error) can be
+used to report the error.
+
+    (net-interface "192.168.1.95")  → "192.168.1.95"
+    (net-interface "localhost")     → "127.0.0.1"
+
+An interface address can be defined as either an IP address or a name.
+The return value is the address given in *str-ip-addr*
+
+

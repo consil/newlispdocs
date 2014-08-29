@@ -1,0 +1,22 @@
+Function: global
+------------------------------------
+
+#### syntax: (global *sym-1* [*sym-2* ... ])
+
+One or more symbols in *sym-1* [*sym-2* ... ] can be made globally
+accessible from contexts other than MAIN. The statement has to be
+executed in the MAIN context, and only symbols belonging to MAIN can be
+made global. `global` returns the last symbol made global.
+
+    (global 'aVar 'x 'y 'z)  → z
+
+    (define (foo x) 
+    (…))
+
+    (constant (global 'foo))
+
+The second example shows how [constant](#constant) and `global` can be
+combined into one statement, protecting and making a previous function
+definition global.
+
+

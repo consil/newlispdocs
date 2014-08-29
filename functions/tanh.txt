@@ -1,0 +1,14 @@
+Function: tanh
+----------------------------------
+
+#### syntax: (tanh *num-radians*)
+
+Calculates the hyperbolic tangent of *num-radians*. The hyperbolic
+tangent is defined mathematically as: *sinh (x) / cosh (x)*.
+
+    (tanh 1)     → 0.761594156
+    (tanh 10)    → 0.9999999959
+    (tanh 1000)  → 1
+    (= (tanh 1) (div (sinh 1) (cosh 1)))  → true
+
+

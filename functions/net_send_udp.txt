@@ -1,0 +1,43 @@
+Function: net-send-udp
+------------------------------------------
+
+#### syntax: (net-send-udp *str-remotehost* *int-remoteport* *str-buffer* [*bool*])
+
+Sends a User Datagram Protocol (UDP) to the host specified in
+*str-remotehost* and to the port in *int-remoteport*. The data sent is
+in *str-buffer*.
+
+The theoretical maximum data size of a UDP packet on an IPv4 system is
+64K minus IP layer overhead, but much smaller on most Unix flavors. 8k
+seems to be a safe size on Mac OS X, BSDs and Linux.
+
+No previous setup using `net-connect` or `net-listen` is necessary.
+`net-send-udp` returns immediately with the number of bytes sent and
+closes the socket used. If no `net-receive-udp` statement is waiting at
+the receiving side, the datagram sent is lost. When using datagram
+communications over insecure connections, setting up a simple protocol
+between sender and receiver is recommended for ensuring delivery. UDP
+communication by itself does not guarantee reliable delivery as TCP/IP
+does.
+
+    (net-send-udp "somehost.com" 3333 "Hello")  → 5
+
+`net-send-udp` is also suitable for sending binary information (e.g.,
+the zero character or other non-visible bytes). For a more comprehensive
+example, see [net-receive-udp](#net-receive-udp).
+
+Optionally, the sending socket can be put in broadcast mode by
+specifying `true` or any expression not evaluating to `nil` in *bool*:
+
+    (net-send-udp "192.168.1.255" 2000 "Hello" true)  → 5
+
+The UDP will be sent to all nodes on the `192.168.1` network. Note that
+on some operating systems, sending the network mask `255` without the
+*bool* `true` option will enable broadcast mode.
+
+As an alternative, the [net-connect](#net-connect) function using the
+`"udp"` option—together with the [net-send-to](#net-send-to)
+function—can be used to talk to a UDP listener in a non-blocking
+fashion.
+
+

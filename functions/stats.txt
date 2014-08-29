@@ -1,0 +1,46 @@
+Function: stats
+-----------------------------------
+
+#### syntax: (stats *list-vector*)
+
+The functions calculates statistical values of central tendency and
+distribution moments of values in *list-vector*. The following values
+are returned by `stats` in a list:
+
+  name    description
+  ------- ------------------------------------------
+  N       Number of values
+  mean    Mean of values
+  avdev   Average deviation from mean value
+  sdev    Standard deviation (population estimate)
+  var     Variance (population estimate)
+  skew    Skew of distribution
+  kurt    Kurtosis of distribution
+
+
+The following example uses the list output from the `stats` expression
+as an argument for the [format](#format) statement:
+
+    (set 'data '(90 100 130 150 180 200 220 300 350 400))
+
+    (println (format [text]
+        N        = %5d
+        mean     = %8.2f
+        avdev    = %8.2f
+        sdev     = %8.2f
+        var      = %8.2f
+        skew     = %8.2f
+        kurt     = %8.2f
+    [/text] (stats data)))
+
+    ; outputs the following
+
+        N        =    10
+        mean     =   212.00
+        avdev    =    84.40
+        sdev     =   106.12
+        var      = 11262.22
+        skew     =     0.49
+        kurtosis =    -1.34
+
+

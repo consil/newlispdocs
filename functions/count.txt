@@ -1,0 +1,23 @@
+Function: count
+-----------------------------------
+
+#### syntax: (count *list-1* *list-2*)
+
+Counts elements of *list-1* in *list-2* and returns a list of those
+counts.
+
+    (count '(1 2 3) '(3 2 1 4 2 3 1 1 2 2))  → (3 4 2)
+    (count '(z a) '(z d z b a z y a))        → (3 2)
+
+    (set 'lst (explode (read-file "myFile.txt")))
+    (set 'letter-counts (count (unique lst) lst))
+
+The second example counts all occurrences of different letters in
+`myFile.txt`.
+
+The first list in `count`, which specifies the items to be counted in
+the second list, should be unique. For items that are not unique, only
+the first instance will carry a count; all other instances will display
+`0` (zero).
+
+

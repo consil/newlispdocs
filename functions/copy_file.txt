@@ -1,0 +1,12 @@
+Function: copy-file
+---------------------------------------
+
+#### syntax: (copy-file *str-from-name* *str-to-name*)
+
+Copies a file from a path-filename given in *str-from-name* to a
+path-filename given in *str-to-name*. Returns `true` if the copy was
+successful or `nil`, if the copy was unsuccessful.
+
+    (copy-file "/home/me/newlisp/data.lsp" "/tmp/data.lsp")
+
+

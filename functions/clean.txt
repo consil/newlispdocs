@@ -1,0 +1,36 @@
+Function: clean
+-----------------------------------
+
+#### syntax: (clean *exp-predicate* *list*)
+
+The predicate *exp-predicate* is applied to each element of *list*. In
+the returned list, all elements for which *exp-predicate* is `true` are
+eliminated.
+
+`clean` works like [filter](#filter) with a negated predicate.
+
+    (clean symbol? '(1 2 d 4 f g 5 h))   → (1 2 4 5)
+
+    (filter symbol? '(1 2 d 4 f g 5 h))  → (d f g h)
+
+    (define (big? x) (> x 5))        → (lambda (x) (> x 5))
+
+    (clean big? '(1 10 3 6 4 5 11))  → (1 3 4 5)
+
+    (clean <= '(3 4 -6 0 2 -3 0))  → (3 4 2)
+
+    (clean (curry match '(a *)) '((a 10) (b 5) (a 3) (c 8) (a 9)))
+    →  ((b 5) (c 8))
+
+The predicate may be a built-in predicate or a user-defined function or
+lambda expression.
+
+For cleaning numbers from one list using numbers from another, use
+[difference](#difference) or [intersect](#intersect) (with the list mode
+option).
+
+See also the related function [index](#index), which returns the indices
+of the remaining elements, and [filter](#filter), which returns all
+elements for which a predicate returns true.
+
+

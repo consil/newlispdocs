@@ -1,0 +1,48 @@
+Function: append
+------------------------------------
+
+#### syntax: (append *list-1* [*list-2* ... ])\
+ syntax: (append *array-1* [*array-2* ... ])\
+ syntax: (append *str-1* [*str-2* ... ])
+
+In the first form, `append` works with lists, appending *list-1* through
+*list-n* to form a new list. The original lists are left unchanged.
+
+    (append '(1 2 3) '(4 5 6) '(a b))  → (1 2 3 4 5 6 a b)
+
+    (set 'aList '("hello" "world"))    → ("hello" "world")
+
+    (append aList '("here" "I am"))    → ("hello" "world" "here" "I am")
+
+In the second form `append` works on arrays:
+
+    (set 'A (array 3 2 (sequence 1 6)))
+    → ((1 2) (3 4) (5 6))
+    (set 'B (array 2 2 (sequence 7 10)))
+    → ((7 8) (9 10))
+
+    (append A B)
+    → ((1 2) (3 4) (5 6) (7 8) (9 10))
+
+    (append B B B)
+    → ((7 8) (9 10) (7 8) (9 10) (7 8) (9 10))
+
+In the third form, `append` works on strings. The strings in *str-n* are
+concatenated into a new string and returned.
+
+    (set 'more " how are you")       → " how are you"
+
+    (append "Hello " "world," more)  → "Hello world, how are you"
+
+`append` is also suitable for processing binary strings containing
+zeroes. The [string](#string) function would cut off strings at zero
+bytes.
+
+Linkage characters or strings can be specified using the [join](#join)
+function. Use the [string](#string) function to convert arguments to
+strings and append in one step.
+
+Use the functions [extend](#extend) and [push](#push) to append to an
+existing list or string modifying the target.
+
+

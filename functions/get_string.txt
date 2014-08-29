@@ -1,0 +1,48 @@
+Function: get-string
+----------------------------------------
+
+#### syntax: (get-string *int-address*)
+
+Gets a character string from the address specified in *int-address*.
+This function is helpful when using imported shared library functions
+with [import](#import).
+
+    char * foo(void)
+    {
+    char * result;
+    result = "ABCDEFG";
+    return(result);
+    }
+
+Consider the above C function from a shared library, which returns a
+character pointer (address to a string).
+
+    (import "mylib.so" "foo")
+    (print (get-string (foo)))  → "ABCDEFG"
+
+When a string is passed as an argument, `get-string` will take its
+address as the argument. Because `get-string` always breaks off at the
+first first `\000` (null character) it encounters, it can be used to
+retrieve a string from a buffer:
+
+    (set 'buff "ABC\000\000\000DEF")  → "ABC\000\000\000DEF"
+
+    (length buff)  → 9
+
+    (get-string buff)  → "ABC"
+
+    (length (get-string buff))  → 3
+
+    ; get a string from offset into a buffer
+    (get-string (+ (address buff) 6)) → "DEF"
+
+    ; use unpack to get the whole buffer
+    (unpack "s9" buff)  → ("ABC\000\000\000DEF")
+
+See also the [get-char](#get-char), [get-int](#get-int),
+[get-float](#get-float), [pack](#pack), and [unpack](#unpack) functions.
+
+Note that `get-string` can crash the system or make it unstable if the
+wrong address is specified.
+
+

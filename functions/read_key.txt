@@ -1,0 +1,29 @@
+Function: read-key
+--------------------------------------
+
+#### syntax: (read-key)
+
+Reads a key from the keyboard and returns an integer value. For
+navigation keys, more than one `read-key` call must be made. For keys
+representing ASCII characters, the return value is the same on all OSes,
+except for navigation keys and other control sequences like function
+keys, in which case the return values may vary on different OSes and
+configurations.
+
+    (read-key)  → 97  ; after hitting the A key
+    (read-key)  → 65  ; after hitting the shifted A key
+    (read-key)  → 10  ; after hitting [enter] on Linux
+    (read-key)  → 13  ; after hitting [enter] on Win32
+
+    (while (!= (set 'c (read-key)) 1) (println c))
+
+The last example can be used to check return sequences from navigation
+and function keys. To break out of the loop, press `Ctrl-A`.
+
+Note that `read-key` will only work when newLISP is running in a Unix
+shell or Win32 command shell. It will not work in the Java based
+newLISP-GS or Tcl/Tk based newLISP-Tk frontend. It will also not work
+when executed by newLISP Unix shared library or newLISP Win32 DLL
+(Dynamic Link Library).
+
+
